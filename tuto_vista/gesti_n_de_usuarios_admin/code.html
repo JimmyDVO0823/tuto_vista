@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#735c00",
+                        "on-primary-fixed": "#001b3c",
+                        "on-tertiary-container": "#4e3d00",
+                        "surface-container-high": "#e6e8ea",
+                        "background": "#f7f9fb",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#d6e3ff",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#74777f",
+                        "secondary-fixed": "#d3e4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "on-primary-container": "#86a0cd",
+                        "on-secondary-fixed": "#001c38",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary-container": "#cba72f",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffe088",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "primary-fixed-dim": "#adc7f7",
+                        "on-surface-variant": "#43474e",
+                        "surface-bright": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "surface-tint": "#455f88",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#00477f",
+                        "surface": "#f7f9fb",
+                        "inverse-primary": "#adc7f7",
+                        "outline-variant": "#c4c6cf",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "surface-dim": "#d8dadc",
+                        "primary-container": "#1a365d",
+                        "primary": "#002045",
+                        "secondary-container": "#7db6ff",
+                        "secondary-fixed-dim": "#a2c9ff",
+                        "secondary": "#1960a3",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#004881",
+                        "on-tertiary-fixed": "#241a00",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#574500"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar (Authority: JSON Mapping) -->
+<aside class="bg-[#f2f4f6] dark:bg-[#1c1c1c] text-[#002045] dark:text-[#f2f4f6] h-screen w-64 fixed left-0 top-0 flex flex-col py-8 z-40">
+<div class="px-8 mb-12">
+<h1 class="text-lg font-black tracking-widest uppercase">THE ACADEMIC EDITORIAL</h1>
+</div>
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a professional academic administrator in a modern office setting, soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrSP4LGMJdHLIyWQ4pPZ1nVGJz7eLVKZNqyjGS1aDSOAMxgyb3fhylS5g9tS7MtJoY2_5fIKd3RLd2f8TWyXX4SPsMFdYwSxupFvrMvNdsqDy2CkJlMAP5kgvGVI6oxKCFdTP3rm2L9CvhF2sOiUccjpindQmK32vAx-eaWlG7Q2vrsgTpXSrgPskPiSXMyZ9uwxxVh5QiIOFMEoBwrI05Sanx9cNlfWTH-Jw1m4JyvHTdHovswQBb5envoc_bsvKcto9xbHdDmmP5"/>
+</div>
+<div>
+<p class="text-sm font-bold">Julian Reed</p>
+<p class="text-[0.65rem] uppercase tracking-wider opacity-60">Honors Scholar</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 text-[#191c1e]/70 dark:text-gray-400 px-8 py-3 hover:bg-[#e6e8ea] dark:hover:bg-[#333] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 text-[#191c1e]/70 dark:text-gray-400 px-8 py-3 hover:bg-[#e6e8ea] dark:hover:bg-[#333] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-medium">My Sessions</span>
+</a>
+<a class="flex items-center gap-3 text-[#191c1e]/70 dark:text-gray-400 px-8 py-3 hover:bg-[#e6e8ea] dark:hover:bg-[#333] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-medium">Assignments</span>
+</a>
+<a class="flex items-center gap-3 text-[#191c1e]/70 dark:text-gray-400 px-8 py-3 hover:bg-[#e6e8ea] dark:hover:bg-[#333] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span class="font-medium">Messages</span>
+</a>
+<a class="flex items-center gap-3 bg-white dark:bg-[#2c2c2c] text-[#002045] dark:text-[#cba72f] font-semibold rounded-l-full ml-4 pl-4 py-3 scale 0.98 transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-6">
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-md text-sm font-bold shadow-sm hover:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                Book New Session
+            </button>
+</div>
+<div class="mt-auto border-t border-outline-variant/10 pt-4">
+<a class="flex items-center gap-3 text-[#191c1e]/70 dark:text-gray-400 px-8 py-3 hover:bg-[#e6e8ea] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-medium">Support</span>
+</a>
+<a class="flex items-center gap-3 text-[#191c1e]/70 dark:text-gray-400 px-8 py-3 hover:bg-[#e6e8ea] transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-medium">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- TopAppBar (Authority: JSON Mapping) -->
+<header class="bg-[#f7f9fb]/80 dark:bg-[#191c1e]/80 backdrop-blur-md text-[#002045] dark:text-[#f2f4f6] docked full-width top-0 sticky z-50 shadow-sm dark:shadow-none flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-[#002045] dark:text-[#f7f9fb]">Administración de Usuarios</span>
+<div class="hidden md:flex gap-6">
+<a class="text-[#191c1e]/60 dark:text-[#f7f9fb]/60 hover:text-[#002045] transition-colors text-sm font-medium" href="#">Find Tutors</a>
+<a class="text-[#191c1e]/60 dark:text-[#f7f9fb]/60 hover:text-[#002045] transition-colors text-sm font-medium" href="#">Library</a>
+<a class="text-[#191c1e]/60 dark:text-[#f7f9fb]/60 hover:text-[#002045] transition-colors text-sm font-medium" href="#">Resources</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low rounded-md border-none focus:ring-2 focus:ring-primary text-sm w-64 transition-all focus:w-80" placeholder="Buscar por nombre o correo..." type="text"/>
+</div>
+<button class="text-sm font-bold bg-primary text-white px-6 py-2 rounded-md hover:scale-[0.98] transition-transform">Apply to Tutor</button>
+</div>
+</header>
+<section class="p-8 space-y-8 flex-1">
+<!-- Header Editorial Style -->
+<div class="flex justify-between items-end">
+<div class="max-w-2xl">
+<p class="text-[0.75rem] uppercase tracking-[0.05em] font-medium text-tertiary mb-2">Panel de Control</p>
+<h2 class="text-4xl font-extrabold text-primary leading-tight">Gestión del <br/>Ecosistema Educativo</h2>
+</div>
+<div class="flex gap-3">
+<div class="bg-surface-container-low p-1 rounded-md flex">
+<button class="px-4 py-1.5 bg-white shadow-sm rounded text-xs font-bold text-primary">Todos</button>
+<button class="px-4 py-1.5 hover:bg-surface-container-high rounded text-xs font-medium text-on-surface-variant">Estudiantes</button>
+<button class="px-4 py-1.5 hover:bg-surface-container-high rounded text-xs font-medium text-on-surface-variant">Tutores</button>
+</div>
+</div>
+</div>
+<!-- Bento Stats Grid (Custom Academic Component) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-[8px_8px_40px_rgba(25,28,30,0.04)] border border-outline-variant/10">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant opacity-60 mb-2">Total Usuarios</p>
+<p class="text-3xl font-black text-primary">2,842</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-[8px_8px_40px_rgba(25,28,30,0.04)] border border-outline-variant/10">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant opacity-60 mb-2">Tutores Activos</p>
+<p class="text-3xl font-black text-primary">158</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-[8px_8px_40px_rgba(25,28,30,0.04)] border border-outline-variant/10">
+<p class="text-xs font-bold uppercase tracking-widest text-on-surface-variant opacity-60 mb-2">Nuevas Solicitudes</p>
+<p class="text-3xl font-black text-tertiary">12</p>
+</div>
+<div class="bg-primary p-6 rounded-lg shadow-lg relative overflow-hidden group">
+<div class="relative z-10">
+<p class="text-xs font-bold uppercase tracking-widest text-white/70 mb-2">Tasa de Retención</p>
+<p class="text-3xl font-black text-white">94.2%</p>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">insights</span>
+</div>
+</div>
+</div>
+<!-- Main Data Table Container -->
+<div class="bg-surface-container-lowest rounded-lg shadow-[8px_8px_40px_rgba(25,28,30,0.04)] overflow-hidden">
+<div class="p-6 flex items-center justify-between border-b border-outline-variant/10">
+<h3 class="text-lg font-bold text-primary">Directorio Académico</h3>
+<div class="flex items-center gap-4">
+<select class="bg-surface-container-low border-none text-xs font-semibold rounded-md py-2 px-4 focus:ring-primary cursor-pointer">
+<option>Estado: Todos</option>
+<option>Activos</option>
+<option>Bloqueados</option>
+</select>
+<button class="flex items-center gap-2 bg-tertiary-container text-on-tertiary-container px-4 py-2 rounded-md text-xs font-bold hover:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined text-sm">download</span>
+                            Exportar CSV
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high">
+<tr>
+<th class="px-6 py-4 text-[0.65rem] uppercase tracking-widest font-bold text-on-surface-variant">ID</th>
+<th class="px-6 py-4 text-[0.65rem] uppercase tracking-widest font-bold text-on-surface-variant">Usuario</th>
+<th class="px-6 py-4 text-[0.65rem] uppercase tracking-widest font-bold text-on-surface-variant">Rol</th>
+<th class="px-6 py-4 text-[0.65rem] uppercase tracking-widest font-bold text-on-surface-variant">Estado</th>
+<th class="px-6 py-4 text-[0.65rem] uppercase tracking-widest font-bold text-on-surface-variant text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-secondary-fixed-dim/20 transition-colors group">
+<td class="px-6 py-4 text-sm font-mono text-on-surface-variant">#AE-2091</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">EM</div>
+<div>
+<p class="text-sm font-bold text-primary">Elena Martínez</p>
+<p class="text-xs text-on-surface-variant opacity-60">elena.mtz@editorial.edu</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-surface-container-low rounded-full text-[10px] font-bold uppercase text-primary">Tutor</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-medium text-on-surface-variant">Activo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant" title="Cambiar Contraseña">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Bloquear Usuario">
+<span class="material-symbols-outlined text-lg">block</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Eliminar">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-surface-container-low/30 hover:bg-secondary-fixed-dim/20 transition-colors group">
+<td class="px-6 py-4 text-sm font-mono text-on-surface-variant">#AE-2092</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary font-bold">CR</div>
+<div>
+<p class="text-sm font-bold text-primary">Carlos Ruiz</p>
+<p class="text-xs text-on-surface-variant opacity-60">c.ruiz98@campus.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-surface-container-low rounded-full text-[10px] font-bold uppercase text-on-surface-variant">Estudiante</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="text-xs font-medium text-on-surface-variant">Bloqueado</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant" title="Cambiar Contraseña">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-primary-container hover:text-primary-fixed rounded-full text-on-surface-variant" title="Desbloquear">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Eliminar">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-secondary-fixed-dim/20 transition-colors group">
+<td class="px-6 py-4 text-sm font-mono text-on-surface-variant">#AE-2095</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-bold">SA</div>
+<div>
+<p class="text-sm font-bold text-primary">Sofía Alarcón</p>
+<p class="text-xs text-on-surface-variant opacity-60">sofia.tutora@editorial.edu</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-surface-container-low rounded-full text-[10px] font-bold uppercase text-primary">Tutor</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-medium text-on-surface-variant">Activo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant" title="Cambiar Contraseña">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Bloquear Usuario">
+<span class="material-symbols-outlined text-lg">block</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Eliminar">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="bg-surface-container-low/30 hover:bg-secondary-fixed-dim/20 transition-colors group">
+<td class="px-6 py-4 text-sm font-mono text-on-surface-variant">#AE-2101</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-outline-variant flex items-center justify-center text-on-surface font-bold">JP</div>
+<div>
+<p class="text-sm font-bold text-primary">Juan Pérez</p>
+<p class="text-xs text-on-surface-variant opacity-60">j.perez@estudiante.es</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-surface-container-low rounded-full text-[10px] font-bold uppercase text-on-surface-variant">Estudiante</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-medium text-on-surface-variant">Activo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant" title="Cambiar Contraseña">
+<span class="material-symbols-outlined text-lg">lock_reset</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Bloquear Usuario">
+<span class="material-symbols-outlined text-lg">block</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-error rounded-full text-on-surface-variant" title="Eliminar">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination -->
+<div class="p-6 bg-surface-container-low border-t border-outline-variant/10 flex items-center justify-between">
+<p class="text-xs font-medium text-on-surface-variant opacity-60">Mostrando 1 a 10 de 2,842 usuarios</p>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-high rounded-md disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary text-white rounded text-xs font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-high rounded text-xs font-medium">2</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-high rounded text-xs font-medium">3</button>
+<span class="px-2 opacity-40">...</span>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-high rounded text-xs font-medium">285</button>
+<button class="p-2 hover:bg-surface-container-high rounded-md">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer (Authority: JSON Mapping) -->
+<footer class="bg-[#f7f9fb] dark:bg-[#191c1e] w-full py-12 border-t border-[#e6e8ea]/20">
+<div class="max-w-7xl mx-auto px-8 flex justify-between items-center">
+<p class="text-[0.75rem] uppercase tracking-[0.05em] font-medium Inter text-gray-500">
+                    © 2024 The Academic Editorial. All rights reserved.
+                </p>
+<div class="flex gap-8">
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium Inter text-gray-500 hover:text-[#002045] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium Inter text-gray-500 hover:text-[#002045] transition-colors" href="#">Terms of Service</a>
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium Inter text-gray-500 hover:text-[#002045] transition-colors" href="#">Accessibility</a>
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium Inter text-gray-500 hover:text-[#002045] transition-colors" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

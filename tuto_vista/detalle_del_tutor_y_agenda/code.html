@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tutor Profile - The Academic Editorial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "tertiary": "#735c00",
+                "on-primary-fixed": "#001b3c",
+                "on-tertiary-container": "#4e3d00",
+                "surface-container-high": "#e6e8ea",
+                "background": "#f7f9fb",
+                "error": "#ba1a1a",
+                "primary-fixed": "#d6e3ff",
+                "error-container": "#ffdad6",
+                "on-error": "#ffffff",
+                "surface-variant": "#e0e3e5",
+                "outline": "#74777f",
+                "secondary-fixed": "#d3e4ff",
+                "surface-container-lowest": "#ffffff",
+                "surface-container": "#eceef0",
+                "on-primary-container": "#86a0cd",
+                "on-secondary-fixed": "#001c38",
+                "inverse-on-surface": "#eff1f3",
+                "surface-container-low": "#f2f4f6",
+                "tertiary-container": "#cba72f",
+                "on-primary": "#ffffff",
+                "tertiary-fixed": "#ffe088",
+                "on-primary-fixed-variant": "#2d476f",
+                "primary-fixed-dim": "#adc7f7",
+                "on-surface-variant": "#43474e",
+                "surface-bright": "#f7f9fb",
+                "on-background": "#191c1e",
+                "surface-tint": "#455f88",
+                "on-secondary": "#ffffff",
+                "on-surface": "#191c1e",
+                "on-error-container": "#93000a",
+                "on-secondary-container": "#00477f",
+                "surface": "#f7f9fb",
+                "inverse-primary": "#adc7f7",
+                "outline-variant": "#c4c6cf",
+                "tertiary-fixed-dim": "#e9c349",
+                "surface-dim": "#d8dadc",
+                "primary-container": "#1a365d",
+                "primary": "#002045",
+                "secondary-container": "#7db6ff",
+                "secondary-fixed-dim": "#a2c9ff",
+                "secondary": "#1960a3",
+                "inverse-surface": "#2d3133",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed-variant": "#004881",
+                "on-tertiary-fixed": "#241a00",
+                "surface-container-highest": "#e0e3e5",
+                "on-tertiary-fixed-variant": "#574500"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "1rem",
+                "xl": "1.25rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .signature-gradient {
+        background: linear-gradient(135deg, #002045 0%, #1a365d 100%);
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="bg-[#f7f9fb]/80 backdrop-blur-md text-[#002045] docked full-width top-0 sticky z-50 shadow-sm flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-[#002045]">The Academic Editorial</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-[#002045] font-bold border-b-2 border-[#002045] pb-1 transition-colors" href="#">Find Tutors</a>
+<a class="text-[#191c1e]/60 hover:text-[#002045] transition-colors" href="#">Library</a>
+<a class="text-[#191c1e]/60 hover:text-[#002045] transition-colors" href="#">Resources</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 text-[#002045] font-semibold hover:scale-95 transition-transform">Sign In</button>
+<button class="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-95 transition-transform shadow-lg">Apply to Tutor</button>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-12 lg:py-20">
+<!-- Profile Header Section: Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-24">
+<!-- Left: Large Profile Photo & Stats -->
+<div class="lg:col-span-5 relative">
+<div class="aspect-[4/5] rounded-xl overflow-hidden bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="professional academic tutor portrait in a brightly lit modern library environment, wearing smart casual attire, warm approachable expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopCHV2ZDx_Q50c6ss_dSttliSlWxRcuB3j78PD9jMgssnjdTqzDV5CmU5gsB__J2pCebxMFmzm7tSuGy8ZZb9rW5zhG6NGzkOyqgsxr91Imxo5f-n1yw1VA09JUcPNdgRNOTDLtEK5mVRlKWA3FxA7ub7gGyr65SGDx5Sm_ExaLuhR9nlKyUalCjAHMWYWYt2EX2lzce9prXzxxOwS2O3dlsvjuBKDAtXSl0qGP4ucrejNw8gvzu10R2yeSBpUTGung0qvafNNbIa"/>
+</div>
+<!-- Floating Stat Cards -->
+<div class="absolute -bottom-6 -right-6 bg-surface-container-lowest p-6 rounded-xl shadow-xl flex gap-8">
+<div class="text-center">
+<p class="text-label-md uppercase tracking-widest text-on-surface-variant font-bold text-[0.65rem]">Sesiones</p>
+<p class="text-2xl font-headline font-extrabold text-primary">1.2k+</p>
+</div>
+<div class="text-center">
+<p class="text-label-md uppercase tracking-widest text-on-surface-variant font-bold text-[0.65rem]">Calificación</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-tertiary-container text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+<p class="text-2xl font-headline font-extrabold text-primary">4.9</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Bio & Specialties -->
+<div class="lg:col-span-7 pt-4">
+<div class="space-y-2 mb-6">
+<span class="bg-tertiary-container/20 text-tertiary font-bold px-3 py-1 rounded-full text-xs tracking-wider uppercase">Tutor Senior de Humanidades</span>
+<h1 class="text-5xl lg:text-6xl font-headline font-extrabold tracking-tight text-primary">Dr. Sebastian Valdés</h1>
+</div>
+<p class="text-lg text-on-surface-variant leading-relaxed mb-8 max-w-2xl">
+                    Especialista en Literatura Comparada y Retórica Académica con más de 10 años de experiencia guiando a estudiantes de posgrado. Mi enfoque editorial transforma el pensamiento crítico en prosa elegante y estructurada.
+                </p>
+<div class="space-y-6">
+<h3 class="text-label-md uppercase tracking-[0.1em] font-bold text-on-surface-variant text-xs">Especialidades Editoriales</h3>
+<div class="flex flex-wrap gap-3">
+<span class="px-5 py-2.5 bg-surface-container-lowest rounded-xl text-primary font-semibold shadow-sm border border-outline-variant/10">Escritura de Tesis</span>
+<span class="px-5 py-2.5 bg-surface-container-lowest rounded-xl text-primary font-semibold shadow-sm border border-outline-variant/10">Pensamiento Crítico</span>
+<span class="px-5 py-2.5 bg-surface-container-lowest rounded-xl text-primary font-semibold shadow-sm border border-outline-variant/10">Literatura Siglo XIX</span>
+<span class="px-5 py-2.5 bg-surface-container-lowest rounded-xl text-primary font-semibold shadow-sm border border-outline-variant/10">Latín Jurídico</span>
+<span class="px-5 py-2.5 bg-surface-container-lowest rounded-xl text-primary font-semibold shadow-sm border border-outline-variant/10">Análisis Narratológico</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Booking Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24">
+<div class="lg:col-span-8 bg-surface-container-low rounded-xl p-8 lg:p-12">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="text-3xl font-headline font-bold text-primary mb-2">Disponibilidad Semanal</h2>
+<p class="text-on-surface-variant">Selecciona un bloque horario para tu sesión editorial.</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-surface-container-lowest rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-2 bg-surface-container-lowest rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Time Slot Grid -->
+<div class="grid grid-cols-5 gap-4 overflow-x-auto no-scrollbar">
+<!-- Day Column -->
+<div class="space-y-4 min-w-[120px]">
+<div class="text-center pb-4 border-b border-outline-variant/20">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Lun</p>
+<p class="text-xl font-headline font-bold">14</p>
+</div>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">09:00 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">11:00 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest/50 text-on-surface-variant/40 text-sm font-medium cursor-not-allowed line-through text-center" disabled="">02:00 PM</button>
+</div>
+<!-- Day Column -->
+<div class="space-y-4 min-w-[120px]">
+<div class="text-center pb-4 border-b border-outline-variant/20">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Mar</p>
+<p class="text-xl font-headline font-bold">15</p>
+</div>
+<button class="w-full py-3 px-2 rounded-xl bg-primary-container text-white text-sm font-bold shadow-md text-center">10:00 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">12:30 PM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">04:00 PM</button>
+</div>
+<!-- Day Column -->
+<div class="space-y-4 min-w-[120px]">
+<div class="text-center pb-4 border-b border-outline-variant/20">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Mie</p>
+<p class="text-xl font-headline font-bold">16</p>
+</div>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">08:00 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest/50 text-on-surface-variant/40 text-sm font-medium cursor-not-allowed line-through text-center" disabled="">11:00 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">03:00 PM</button>
+</div>
+<!-- Day Column -->
+<div class="space-y-4 min-w-[120px]">
+<div class="text-center pb-4 border-b border-outline-variant/20">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Jue</p>
+<p class="text-xl font-headline font-bold">17</p>
+</div>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">09:30 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">01:00 PM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">05:00 PM</button>
+</div>
+<!-- Day Column -->
+<div class="space-y-4 min-w-[120px]">
+<div class="text-center pb-4 border-b border-outline-variant/20">
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Vie</p>
+<p class="text-xl font-headline font-bold">18</p>
+</div>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">10:00 AM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">12:00 PM</button>
+<button class="w-full py-3 px-2 rounded-xl bg-surface-container-lowest text-sm font-medium hover:bg-primary-container hover:text-white transition-all text-center">02:30 PM</button>
+</div>
+</div>
+<!-- Logic Comment for Developers -->
+<!-- 
+                  LOGIC: Schedule Overlap Check 
+                  Before rendering the slot buttons, the system must cross-reference 
+                  the tutor's availability table with the student's existing sessions.
+                  1. fetch(tutor_schedule) && fetch(student_schedule)
+                  2. For each available_slot:
+                     if (available_slot.start < student_session.end && student_session.start < available_slot.end)
+                     set slot.state = 'CONFLICT' and render as disabled.
+                -->
+</div>
+<!-- Booking Summary Sidecard -->
+<div class="lg:col-span-4">
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10 sticky top-24">
+<h3 class="text-xl font-headline font-bold text-primary mb-6">Detalles de Reserva</h3>
+<div class="space-y-6 mb-8">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant font-medium">Sesión Editorial</span>
+<span class="text-primary font-bold">60 Minutos</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant font-medium">Fecha Seleccionada</span>
+<span class="text-primary font-bold">Marzo 15, 2024</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant font-medium">Hora</span>
+<span class="text-primary font-bold">10:00 AM</span>
+</div>
+<div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-primary font-bold">Tarifa Total</span>
+<span class="text-2xl font-headline font-extrabold text-primary">$45.00</span>
+</div>
+</div>
+<button class="signature-gradient w-full py-4 rounded-xl text-white font-bold text-lg hover:scale-[0.98] transition-transform shadow-xl flex items-center justify-center gap-3">
+<span class="material-symbols-outlined text-xl">event_available</span>
+                        Agendar Clase
+                    </button>
+<p class="text-center text-[0.7rem] text-on-surface-variant/60 mt-4 uppercase tracking-widest font-medium">Garantía de calidad académica 100%</p>
+</div>
+</div>
+</div>
+<!-- Reviews Section: Bento Grid Style -->
+<div class="space-y-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h2 class="text-4xl font-headline font-extrabold text-primary mb-2">Voces de la Academia</h2>
+<p class="text-on-surface-variant max-w-xl">Experiencias de estudiantes que han transformado sus trabajos de investigación con la guía del Dr. Valdés.</p>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">
+<span class="text-primary font-bold">Excelente</span>
+<div class="flex text-tertiary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Review 1 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/5">
+<div class="flex gap-1 mb-4 text-tertiary-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface italic mb-6 leading-relaxed">"La atención al detalle en la estructura de mi tesis fue invaluable. Sebastian tiene una forma única de clarificar argumentos complejos."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold">ME</div>
+<div>
+<p class="font-bold text-primary text-sm">María Elena G.</p>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold">Estudiante de Doctorado</p>
+</div>
+</div>
+</div>
+<!-- Review 2 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/5 md:translate-y-8">
+<div class="flex gap-1 mb-4 text-tertiary-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface italic mb-6 leading-relaxed">"Su dominio de la retórica me ayudó a publicar mi primer artículo en una revista indexada. Totalmente recomendado."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">RJ</div>
+<div>
+<p class="font-bold text-primary text-sm">Ricardo J.</p>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold">Investigador Junior</p>
+</div>
+</div>
+</div>
+<!-- Review 3 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm border border-outline-variant/5">
+<div class="flex gap-1 mb-4 text-tertiary-container">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface italic mb-6 leading-relaxed">"Las clases son dinámicas y muy enriquecedoras. No solo aprendes a escribir, aprendes a pensar con mayor rigor."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed font-bold">LV</div>
+<div>
+<p class="font-bold text-primary text-sm">Lucía V.</p>
+<p class="text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold">Maestría en Letras</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#f7f9fb] border-t border-[#e6e8ea]/20 w-full py-12">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">© 2024 THE ACADEMIC EDITORIAL. TODOS LOS DERECHOS RESERVADOS.</p>
+<div class="flex gap-8">
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500 hover:text-[#002045] transition-colors" href="#">POLÍTICA DE PRIVACIDAD</a>
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500 hover:text-[#002045] transition-colors" href="#">TÉRMINOS DE SERVICIO</a>
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500 hover:text-[#002045] transition-colors" href="#">ACCESIBILIDAD</a>
+<a class="text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500 hover:text-[#002045] transition-colors" href="#">CONTACTO</a>
+</div>
+</div>
+</footer>
+</body></html>
