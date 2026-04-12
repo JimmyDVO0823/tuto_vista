@@ -546,3 +546,10 @@
     </div>
   </footer>
 </>
+             <button className="signature-gradient text-white px-12 py-4 rounded-xl font-bold text-lg shadow-lg">Finalizar Reserva</button>
+          </div >
+        </div >
+      </main >
+    </>
+  );
+}

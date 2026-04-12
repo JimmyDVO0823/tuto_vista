@@ -475,3 +475,19 @@
     </footer>
   </main>
 </>
+          </div >
+        </header >
+  <div className="p-10 max-w-7xl mx-auto">
+    <h1 className="text-5xl font-extrabold tracking-tight text-[#002045] leading-tight mb-8">
+      Bienvenido, Julian.
+    </h1>
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+      <section className="md:col-span-8 space-y-6">
+        <h2 className="text-2xl font-bold text-[#002045]">Próximas Tutorías</h2>
+      </section>
+    </div>
+  </div>
+      </main >
+    </>
+  );
+}

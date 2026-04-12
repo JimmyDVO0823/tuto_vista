@@ -484,3 +484,8 @@
     </div>
   </footer>
 </>
+        </div >
+      </main >
+    </div >
+  );
+}

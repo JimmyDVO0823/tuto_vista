@@ -403,3 +403,18 @@
     </footer>
   </main>
 </>
+        </header >
+  <section className="grid grid-cols-12 gap-6 mb-12">
+    <div className="col-span-4 bg-white p-8 rounded-xl border border-[#e6e8ea]">
+      <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Total Usuarios</p>
+      <h2 className="text-4xl font-bold text-[#002045]">12,482</h2>
+    </div>
+    <div className="col-span-4 signature-gradient text-white p-8 rounded-xl">
+      <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-1">Ingresos</p>
+      <h2 className="text-4xl font-bold">$42,910.00</h2>
+    </div>
+  </section>
+      </main >
+    </>
+  );
+}
