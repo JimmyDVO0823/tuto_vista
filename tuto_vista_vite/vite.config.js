@@ -8,4 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    allowedHosts: true // Esto permite cualquier enlace de Localtunnel
+  }
 })

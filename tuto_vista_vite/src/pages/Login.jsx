@@ -3,13 +3,14 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
+import Navbar from '../components/Navbar';
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState('login');
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f9fb]">
-      <Header />
+      <Navbar />
       
       <main className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-[1000px] grid md:grid-cols-2 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
