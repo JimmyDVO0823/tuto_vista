@@ -45,6 +45,8 @@ export default {
         "surface-dim": "#d8dadc",
         "primary-container": "#1a365d",
         "primary": "#002045",
+        "academic-gold": "#CEAE42",
+        "mini-gray": "#F2F4F6",
         "secondary-container": "#7db6ff",
         "secondary-fixed-dim": "#a2c9ff",
         "secondary": "#1960a3",

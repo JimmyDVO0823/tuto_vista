@@ -1,4 +1,4 @@
-import '/home/dfranco/Documentos/UNIVERSIDAD/5/WEB/Proyecto_Final/tuto_vista_vite/src/index.css'; // <-- ¡Esta es la línea mágica!
+import '../src/index.css';
 /** @type { import('@storybook/react-vite').Preview } */
 const preview = {
   parameters: {
