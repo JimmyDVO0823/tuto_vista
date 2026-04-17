@@ -9,6 +9,7 @@ This document centralizes the styling tokens and principles used in the project 
 | **Academic Blue** | `#002045` | `primary` | Branding, Headers, Main text |
 | **Academic Gold** | `#CEAE42` | `academic-gold` | CTAs, Achievements, Active states |
 | **Mini Gray** | `#F2F4F6` | `mini-gray` | Secondary surfaces, Dividers, Sidebars |
+| **Elegant Gray** | `#696C6E` | `elegant-gray` | Muted text, Borders, Metadata |
 | **Surface Base** | `#f7f9fb` | `bg-surface` | Main page backgrounds |
 | **Container Low** | `#f2f4f6` | `bg-surface-container-low` | Layout sections (e.g., Sidebar) |
 | **Container Lowest** | `#ffffff` | `bg-surface-container-lowest` | Primary content cards |

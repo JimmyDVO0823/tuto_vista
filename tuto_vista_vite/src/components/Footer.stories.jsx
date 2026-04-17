@@ -17,7 +17,7 @@ export const Default = () => <Footer />;
 // se queden pegados abajo cuando hay poco contenido en la página.
 export const AlFondoDePagina = () => (
   <div className="min-h-screen flex flex-col">
-    <main className="flex-grow flex items-center justify-center p-8 bg-white dark:bg-[#16171d]">
+    <main className="flex-grow flex items-center justify-center p-8 bg-white">
       <p className="text-gray-400">Aquí iría el contenido de tu página...</p>
     </main>
     <Footer />

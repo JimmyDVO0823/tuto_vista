@@ -17,10 +17,10 @@ const Sidebar = () => {
   ];
 
   return (
-    <nav className="h-screen w-64 fixed left-0 top-0 bg-[#f2f4f6] dark:bg-[#1c1c1c] flex flex-col py-8 z-40">
+    <nav className="h-screen w-64 fixed left-0 top-0 bg-mini-gray flex flex-col py-8 z-40">
       {/* Brand */}
       <div className="px-8 mb-10">
-        <span className="text-lg font-black tracking-widest uppercase text-primary dark:text-[#f2f4f6] font-display">
+        <span className="text-lg font-black tracking-widest uppercase text-primary font-display">
           THE ACADEMIC
         </span>
       </div>
@@ -35,7 +35,7 @@ const Sidebar = () => {
           />
         </div>
         <div>
-          <p className="text-sm font-bold text-primary dark:text-[#f2f4f6] font-body">
+          <p className="text-sm font-bold text-primary font-body">
             Julian Reed
           </p>
           <p className="text-[10px] uppercase tracking-wider text-[#191c1e]/60 font-medium">
@@ -54,8 +54,8 @@ const Sidebar = () => {
               to={link.path}
               className={`flex items-center gap-3 py-3 transition-all ${
                 isActive
-                  ? 'bg-white dark:bg-[#2c2c2c] text-primary dark:text-academic-gold font-semibold rounded-l-full ml-4 pl-4 scale-95 transform'
-                  : 'text-[#191c1e]/70 dark:text-gray-400 px-8 hover:bg-[#e6e8ea] dark:hover:bg-[#333]'
+                  ? 'bg-white text-primary font-semibold rounded-l-full ml-4 pl-4 scale-95 transform'
+                  : 'text-elegant-gray px-8 hover:bg-[#e6e8ea]'
               }`}
             >
               <span className="material-symbols-outlined !text-[20px]">
@@ -69,7 +69,7 @@ const Sidebar = () => {
 
       {/* Footer Actions */}
       <div className="px-8 mt-auto flex flex-col gap-4">
-        <button className="signature-gradient text-white font-bold py-3 px-4 rounded-md text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+        <button className="bg-academic-gold text-primary font-bold py-3 px-4 rounded-md text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
           <span className="material-symbols-outlined !text-[18px]">add_circle</span>
           Book New Session
         </button>

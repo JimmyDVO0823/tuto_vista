@@ -40,21 +40,3 @@ ActiveOther.decorators = [
   ),
 ];
 
-// Dark Mode Simulation
-export const ModoOscuro = () => (
-  <div className="dark h-full">
-    <Sidebar />
-  </div>
-);
-ModoOscuro.decorators = [
-  (Story) => (
-    <MemoryRouter initialEntries={['/dashboard/student']}>
-      <div className="flex dark bg-[#191c1e] min-h-screen">
-        <Story />
-        <div className="flex-1 p-10">
-          <h1 className="text-2xl font-bold text-white/20">Dark Mode Mockup</h1>
-        </div>
-      </div>
-    </MemoryRouter>
-  ),
-];

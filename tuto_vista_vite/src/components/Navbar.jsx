@@ -2,16 +2,16 @@ import { Link } from 'react-router-dom';
 
 export default function Navbar() {
   return (
-    <nav className="bg-[#f7f9fb]/80 dark:bg-[#191c1e]/80 backdrop-blur-md top-0 sticky z-50 shadow-sm dark:shadow-none">
+    <nav className="bg-[#f7f9fb]/80 backdrop-blur-md top-0 sticky z-50 shadow-sm">
       <div className="flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
         <div className="flex items-center gap-12">
-          <Link to="/" className="text-xl font-bold tracking-tight text-[#002045] dark:text-[#f7f9fb] font-headline">
+          <Link to="/" className="text-xl font-bold tracking-tight text-[#002045] font-headline">
             The Academic Editorial
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link className="text-[#191c1e]/60 dark:text-[#f7f9fb]/60 hover:text-[#002045] dark:hover:text-white transition-colors" to="/tutors">Find Tutors</Link>
-            <Link className="text-[#191c1e]/60 dark:text-[#f7f9fb]/60 hover:text-[#002045] dark:hover:text-white transition-colors" to="/dashboard/student">Library</Link>
-            <a className="text-[#191c1e]/60 dark:text-[#f7f9fb]/60 hover:text-[#002045] dark:hover:text-white transition-colors" href="#">Resources</a>
+            <Link className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" to="/tutors">Find Tutors</Link>
+            <Link className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" to="/dashboard/student">Library</Link>
+            <a className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" href="#">Resources</a>
           </div>
         </div>
         <div className="flex items-center gap-4">

@@ -47,6 +47,7 @@ export default {
         "primary": "#002045",
         "academic-gold": "#CEAE42",
         "mini-gray": "#F2F4F6",
+        "elegant-gray": "#696C6E",
         "secondary-container": "#7db6ff",
         "secondary-fixed-dim": "#a2c9ff",
         "secondary": "#1960a3",
