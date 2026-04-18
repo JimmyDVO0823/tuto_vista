@@ -1,11 +1,17 @@
-import Sidebar from '../components/Sidebar';
+import React from 'react';
+import MainLayout from '../components/MainLayout';
 
 const SubjectsManagement = () => {
-  return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      <Sidebar />
+  const subjects = [
+    { code: 'MAT-101', name: 'Cálculo Diferencial e Integral I', dept: 'Departamento de Matemáticas', status: 'ACTIVO', sem: 'Semestre A' },
+    { code: 'CS-204', name: 'Programación Web Avanzada', dept: 'Ciencias de la Computación', status: 'ACTIVO', sem: 'Semestre B' },
+    { code: 'FIS-102', name: 'Física Mecánica', dept: 'Departamento de Física', status: 'INACTIVO', sem: 'Semestre A' },
+    { code: 'HUM-110', name: 'Ética y Pensamiento Crítico', dept: 'Humanidades y Artes', status: 'ACTIVO', sem: 'Transversal' },
+  ];
 
-      <main className="ml-64 min-h-screen p-12">
+  return (
+    <MainLayout>
+      <main className="p-12">
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">Administración del Sistema</p>
@@ -17,18 +23,18 @@ const SubjectsManagement = () => {
           </button>
         </header>
 
-        <div className="bg-surface-container-low p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
+        <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
           <div className="relative flex-1">
              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
              <input className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 text-sm" placeholder="Buscar materia..." />
           </div>
           <div className="flex gap-2">
-             <button className="bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100">Filtros</button>
-             <button className="bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100">Exportar</button>
+             <button className="bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100 shadow-sm">Filtros</button>
+             <button className="bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100 shadow-sm">Exportar</button>
           </div>
         </div>
 
-        <section className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
           <table className="w-full text-left">
             <thead className="bg-[#f2f4f6]">
               <tr>
@@ -67,7 +73,7 @@ const SubjectsManagement = () => {
           </div>
         </footer>
       </main>
-    </div>
+    </MainLayout>
   );
 };
 

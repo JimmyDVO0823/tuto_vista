@@ -1,4 +1,5 @@
-import Sidebar from '../components/Sidebar';
+import React from 'react';
+import MainLayout from '../components/MainLayout';
 
 const MyTutorsHistory = () => {
   const tableData = [
@@ -9,10 +10,8 @@ const MyTutorsHistory = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 p-10 min-h-screen">
+    <MainLayout>
+      <main className="p-10">
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold text-academic-gold uppercase tracking-widest mb-2 block">Académico</span>
@@ -80,7 +79,7 @@ const MyTutorsHistory = () => {
            </div>
         </footer>
       </main>
-    </div>
+    </MainLayout>
   );
 };
 

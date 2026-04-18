@@ -1,15 +1,13 @@
-import Sidebar from '../components/Sidebar';
+import React from 'react';
+import MainLayout from '../components/MainLayout';
 
 const DashboardAdmin = () => {
   return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      <Sidebar />
-
-      {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 min-h-screen">
+    <MainLayout>
+      <main className="p-8">
         <header className="flex justify-between items-end mb-12">
           <div className="max-w-2xl">
-            <span className="text-[0.75rem] uppercase tracking-[0.15em] font-bold text-tertiary mb-2 block">
+            <span className="text-[0.75rem] uppercase tracking-[0.15em] font-bold text-academic-gold mb-2 block">
               Panel de Administración
             </span>
             <h1 className="text-5xl font-extrabold text-primary tracking-tight leading-none">
@@ -17,7 +15,7 @@ const DashboardAdmin = () => {
             </h1>
           </div>
           <div className="flex gap-4">
-            <div className="bg-surface-container-low px-4 py-2 rounded-md flex items-center gap-2">
+            <div className="bg-white px-4 py-2 rounded-md border border-gray-100 shadow-sm flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">calendar_month</span>
               <span className="text-xs font-semibold uppercase tracking-wider">
                 Octubre 2024
@@ -33,7 +31,7 @@ const DashboardAdmin = () => {
               <div className="w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary">group</span>
               </div>
-              <span className="text-[0.65rem] font-bold text-secondary uppercase tracking-widest">
+              <span className="text-[0.65rem] font-bold text-academic-gold uppercase tracking-widest">
                 +12% vs mes anterior
               </span>
             </div>
@@ -51,7 +49,7 @@ const DashboardAdmin = () => {
                 <span className="material-symbols-outlined text-white">payments</span>
               </div>
               <div className="flex gap-1">
-                <span className="w-2 h-2 rounded-full bg-tertiary-container animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-academic-gold animate-pulse" />
                 <span className="text-[0.65rem] font-bold uppercase tracking-widest text-white/80">
                   En Tiempo Real
                 </span>
@@ -67,8 +65,8 @@ const DashboardAdmin = () => {
 
           <div className="col-span-3 bg-white p-8 rounded-xl flex flex-col justify-between min-h-[180px] shadow-sm">
             <div className="flex justify-between items-start">
-              <div className="w-12 h-12 rounded-lg bg-tertiary-container/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-tertiary">school</span>
+              <div className="w-12 h-12 rounded-lg bg-academic-gold/10 flex items-center justify-center">
+                <span className="material-symbols-outlined text-academic-gold">school</span>
               </div>
             </div>
             <div>
@@ -97,9 +95,9 @@ const DashboardAdmin = () => {
               </div>
             </div>
             <div className="relative h-64 flex items-end justify-between gap-1 px-4">
-              <div className="absolute inset-0 flex flex-col justify-between py-2 border-l border-b border-outline-variant/20">
+               <div className="absolute inset-0 flex flex-col justify-between py-2 border-l border-b border-gray-100">
                 {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="w-full border-t border-dashed border-outline-variant/10" />
+                  <div key={i} className="w-full border-t border-dashed border-gray-50" />
                 ))}
               </div>
               {[40, 55, 45, 70, 60, 85, 95].map((h, i) => (
@@ -154,8 +152,7 @@ const DashboardAdmin = () => {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="mt-20 border-t border-[#e6e8ea] py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">
+        <footer className="mt-20 border-t border-gray-100 py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">
           <p>© 2024 The Academic Editorial. All rights reserved.</p>
           <div className="flex gap-8">
             {['Privacy Policy', 'Terms of Service', 'Accessibility', 'Contact'].map(link => (
@@ -164,7 +161,7 @@ const DashboardAdmin = () => {
           </div>
         </footer>
       </main>
-    </div>
+    </MainLayout>
   );
 };
 

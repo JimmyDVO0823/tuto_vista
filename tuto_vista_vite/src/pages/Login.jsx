@@ -1,102 +1,75 @@
-import { useState } from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import LoginForm from '../components/LoginForm';
-import RegisterForm from '../components/RegisterForm';
-import Sidebar from '../components/Sidebar';
+import React, { useState } from 'react';
+import MainLayout from '../components/MainLayout';
 
 const Login = () => {
-  const [activeTab, setActiveTab] = useState('login');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-  return (
-    <div className="min-h-screen flex bg-[#f7f9fb] font-body">
-      <Sidebar />
-      <div className="flex-1 ml-64 flex flex-col">
-        <main className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-[1000px] grid md:grid-cols-2 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
-          {/* Left Side: Illustration / Branding */}
-          <div className="hidden md:block relative p-12 signature-gradient text-white overflow-hidden">
-            <div className="relative z-10 h-full flex flex-col justify-between">
-              <div>
-                <span className="text-xs uppercase tracking-[0.1em] text-white/80 font-bold mb-4 block">
-                  Bienvenido
-                </span>
-                <h1 className="text-4xl font-bold leading-tight mb-6">
-                  Excelencia Académica a tu alcance.
-                </h1>
-                <p className="text-white/80 leading-relaxed max-w-sm">
-                  Únete a nuestra comunidad de académicos y profesionales
-                  comprometidos con el aprendizaje profundo y la redacción editorial
-                  de alto nivel.
-                </p>
-              </div>
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white">
-                      school
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium">
-                    Acceso a tutores certificados
-                  </span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white">
-                      library_books
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium">
-                    Recursos editoriales exclusivos
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-            <img
-              alt="Estudiantes en biblioteca"
-              className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-30"
-              src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1000"
-            />
-          </div>
+    return (
+        <MainLayout>
+          <div className="flex-1 flex flex-col lg:flex-row min-h-screen">
+            {/* Form Section */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-12 bg-white">
+                <div className="w-full max-w-md space-y-10">
+                    <header className="space-y-4 text-center lg:text-left">
+                        <span className="text-xs font-bold text-academic-gold uppercase tracking-widest">Bienvenido de nuevo</span>
+                        <h1 className="text-5xl font-extrabold text-[#002045] tracking-tight font-display">Acceso Académico</h1>
+                        <p className="text-gray-500 text-lg leading-relaxed">Continúa tu viaje intelectual con The Academic Editorial.</p>
+                    </header>
 
-          {/* Right Side: Forms */}
-          <div className="p-8 md:p-12 bg-white">
-            <div className="mb-8">
-              <div className="flex gap-1 bg-[#f7f9fb] p-1 rounded-md mb-8">
-                <button 
-                  onClick={() => setActiveTab('login')}
-                  className={`flex-1 py-2 text-sm font-bold rounded transition-all ${
-                    activeTab === 'login' 
-                      ? 'bg-white text-[#002045] shadow-sm' 
-                      : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
-                  Iniciar Sesión
-                </button>
-                <button 
-                  onClick={() => setActiveTab('register')}
-                  className={`flex-1 py-2 text-sm font-bold rounded transition-all ${
-                    activeTab === 'register' 
-                      ? 'bg-white text-[#002045] shadow-sm' 
-                      : 'text-gray-500 hover:bg-gray-100'
-                  }`}
-                >
-                  Registrarse
-                </button>
-              </div>
+                    <form className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold uppercase tracking-widest text-[#696C6E]" htmlFor="email">Correo Institucional</label>
+                            <input
+                                className="w-full px-6 py-4 bg-[#F2F4F6] border-none rounded-xl focus:ring-2 focus:ring-[#002045]/10 outline-none transition-all"
+                                id="email"
+                                placeholder="usuario@editorial.edu"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold uppercase tracking-widest text-[#696C6E]" htmlFor="password">Contraseña</label>
+                            <input
+                                className="w-full px-6 py-4 bg-[#F2F4F6] border-none rounded-xl focus:ring-2 focus:ring-[#002045]/10 outline-none transition-all"
+                                id="password"
+                                placeholder="••••••••"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
+                        <button className="w-full signature-gradient text-white py-5 rounded-xl font-bold text-lg shadow-xl shadow-[#002045]/20 hover:-translate-y-1 transition-all" type="submit">
+                            Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <footer className="text-center lg:text-left pt-6 border-t border-gray-100">
+                        <p className="text-gray-500">¿No tienes una cuenta? <a className="text-[#002045] font-bold hover:underline" href="#">Regístrate aquí</a></p>
+                    </footer>
+                </div>
             </div>
 
-            {activeTab === 'login' ? <LoginForm /> : <RegisterForm />}
+            {/* Visual Section */}
+            <div className="hidden lg:flex lg:w-1/2 bg-[#002045] relative overflow-hidden items-center justify-center p-20">
+                <div className="absolute inset-0 opacity-20">
+                    {/* Grid Pattern Pattern */}
+                    <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+                </div>
+                <div className="relative z-10 text-center space-y-8 max-w-lg">
+                    <div className="w-24 h-24 bg-academic-gold rounded-full mx-auto flex items-center justify-center shadow-2xl">
+                         <span className="material-symbols-outlined text-4xl text-[#002045]">auto_stories</span>
+                    </div>
+                    <blockquote className="text-3xl font-light italic text-white/90 leading-snug font-display">
+                        "La educación no es la preparación para la vida; la educación es la vida misma."
+                    </blockquote>
+                    <p className="text-academic-gold font-bold uppercase tracking-widest text-sm">— John Dewey</p>
+                </div>
+            </div>
           </div>
-        </div>
-      </main>
-
-      <Footer />
-      </div>
-    </div>
-  );
+        </MainLayout>
+    );
 };
 
 export default Login;

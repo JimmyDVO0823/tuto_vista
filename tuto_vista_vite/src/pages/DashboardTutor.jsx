@@ -1,12 +1,10 @@
-import Sidebar from '../components/Sidebar';
+import React from 'react';
+import MainLayout from '../components/MainLayout';
 
 const DashboardTutor = () => {
   return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      <Sidebar />
-
-      {/* Main Content Area */}
-      <main className="flex-1 ml-64 p-10 min-h-screen">
+    <MainLayout>
+      <main className="p-10">
         <header className="flex justify-between items-end mb-12">
           <div className="max-w-2xl">
             <p className="text-xs font-medium uppercase tracking-[0.1em] text-academic-gold mb-2">
@@ -41,7 +39,7 @@ const DashboardTutor = () => {
               </span>
               <div>
                 <h3 className={`text-xs font-medium uppercase tracking-widest mb-1 ${stat.gradient ? 'text-white/60' : 'text-gray-400'}`}>
-                  {stat.label}
+                   {stat.label}
                 </h3>
                 <div className="flex items-center gap-2">
                   <p className={`text-4xl font-bold font-headline ${stat.gradient ? 'text-white' : 'text-primary'}`}>
@@ -96,17 +94,17 @@ const DashboardTutor = () => {
             </div>
           </aside>
         </div>
-      </main>
 
-      <footer className="mt-20 border-t border-gray-100 py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500 ml-64 w-[calc(100%-16rem)] px-10">
-        <p>© 2024 The Academic Editorial. All rights reserved.</p>
-        <div className="flex gap-8">
-          {['Privacy Policy', 'Terms of Service', 'Accessibility', 'Contact'].map(link => (
-            <a key={link} className="hover:text-primary transition-colors" href="#">{link}</a>
-          ))}
-        </div>
-      </footer>
-    </div>
+        <footer className="mt-20 border-t border-gray-100 py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">
+          <p>© 2024 The Academic Editorial. All rights reserved.</p>
+          <div className="flex gap-8">
+            {['Privacy Policy', 'Terms of Service', 'Accessibility', 'Contact'].map(link => (
+              <a key={link} className="hover:text-primary transition-colors" href="#">{link}</a>
+            ))}
+          </div>
+        </footer>
+      </main>
+    </MainLayout>
   );
 };
 

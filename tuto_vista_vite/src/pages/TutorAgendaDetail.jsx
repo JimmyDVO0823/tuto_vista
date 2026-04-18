@@ -1,76 +1,102 @@
-import Sidebar from '../components/Sidebar';
+import React from 'react';
+import MainLayout from '../components/MainLayout';
 
 const TutorAgendaDetail = () => {
   return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      <Sidebar />
-      <div className="flex-1 ml-64 flex flex-col">
+    <MainLayout>
+      <main className="flex-1 p-12 min-h-screen">
+        <header className="mb-16 flex items-start justify-between">
+           <div className="max-w-2xl">
+              <span className="text-xs font-bold text-academic-gold uppercase tracking-[0.2em] mb-4 block">Perfiles Sugeridos</span>
+              <h1 className="text-6xl font-extrabold text-primary tracking-tight font-display mb-6 leading-tight">Dra. Elena Martínez</h1>
+              <p className="text-xl text-gray-500 leading-relaxed italic border-l-4 border-mini-gray pl-6">
+                "La educación no es llenar un cubo, sino encender un fuego."
+              </p>
+           </div>
+           <div className="flex flex-col items-end gap-4">
+              <div className="flex gap-1 text-academic-gold">
+                {[1, 2, 3, 4, 5].map(i => <span key={i} className="material-symbols-outlined text-[20px]">star</span>)}
+              </div>
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">4.9 Average Rating</span>
+           </div>
+        </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-12 lg:py-20 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-24">
-          <div className="lg:col-span-5 relative">
-            <div className="aspect-[4/5] rounded-xl overflow-hidden bg-gray-100">
-              <img className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopCHV2ZDx_Q50c6ss_dSttliSlWxRcuB3j78PD9jMgssnjdTqzDV5CmU5gsB__J2pCebxMFmzm7tSuGy8ZZb9rW5zhG6NGzkOyqgsxr91Imxo5f-n1yw1VA09JUcPNdgRNOTDLtEK5mVRlKWA3FxA7ub7gGyr65SGDx5Sm_ExaLuhR9nlKyUalCjAHMWYWYt2EX2lzce9prXzxxOwS2O3dlsvjuBKDAtXSl0qGP4ucrejNw8gvzu10R2yeSBpUTGung0qvafNNbIa" alt="Tutor" />
-            </div>
-            <div className="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl flex gap-8">
-               <div className="text-center">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Sesiones</p>
-                  <p className="text-2xl font-bold text-primary">1.2k+</p>
-               </div>
-               <div className="text-center">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Rating</p>
-                  <p className="text-2xl font-bold text-primary">4.9</p>
-               </div>
-            </div>
-          </div>
+        <section className="grid grid-cols-12 gap-16">
+           <aside className="col-span-4 space-y-12">
+              <div className="aspect-[4/5] bg-mini-gray rounded-2xl overflow-hidden shadow-sm grayscale hover:grayscale-0 transition-all duration-700">
+                 <img src="https://i.pravatar.cc/500?u=elena" alt="Elena" className="w-full h-full object-cover" />
+              </div>
 
-          <div className="lg:col-span-7 pt-4">
-            <span className="bg-academic-gold/10 text-academic-gold font-bold px-3 py-1 rounded-full text-xs tracking-wider uppercase mb-6 inline-block">Tutor Senior de Humanidades</span>
-            <h1 className="text-5xl lg:text-6xl font-extrabold text-primary tracking-tight mb-8">Dr. Sebastian Valdés</h1>
-            <p className="text-lg text-gray-600 leading-relaxed max-w-2xl mb-8">Especialista en Literatura Comparada y Retórica Académica con más de 10 años de experiencia guiando a estudiantes de posgrado.</p>
-            <div className="flex flex-wrap gap-3">
-               {['Escritura de Tesis', 'Pensamiento Crítico', 'Literatura Siglo XIX'].map(tag => (
-                  <span key={tag} className="px-5 py-2.5 bg-white rounded-xl text-primary font-semibold shadow-sm border border-gray-100">{tag}</span>
-               ))}
-            </div>
-          </div>
-        </div>
+              <div className="space-y-8">
+                 <h3 className="text-sm font-bold uppercase tracking-widest text-primary border-b border-gray-100 pb-4">Especialidades</h3>
+                 <div className="flex flex-wrap gap-2">
+                    {['Cálculo I', 'Álgebra Lineal', 'Métodos Numéricos', 'Física II'].map(s => (
+                      <span key={s} className="px-4 py-2 bg-white text-primary text-xs font-bold rounded-full border border-gray-100 shadow-sm">{s}</span>
+                    ))}
+                 </div>
+              </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 bg-[#f2f4f6] rounded-xl p-8 lg:p-12">
-            <h2 className="text-3xl font-bold text-primary mb-8">Disponibilidad Semanal</h2>
-            <div className="grid grid-cols-5 gap-4">
-               {['Lun 14', 'Mar 15', 'Mie 16', 'Jue 17', 'Vie 18'].map((day, i) => (
-                  <div key={day} className="space-y-4">
-                     <p className="text-center font-bold text-primary border-b border-gray-200 pb-2">{day}</p>
-                     <button className="w-full py-3 bg-white rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">09:00 AM</button>
-                     <button className="w-full py-3 bg-white rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">11:00 AM</button>
-                  </div>
-               ))}
-            </div>
-          </div>
+              <div className="bg-[#f2f4f6] p-10 rounded-2xl space-y-6">
+                 <h3 className="text-xl font-bold text-primary">Logros Académicos</h3>
+                 <ul className="space-y-4">
+                    {[
+                      { icon: 'workspace_premium', text: 'PhD en Matemáticas Puras' },
+                      { icon: 'history_edu', text: '12+ Años de experiencia' },
+                      { icon: 'verified', text: 'Tutor Destacado 2023' }
+                    ].map(a => (
+                      <li key={a.text} className="flex gap-4 items-center text-sm font-medium">
+                        <span className="material-symbols-outlined text-academic-gold">{a.icon}</span>
+                        <span>{a.text}</span>
+                      </li>
+                    ))}
+                 </ul>
+              </div>
+           </aside>
 
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 sticky top-24">
-               <h3 className="text-xl font-bold text-primary mb-6">Detalles de Reserva</h3>
-               <div className="space-y-4 mb-8">
-                  <div className="flex justify-between text-sm"><span className="text-gray-500">Sesión Editorial</span> <span className="font-bold">60 Minutos</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-gray-500">Tarifa</span> <span className="text-2xl font-bold font-headline">$45.00</span></div>
-               </div>
-               <button className="signature-gradient w-full py-4 rounded-xl text-white font-bold text-lg shadow-lg active:scale-95 transition-transform">Agendar Clase</button>
-            </div>
-          </div>
-        </div>
+           <article className="col-span-8 space-y-16">
+              <div className="space-y-6">
+                 <h2 className="text-3xl font-bold text-primary tracking-tight">Agenda Semestral</h2>
+                 <p className="text-gray-500 leading-relaxed text-lg">
+                    Elena se especializa en acompañar a estudiantes de ingeniería en las áreas más complejas del análisis matemático. Sus sesiones son conocidas por su claridad conceptual y enfoque editorial.
+                 </p>
+              </div>
+
+              <div className="bg-white rounded-3xl p-10 shadow-xl shadow-primary/5 border border-gray-50">
+                 <div className="flex justify-between items-center mb-10">
+                    <h4 className="font-bold text-lg">Seleccione un espacio disponible</h4>
+                    <div className="flex gap-2">
+                       <button className="p-2 bg-mini-gray rounded-full material-symbols-outlined">chevron_left</button>
+                       <button className="p-2 bg-mini-gray rounded-full material-symbols-outlined">chevron_right</button>
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-5 gap-4">
+                    {['LUN', 'MAR', 'MIE', 'JUE', 'VIE'].map(day => (
+                      <div key={day} className="space-y-4">
+                        <span className="text-[10px] font-bold text-gray-400 block text-center uppercase tracking-widest mb-6">{day}</span>
+                        {[1, 2, 3].map(h => (
+                           <button key={h} className="w-full py-4 rounded-xl text-xs font-bold transition-all border border-gray-100 hover:border-academic-gold hover:text-academic-gold hover:bg-academic-gold/5">
+                              09:00 AM
+                           </button>
+                        ))}
+                      </div>
+                    ))}
+                 </div>
+
+                 <div className="mt-12 pt-10 border-t border-gray-100 flex justify-between items-center">
+                    <div>
+                       <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Inversión por Sesión</p>
+                       <p className="text-3xl font-black text-primary">$45.00 <span className="text-sm font-medium text-gray-400">/ 1.5h</span></p>
+                    </div>
+                    <button className="signature-gradient text-white px-10 py-5 rounded-2xl font-bold shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all">
+                       Solicitar Tutoría
+                    </button>
+                 </div>
+              </div>
+           </article>
+        </section>
       </main>
-
-      <footer className="bg-[#f7f9fb] border-t border-gray-100 w-full py-12 px-8 flex justify-between items-center text-[0.75rem] uppercase tracking-widest text-gray-400">
-         <p>© 2024 THE ACADEMIC EDITORIAL</p>
-         <div className="flex gap-8">
-            {['Privacy', 'Terms', 'Contact'].map(l => <a key={l} href="#" className="hover:text-primary transition-colors">{l}</a>)}
-         </div>
-      </footer>
-      </div>
-    </div>
+    </MainLayout>
   );
 };
 

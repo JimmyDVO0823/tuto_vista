@@ -1,4 +1,5 @@
-import Sidebar from '../components/Sidebar';
+import React from 'react';
+import MainLayout from '../components/MainLayout';
 
 const UsersManagement = () => {
   const users = [
@@ -9,11 +10,9 @@ const UsersManagement = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      <Sidebar />
-
-      <main className="flex-1 ml-64 min-h-screen">
-        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-8 py-4 flex justify-between items-center w-full">
+    <MainLayout>
+      <main className="min-h-screen">
+        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-8 py-4 flex justify-between items-center w-full">
           <div className="flex items-center gap-8">
             <span className="text-xl font-bold tracking-tight text-primary font-display">Administración de Usuarios</span>
           </div>
@@ -78,7 +77,7 @@ const UsersManagement = () => {
            </div>
         </section>
       </main>
-    </div>
+    </MainLayout>
   );
 };
 

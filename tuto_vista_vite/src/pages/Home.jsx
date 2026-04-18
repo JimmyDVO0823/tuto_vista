@@ -1,23 +1,25 @@
-import Sidebar from "../components/Sidebar";
-import HeroSection from "../components/HeroSection";
-import CategoriesSection from "../components/CategoriesSection";
-import HowItWorksSection from "../components/HowItWorksSection";
-import TestimonialsSection from "../components/TestimonialsSection";
-import CTASection from "../components/CTASection";
-import Footer from "../components/Footer";
+import React from 'react';
+import MainLayout from '../components/MainLayout';
+import HeroSection from '../components/HeroSection';
+import HowItWorksSection from '../components/HowItWorksSection';
+import CTASection from '../components/CTASection';
+import CategoriesSection from '../components/CategoriesSection';
+import TestimonialsSection from '../components/TestimonialsSection';
+import Footer from '../components/Footer';
 
-export default function Home() {
+const Home = () => {
   return (
-    <div className="bg-[#f7f9fb] text-on-surface font-body selection:bg-tertiary-container selection:text-on-tertiary-container flex">
-      <Sidebar />
-      <main className="flex-1 ml-64">
+    <MainLayout>
+      <div className="flex-1 flex flex-col">
         <HeroSection />
         <CategoriesSection />
         <HowItWorksSection />
         <TestimonialsSection />
         <CTASection />
         <Footer />
-      </main>
-    </div>
+      </div>
+    </MainLayout>
   );
-}
+};
+
+export default Home;
