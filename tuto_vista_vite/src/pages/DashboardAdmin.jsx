@@ -1,89 +1,9 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const DashboardAdmin = () => {
   return (
-    <div className="flex min-h-screen bg-surface font-body">
-      {/* SideNavBar */}
-      <aside className="h-screen w-64 fixed left-0 top-0 bg-[#f2f4f6] flex flex-col py-8 z-40">
-        <div className="px-8 mb-10">
-          <span className="text-lg font-black tracking-widest uppercase text-primary">
-            The Editorial
-          </span>
-        </div>
-        <div className="flex items-center px-8 mb-10 gap-3">
-          <div className="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden">
-            <img
-              className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBD-D8rOFTfBViH9iJai4mtns85ySMoEPcEGw8i1KEuunHhv5AALh6QplXqH0Gdfdd3V-XoDprTzpxs4wcJky9JJkKike9gOfhs5Kq94madtGEp5pQXudm7Vko3qC7aQPvBYzJsyJHeKZ_K4qCJfR13MBZXm6Y_wD8NpWS-v9Enn5WRnXnr9DSzHrqZ0TfRug_6CCwbClffu8Ce63PKV7IBiodP1jkkQD5kghA7lRJPOUUBjKAQ34fRb8iZkbECFCKFTZt68T-VDsla"
-              alt="Admin Profile"
-            />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-primary">Julian Reed</p>
-            <p className="text-[0.65rem] uppercase tracking-wider text-gray-500 font-semibold">
-              Honors Scholar
-            </p>
-          </div>
-        </div>
-        <nav className="flex-1 space-y-1">
-          <a
-            className="flex items-center gap-3 bg-white text-primary font-semibold rounded-l-full ml-4 pl-4 py-3 transition-transform active:scale-95"
-            href="#"
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            <span className="text-sm">Dashboard</span>
-          </a>
-          <a
-            className="flex items-center gap-3 text-on-background/70 px-8 py-3 hover:bg-[#e6e8ea] transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">calendar_today</span>
-            <span className="text-sm">My Sessions</span>
-          </a>
-          <a
-            className="flex items-center gap-3 text-on-background/70 px-8 py-3 hover:bg-[#e6e8ea] transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">menu_book</span>
-            <span className="text-sm">Assignments</span>
-          </a>
-          <a
-            className="flex items-center gap-3 text-on-background/70 px-8 py-3 hover:bg-[#e6e8ea] transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">mail</span>
-            <span className="text-sm">Messages</span>
-          </a>
-          <a
-            className="flex items-center gap-3 text-on-background/70 px-8 py-3 hover:bg-[#e6e8ea] transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">settings</span>
-            <span className="text-sm">Settings</span>
-          </a>
-        </nav>
-        <div className="px-8 mt-6">
-          <button className="w-full bg-tertiary-container text-on-tertiary-container font-bold py-3 rounded-md text-xs uppercase tracking-widest shadow-sm hover:opacity-90 transition-opacity">
-            Book New Session
-          </button>
-        </div>
-        <div className="mt-auto space-y-1">
-          <a
-            className="flex items-center gap-3 text-on-background/70 px-8 py-3 hover:bg-[#e6e8ea] transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">help</span>
-            <span className="text-sm">Support</span>
-          </a>
-          <a
-            className="flex items-center gap-3 text-on-background/70 px-8 py-3 hover:bg-[#e6e8ea] transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">logout</span>
-            <span className="text-sm">Logout</span>
-          </a>
-        </div>
-      </aside>
+    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
+      <Sidebar />
 
       {/* Main Content */}
       <main className="flex-1 ml-64 p-8 min-h-screen">

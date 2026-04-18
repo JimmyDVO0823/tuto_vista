@@ -1,4 +1,4 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const MyTutorsHistory = () => {
   const tableData = [
@@ -9,25 +9,8 @@ const MyTutorsHistory = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-surface font-body">
-      {/* Sidebar Overlay (Simplified for context) */}
-      <aside className="h-screen w-64 fixed left-0 top-0 bg-[#f2f4f6] flex flex-col py-8 z-40">
-        <div className="px-8 mb-10">
-          <span className="text-lg font-black tracking-widest uppercase text-primary font-display">
-            THE ACADEMIC
-          </span>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {['Dashboard', 'My Sessions', 'Assignments', 'Messages', 'Settings'].map((item, i) => (
-             <a key={item} href="#" className={`flex items-center gap-3 px-8 py-3 transition-all ${item === 'My Sessions' ? 'bg-white text-primary font-bold rounded-l-full ml-4 pl-4' : 'text-elegant-gray hover:bg-gray-200'}`}>
-                <span className="material-symbols-outlined text-[20px]">
-                  {['dashboard', 'calendar_today', 'menu_book', 'mail', 'settings'][i]}
-                </span>
-                <span className="text-sm">{item}</span>
-             </a>
-          ))}
-        </nav>
-      </aside>
+    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
+      <Sidebar />
 
       <main className="flex-1 ml-64 p-10 min-h-screen">
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">

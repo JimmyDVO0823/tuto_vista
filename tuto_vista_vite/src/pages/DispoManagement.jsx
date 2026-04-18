@@ -1,27 +1,18 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const DispoManagement = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f9fb] font-body">
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
-         <span className="text-xl font-bold text-primary font-display">The Academic Editorial</span>
-         <div className="flex gap-4">
-            <button className="px-6 py-2 bg-primary text-white rounded-full text-sm font-bold">Guardar Cambios</button>
-         </div>
-      </header>
+    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
+      <Sidebar />
+      <div className="flex-1 ml-64 flex flex-col">
+        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-8 py-4 flex justify-between items-center">
+           <span className="text-xl font-bold text-primary font-display">Configuración de Horarios</span>
+           <div className="flex gap-4">
+              <button className="px-6 py-2 bg-primary text-white rounded-full text-sm font-bold">Guardar Cambios</button>
+           </div>
+        </header>
 
-      <div className="flex flex-1">
-         <aside className="w-64 bg-[#f2f4f6] h-screen fixed left-0 top-0 pt-20">
-            <nav className="p-4 space-y-1">
-               {['Dashboard', 'Disponibilidad', 'Sesiones'].map(item => (
-                  <a key={item} href="#" className={`flex items-center gap-3 p-3 rounded-lg text-sm font-medium ${item === 'Disponibilidad' ? 'bg-white text-primary shadow-sm' : 'text-elegant-gray hover:bg-gray-200'}`}>
-                     {item}
-                  </a>
-               ))}
-            </nav>
-         </aside>
-
-         <main className="flex-1 ml-64 p-10">
+        <main className="flex-1 p-10">
             <div className="max-w-5xl mx-auto">
                <header className="mb-12">
                   <h1 className="text-4xl font-extrabold text-primary font-display mb-4">Gestión de Disponibilidad</h1>

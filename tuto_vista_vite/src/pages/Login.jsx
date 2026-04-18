@@ -3,16 +3,16 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
-import Navbar from '../components/Navbar';
+import Sidebar from '../components/Sidebar';
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState('login');
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f7f9fb]">
-      <Navbar />
-      
-      <main className="flex-grow flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex bg-[#f7f9fb] font-body">
+      <Sidebar />
+      <div className="flex-1 ml-64 flex flex-col">
+        <main className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-[1000px] grid md:grid-cols-2 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
           {/* Left Side: Illustration / Branding */}
           <div className="hidden md:block relative p-12 signature-gradient text-white overflow-hidden">
@@ -94,6 +94,7 @@ const Login = () => {
       </main>
 
       <Footer />
+      </div>
     </div>
   );
 };

@@ -1,20 +1,10 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const TutorAgendaDetail = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f9fb] font-body">
-      <nav className="bg-white/80 backdrop-blur-md text-primary sticky top-0 z-50 px-8 py-4 flex justify-between items-center border-b border-gray-50">
-        <div className="flex items-center gap-8">
-          <span className="text-xl font-bold tracking-tight">The Academic Editorial</span>
-          <div className="hidden md:flex gap-6">
-            <a className="text-primary font-bold border-b-2 border-primary pb-1" href="#">Find Tutors</a>
-            {['Library', 'Resources'].map(l => <a key={l} className="text-gray-400 hover:text-primary transition-colors" href="#">{l}</a>)}
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <button className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md">Apply to Tutor</button>
-        </div>
-      </nav>
+    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
+      <Sidebar />
+      <div className="flex-1 ml-64 flex flex-col">
 
       <main className="max-w-7xl mx-auto px-6 py-12 lg:py-20 flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-24">
@@ -79,6 +69,7 @@ const TutorAgendaDetail = () => {
             {['Privacy', 'Terms', 'Contact'].map(l => <a key={l} href="#" className="hover:text-primary transition-colors">{l}</a>)}
          </div>
       </footer>
+      </div>
     </div>
   );
 };

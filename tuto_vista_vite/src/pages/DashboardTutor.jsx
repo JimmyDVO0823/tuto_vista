@@ -1,68 +1,9 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const DashboardTutor = () => {
   return (
-    <div className="flex min-h-screen bg-surface font-body">
-      {/* SideNavBar */}
-      <aside className="bg-[#f2f4f6] text-[#002045] h-screen w-64 fixed left-0 top-0 flex flex-col py-8 z-40">
-        <div className="px-8 mb-10">
-          <span className="text-lg font-black tracking-widest uppercase font-headline">
-            ACADEMIC
-          </span>
-        </div>
-        <div className="flex flex-col items-center mb-10 px-8">
-          <div className="relative w-20 h-20 mb-4">
-            <img
-              className="w-20 h-20 rounded-full object-cover shadow-sm"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJAQYEI1ONEC-mzpKSEt9vnJG9CJyzsuMfDyrNhWVCNlyTm2jAPaQt0E3w4L7ZH4HaeJDR45WGkge4WuQn6OkpEhNU97aewYgbQMlVi4gnjZX9Mo0bUZV_46C1h3BIhMHEqq-x0_6yg5_MINRVSRPq6my8MVV5pLnxvDaxpMRtE24M4TO01UN0AFHNiTqnPkkfBeguutbMFEqRahg9SD43YXM_IDyJQDjyU3WG29_QvykFCKDJddq9Bpg0h75hxKUyTJKbRvfvd-hI"
-              alt="Tutor Profile"
-            />
-            <div className="absolute bottom-0 right-0 w-4 h-4 bg-academic-gold rounded-full border-2 border-[#f2f4f6]" />
-          </div>
-          <h2 className="font-headline font-bold text-lg leading-tight">
-            Julian Reed
-          </h2>
-          <p className="text-xs font-medium uppercase tracking-[0.05em] text-[#191c1e]/60">
-            Honors Scholar
-          </p>
-        </div>
-        <nav className="flex-1 space-y-1">
-          <a
-            className="bg-white text-[#002045] font-semibold rounded-l-full ml-4 pl-4 py-3 flex items-center gap-3 transition-all"
-            href="#"
-          >
-            <span className="material-symbols-outlined">dashboard</span>
-            <span>Dashboard</span>
-          </a>
-          {['My Sessions', 'Assignments', 'Messages', 'Settings'].map((item, i) => (
-            <a
-              key={item}
-              className="text-[#191c1e]/70 px-8 py-3 flex items-center gap-3 hover:bg-[#e6e8ea] transition-all"
-              href="#"
-            >
-              <span className="material-symbols-outlined">
-                {['calendar_today', 'menu_book', 'mail', 'settings'][i]}
-              </span>
-              <span>{item}</span>
-            </a>
-          ))}
-        </nav>
-        <div className="px-8 mt-auto flex flex-col gap-4">
-          <button className="signature-gradient text-white font-bold py-3 px-4 rounded-xl text-sm shadow-md transition-transform active:scale-95">
-            Book New Session
-          </button>
-          <div className="space-y-1 border-t border-[#e6e8ea] pt-6">
-            <a className="text-[#191c1e]/70 py-2 flex items-center gap-3 hover:text-[#002045] transition-colors" href="#">
-              <span className="material-symbols-outlined">help</span>
-              <span className="text-xs uppercase tracking-wider font-medium">Support</span>
-            </a>
-            <a className="text-[#191c1e]/70 py-2 flex items-center gap-3 hover:text-[#002045] transition-colors" href="#">
-              <span className="material-symbols-outlined">logout</span>
-              <span className="text-xs uppercase tracking-wider font-medium">Logout</span>
-            </a>
-          </div>
-        </div>
-      </aside>
+    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
+      <Sidebar />
 
       {/* Main Content Area */}
       <main className="flex-1 ml-64 p-10 min-h-screen">

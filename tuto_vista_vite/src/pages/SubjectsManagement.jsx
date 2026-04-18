@@ -1,31 +1,9 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const SubjectsManagement = () => {
-  const subjects = [
-    { code: 'MAT-101', name: 'Cálculo Diferencial e Integral I', dept: 'Departamento de Matemáticas', status: 'ACTIVO', sem: 'Semestre A' },
-    { code: 'CS-204', name: 'Programación Web Avanzada', dept: 'Ciencias de la Computación', status: 'ACTIVO', sem: 'Semestre B' },
-    { code: 'FIS-102', name: 'Física Mecánica', dept: 'Departamento de Física', status: 'INACTIVO', sem: 'Semestre A' },
-    { code: 'HUM-110', name: 'Ética y Pensamiento Crítico', dept: 'Humanidades y Artes', status: 'ACTIVO', sem: 'Transversal' },
-  ];
-
   return (
     <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      {/* SideNavBar */}
-      <aside className="bg-[#f2f4f6] text-[#002045] h-screen w-64 fixed left-0 top-0 flex flex-col py-8 z-50">
-        <div className="px-8 mb-10">
-          <h1 className="text-lg font-black tracking-widest uppercase font-headline">THE ACADEMIC</h1>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {['Dashboard', 'Assignments', 'My Sessions', 'Messages', 'Settings'].map((item, i) => (
-             <a key={item} href="#" className={`flex items-center gap-3 px-8 py-3 transition-all ${item === 'Assignments' ? 'bg-white text-primary font-bold rounded-l-full ml-4 pl-4' : 'text-[#191c1e]/70 hover:bg-[#e6e8ea]'}`}>
-                <span className="material-symbols-outlined">
-                  {['dashboard', 'menu_book', 'calendar_today', 'mail', 'settings'][i]}
-                </span>
-                <span className="text-sm">{item}</span>
-             </a>
-          ))}
-        </nav>
-      </aside>
+      <Sidebar />
 
       <main className="ml-64 min-h-screen p-12">
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">

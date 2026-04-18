@@ -1,4 +1,4 @@
-import React from 'react';
+import Sidebar from '../components/Sidebar';
 
 const UsersManagement = () => {
   const users = [
@@ -10,22 +10,7 @@ const UsersManagement = () => {
 
   return (
     <div className="flex min-h-screen bg-[#f7f9fb] font-body">
-      {/* SideNavBar */}
-      <aside className="bg-[#f2f4f6] text-[#002045] h-screen w-64 fixed left-0 top-0 flex flex-col py-8 z-40">
-        <div className="px-8 mb-12">
-          <h1 className="text-lg font-black tracking-widest uppercase font-display">THE ACADEMIC</h1>
-        </div>
-        <nav className="flex-1 space-y-1">
-          {['Dashboard', 'My Sessions', 'Assignments', 'Messages', 'Settings'].map((item, i) => (
-             <a key={item} href="#" className="flex items-center gap-3 px-8 py-3 text-elegant-gray hover:bg-gray-200 transition-all">
-                <span className="material-symbols-outlined">
-                  {['dashboard', 'calendar_today', 'menu_book', 'mail', 'settings'][i]}
-                </span>
-                <span className="text-sm">{item}</span>
-             </a>
-          ))}
-        </nav>
-      </aside>
+      <Sidebar />
 
       <main className="flex-1 ml-64 min-h-screen">
         <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 px-8 py-4 flex justify-between items-center w-full">
