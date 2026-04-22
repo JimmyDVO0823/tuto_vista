@@ -7,7 +7,7 @@ const TutorSearchHeader = () => {
         <span className="text-sm font-label font-bold uppercase tracking-[0.1em] text-tertiary mb-2 block">
           Explora Expertos
         </span>
-        <h1 className="text-5xl font-headline font-extrabold text-primary leading-tight">
+        <h1 className="text-5xl font-headline font-black text-primary leading-tight">
           Encuentra tu mentor académico ideal.
         </h1>
       </div>
