@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import SidebarItem from './SidebarItem';
 
 /**
  * Sidebar Component - The Academic Editorial
@@ -62,34 +63,16 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
 
       {/* Navigation */}
       <div className="flex-1 flex flex-col gap-1 overflow-y-auto no-scrollbar">
-        {navLinks.map((link) => {
-          const isActive = location.pathname === link.path;
-          return (
-            <Link
-              key={link.label}
-              to={link.path}
-              className={`flex items-center gap-4 py-3 relative transition-all group ${
-                isActive
-                  ? 'bg-white text-primary font-semibold rounded-l-full ml-4 pl-4'
-                  : 'text-elegant-gray px-7 hover:bg-[#e6e8ea]'
-              } ${isCollapsed ? 'px-0 justify-center ml-0 rounded-none' : ''}`}
-            >
-              <span className={`material-symbols-outlined !text-[24px] transition-transform duration-300 ${isCollapsed && isActive ? 'text-primary scale-110' : ''}`}>
-                {link.icon}
-              </span>
-              {!isCollapsed && (
-                <span className="text-sm font-body whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300">
-                  {link.label}
-                </span>
-              )}
-              {isCollapsed && (
-                <div className="absolute left-full ml-4 px-2 py-1 bg-primary text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  {link.label}
-                </div>
-              )}
-            </Link>
-          );
-        })}
+        {navLinks.map((link) => (
+          <SidebarItem
+            key={link.label}
+            label={link.label}
+            path={link.path}
+            icon={link.icon}
+            isCollapsed={isCollapsed}
+            isActive={location.pathname === link.path}
+          />
+        ))}
       </div>
 
       {/* Footer Actions */}
