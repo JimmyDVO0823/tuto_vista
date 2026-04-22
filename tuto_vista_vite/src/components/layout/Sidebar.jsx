@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SidebarItem from './SidebarItem';
+import SessionView from './SessionView';
 
 /**
  * Sidebar Component - The Academic Editorial
@@ -9,6 +10,13 @@ import SidebarItem from './SidebarItem';
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const location = useLocation();
   
+  // Mock user for now - This could come from an Auth Context later
+  const currentUser = {
+    name: 'Julian Reed',
+    role: 'Honors Scholar',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZOpt5w551XHfqYULnJTuGEpt5A5sQfS-rGYKJ8RDVypF4--j8zvRx_kCajeOtRLIRKsdAbkuPrKdk5ydD3xJddzS9imHE2c3kiFVHhtq30GBs7Uls7KcLTJIlMYLsJSNMlU3NIFdEPo4kbdl4YNcs6bTNdMjsPbKSZmBh_hfqoW21-1cy7-5EDrugAATFLZUnVBX_3-8198vMuOkVcHWkXn9UnbH80JaimlyeFq9dHs-XkAl9UuidVl9bOgJyvB6hsxkovmP3Zx-s'
+  };
+
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard/student', icon: 'dashboard' },
     { label: 'Tutors Explorer', path: '/tutors', icon: 'search' },
@@ -42,25 +50,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       </div>
 
       {/* User Profile */}
-      <div className={`px-5 mb-8 flex items-center gap-3 transition-opacity duration-300 ${isCollapsed ? 'justify-center' : ''}`}>
-        <div className="w-10 h-10 min-w-[40px] rounded-full overflow-hidden bg-[#e6e8ea] border-2 border-white shadow-sm shrink-0">
-          <img
-            alt="Julian Reed"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZOpt5w551XHfqYULnJTuGEpt5A5sQfS-rGYKJ8RDVypF4--j8zvRx_kCajeOtRLIRKsdAbkuPrKdk5ydD3xJddzS9imHE2c3kiFVHhtq30GBs7Uls7KcLTJIlMYLsJSNMlU3NIFdEPo4kbdl4YNcs6bTNdMjsPbKSZmBh_hfqoW21-1cy7-5EDrugAATFLZUnVBX_3-8198vMuOkVcHWkXn9UnbH80JaimlyeFq9dHs-XkAl9UuidVl9bOgJyvB6hsxkovmP3Zx-s"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        {!isCollapsed && (
-          <div className="animate-in slide-in-from-left-2 duration-300">
-            <p className="text-sm font-bold text-primary font-body whitespace-nowrap">
-              Julian Reed
-            </p>
-            <p className="text-[10px] uppercase tracking-wider text-[#191c1e]/60 font-medium whitespace-nowrap">
-              Honors Scholar
-            </p>
-          </div>
-        )}
-      </div>
+      <SessionView user={null} isCollapsed={isCollapsed} />
 
       {/* Navigation */}
       <div className="flex-1 flex flex-col gap-1 overflow-y-auto no-scrollbar">
