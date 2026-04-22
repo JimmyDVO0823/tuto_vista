@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const LoginForm = () => {
   return (
     <div className="space-y-6" id="login-form">
@@ -105,6 +107,18 @@ const LoginForm = () => {
           </svg>
           <span className="text-xs font-semibold">Facebook</span>
         </button>
+      </div>
+      
+      <div className="text-center pt-4 border-t border-gray-100">
+        <p className="text-sm text-gray-500">
+          ¿No tienes una cuenta?{" "}
+          <Link
+            to="/registerform"
+            className="text-[#002045] font-bold hover:underline"
+          >
+            Regístrate aquí
+          </Link>
+        </p>
       </div>
     </div>
   );

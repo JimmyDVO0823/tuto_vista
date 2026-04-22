@@ -10,12 +10,8 @@ import SessionView from './SessionView';
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const location = useLocation();
   
-  // Mock user for now - This could come from an Auth Context later
-  const currentUser = {
-    name: 'Julian Reed',
-    role: 'Honors Scholar',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZOpt5w551XHfqYULnJTuGEpt5A5sQfS-rGYKJ8RDVypF4--j8zvRx_kCajeOtRLIRKsdAbkuPrKdk5ydD3xJddzS9imHE2c3kiFVHhtq30GBs7Uls7KcLTJIlMYLsJSNMlU3NIFdEPo4kbdl4YNcs6bTNdMjsPbKSZmBh_hfqoW21-1cy7-5EDrugAATFLZUnVBX_3-8198vMuOkVcHWkXn9UnbH80JaimlyeFq9dHs-XkAl9UuidVl9bOgJyvB6hsxkovmP3Zx-s'
-  };
+  // Mock user - set to null to demonstrate logged-out state
+  const currentUser = null;
 
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard/student', icon: 'dashboard' },
@@ -50,7 +46,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       </div>
 
       {/* User Profile */}
-      <SessionView user={null} isCollapsed={isCollapsed} />
+      <SessionView user={currentUser} isCollapsed={isCollapsed} />
 
       {/* Navigation */}
       <div className="flex-1 flex flex-col gap-1 overflow-y-auto no-scrollbar">
@@ -87,13 +83,25 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
             <span className="material-symbols-outlined !text-[18px]">help</span>
             {!isCollapsed && <span>Support</span>}
           </Link>
-          <button
-            className={`text-xs text-gray-500 hover:text-red-600 flex items-center gap-2 px-2 py-1 transition-colors font-medium text-left ${isCollapsed ? 'p-0' : ''}`}
-            title="Logout"
-          >
-            <span className="material-symbols-outlined !text-[18px]">logout</span>
-            {!isCollapsed && <span>Logout</span>}
-          </button>
+          
+          {currentUser ? (
+            <button
+              className={`text-xs text-gray-500 hover:text-red-600 flex items-center gap-2 px-2 py-1 transition-colors font-medium text-left ${isCollapsed ? 'p-0' : ''}`}
+              title="Logout"
+            >
+              <span className="material-symbols-outlined !text-[18px]">logout</span>
+              {!isCollapsed && <span className="whitespace-nowrap">Logout</span>}
+            </button>
+          ) : (
+            <Link
+              to="/loginform"
+              className={`text-xs text-gray-500 hover:text-primary flex items-center gap-2 px-2 py-1 transition-colors font-medium ${isCollapsed ? 'p-0' : ''}`}
+              title="Login"
+            >
+              <span className="material-symbols-outlined !text-[18px]">login</span>
+              {!isCollapsed && <span className="whitespace-nowrap">Login</span>}
+            </Link>
+          )}
         </div>
       </div>
     </nav>
