@@ -66,10 +66,6 @@ const SubjectsManagement = () => {
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">Administración del Sistema</p>
             <h2 className="text-5xl font-extrabold font-headline text-primary tracking-tight leading-tight">Gestión de Materias Académicas</h2>
           </div>
-          <Button variant="primary" className="rounded-xl px-10">
-            <span className="material-symbols-outlined">add_circle</span>
-            <span>Agregar Nueva Materia</span>
-          </Button>
         </header>
 
         <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">

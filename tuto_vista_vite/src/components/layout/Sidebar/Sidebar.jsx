@@ -16,7 +16,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const navLinks = [
     { label: 'Dashboard', path: '/dashboard/student', icon: 'dashboard' },
     { label: 'Find Tutors', path: '/tutors', icon: 'search' },
-    { label: 'My Sessions', path: '#', icon: 'calendar_today' },
+    { label: 'My Sessions', path: '/dispo', icon: 'calendar_today' },
     { label: 'Assignments', path: '/subjects', icon: 'menu_book' },
     { label: 'Messages', path: '#', icon: 'mail' },
     { label: 'Settings', path: '#', icon: 'settings' },

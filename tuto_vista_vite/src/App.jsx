@@ -6,6 +6,7 @@ import DashboardStudent from './pages/DashboardStudent'
 import LoginForm from './components/features/auth/LoginForm/LoginForm'
 import RegisterForm from './components/features/auth/RegisterForm/RegisterForm'
 import SubjectsManagement from './pages/SubjectsManagement'
+import DispoManagement from './pages/DispoManagement'
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         <Route path="/tutors" element={<TutorsExplorer />} />
         <Route path="/dashboard/student" element={<DashboardStudent />} />
         <Route path="/subjects" element={<SubjectsManagement />} />
+        <Route path="/dispo" element={<DispoManagement />} />
       </Routes>
     </Router>
   )
