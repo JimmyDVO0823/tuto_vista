@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
-import SubjectTable from '../components/SubjectTable';
+import SubjectTable from '../components/ui/SubjectTable/SubjectTable';
 import Button from '../components/ui/Button/Button';
 import Searcher from '../components/ui/Searcher/Searcher';
 
