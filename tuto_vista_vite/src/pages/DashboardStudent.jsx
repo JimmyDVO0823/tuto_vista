@@ -1,11 +1,9 @@
 import React from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
+import NextSessions from '../components/features/dashboard/NextSessions/NextSessions';
+import PendingAssignments from '../components/features/dashboard/PendingAssignments/PendingAssignments';
 
 const DashboardStudent = () => {
-  const upcomingSessions = [
-    { title: 'Econometría Avanzada', time: '14:00 - 15:30', tutor: 'Dra. Elena Vargas', type: 'Editorial' },
-    { title: 'Escritura Académica II', time: '17:00 - 18:30', tutor: 'Dr. Julián Reed', type: 'Revision' }
-  ];
 
   return (
     <MainLayout>
@@ -24,30 +22,9 @@ const DashboardStudent = () => {
         </header>
 
         <section className="grid grid-cols-12 gap-10 mb-20">
-          <article className="col-span-8 space-y-8">
-            <h2 className="text-2xl font-bold font-headline text-primary">Sesiones en curso</h2>
-            <div className="space-y-4">
-              {upcomingSessions.map((session, i) => (
-                <div key={i} className="group bg-white p-8 rounded-2xl flex items-center justify-between border-l-4 border-primary shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-center gap-8">
-                    <div className="w-16 h-16 rounded-full bg-mini-gray flex items-center justify-center font-bold text-primary text-xl">
-                      {session.title.charAt(0)}
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-bold text-primary mb-1">{session.title}</h4>
-                      <p className="text-sm font-medium text-gray-400 uppercase tracking-widest">{session.tutor} • {session.type}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-3 text-right">
-                    <div className="flex items-center gap-2 text-primary font-bold">
-                       <span className="material-symbols-outlined text-sm">schedule</span>
-                       <span>{session.time}</span>
-                    </div>
-                    <button className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all group-hover:px-8">Unirse a sesión</button>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <article className="col-span-8">
+            <NextSessions />
+            <PendingAssignments />
           </article>
 
           <aside className="col-span-4 space-y-10">
