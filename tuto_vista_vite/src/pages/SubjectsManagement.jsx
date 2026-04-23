@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import SubjectTable from '../components/SubjectTable';
 import Button from '../components/ui/Button/Button';
+import Searcher from '../components/ui/Searcher/Searcher';
 
 const SubjectsManagement = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
   const subjects = [
     { 
       name: 'Cálculo Diferencial e Integral I', 
@@ -47,6 +50,14 @@ const SubjectsManagement = () => {
     },
   ];
 
+  const normalizeString = (str) => 
+    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+  const filteredSubjects = subjects.filter((s) =>
+    normalizeString(s.name).includes(normalizeString(searchQuery)) ||
+    normalizeString(s.dept).includes(normalizeString(searchQuery))
+  );
+
   return (
     <MainLayout>
       <main className="p-12">
@@ -62,16 +73,17 @@ const SubjectsManagement = () => {
         </header>
 
         <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
-          <div className="relative flex-1">
-             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
-             <input className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 text-sm" placeholder="Buscar materia..." />
-          </div>
+          <Searcher 
+            value={searchQuery} 
+            onChange={setSearchQuery} 
+            placeholder="Buscar materia o departamento..." 
+          />
           <div className="flex gap-2">
              <Button variant="boring">Filtros</Button>
           </div>
         </div>
 
-        <SubjectTable subjects={subjects} />
+        <SubjectTable subjects={filteredSubjects} />
 
         <footer className="mt-20 border-t border-gray-100 py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">
           <p>© 2024 The Academic Editorial. All rights reserved.</p>
