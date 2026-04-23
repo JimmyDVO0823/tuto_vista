@@ -4,44 +4,20 @@ import timeGridPlugin from '@fullcalendar/timegrid' // Vista de semana
 
 export default function AcademicCalendar() {
   return (
-    <div className="bg-surface-container-lowest p-8 rounded-lg shadow-ambient font-body">
-      <style>{`
-        .fc {
-          --fc-button-bg-color: #002045;
-          --fc-button-border-color: #002045;
-          --fc-button-hover-bg-color: #1a365d;
-          --fc-button-hover-border-color: #1a365d;
-          --fc-button-active-bg-color: #CEAE42;
-          --fc-button-active-border-color: #CEAE42;
-          --fc-event-bg-color: #002045;
-          --fc-event-border-color: #002045;
-          --fc-today-bg-color: #F2F4F6;
-        }
-        .fc .fc-toolbar-title {
-          font-family: 'Manrope', sans-serif;
-          font-weight: 700;
-          color: #002045;
-          font-size: 1.5rem;
-        }
-        .fc .fc-button {
-          font-family: 'Inter', sans-serif;
-          font-weight: 600;
-          text-transform: capitalize;
-          border-radius: 0.75rem;
-        }
-        .fc .fc-col-header-cell-cushion {
-          font-family: 'Manrope', sans-serif;
-          font-weight: 600;
-          color: #696C6E;
-          text-decoration: none;
-        }
-        .fc .fc-daygrid-day-number {
-          font-family: 'Inter', sans-serif;
-          color: #696C6E;
-          text-decoration: none;
-          padding: 8px;
-        }
-      `}</style>
+    <div className="bg-surface-container-lowest p-8 rounded-lg shadow-ambient font-body
+      [--fc-button-bg-color:theme(colors.primary)]
+      [--fc-button-border-color:theme(colors.primary)]
+      [--fc-button-hover-bg-color:theme(colors.primary-container)]
+      [--fc-button-hover-border-color:theme(colors.primary-container)]
+      [--fc-button-active-bg-color:theme(colors.academic-gold)]
+      [--fc-button-active-border-color:theme(colors.academic-gold)]
+      [--fc-event-bg-color:theme(colors.primary)]
+      [--fc-event-border-color:theme(colors.primary)]
+      [--fc-today-bg-color:theme(colors.mini-gray)]
+      [&_.fc-toolbar-title]:font-headline [&_.fc-toolbar-title]:font-bold [&_.fc-toolbar-title]:text-primary [&_.fc-toolbar-title]:text-2xl
+      [&_.fc-button]:font-body [&_.fc-button]:font-semibold [&_.fc-button]:capitalize [&_.fc-button]:rounded-xl
+      [&_.fc-col-header-cell-cushion]:font-headline [&_.fc-col-header-cell-cushion]:font-semibold [&_.fc-col-header-cell-cushion]:text-elegant-gray [&_.fc-col-header-cell-cushion]:no-underline
+      [&_.fc-daygrid-day-number]:font-body [&_.fc-daygrid-day-number]:text-elegant-gray [&_.fc-daygrid-day-number]:no-underline [&_.fc-daygrid-day-number]:p-2">
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin]}
         initialView="dayGridMonth"
