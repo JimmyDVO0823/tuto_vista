@@ -4,13 +4,13 @@
 ## [x] DashboardStudent
 ## [ ] DashboardTutor
 ## [ ] DispoManagement
-## [ ] Home
+## [x] Home
 ## [x] Login
 ## [ ] MyTutorsHistory
-## [ ] SubjectsManagement
+## [x] SubjectsManagement
 ## [ ] TutorAgendaDetail
 ## [x] TutorsExplorer
 ## [ ] UsersManagement
 
 ---
-**Progreso Total: 3/11**
+**Progreso Total: 5/11**

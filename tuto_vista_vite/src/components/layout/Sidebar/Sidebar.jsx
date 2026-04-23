@@ -14,6 +14,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const currentUser = null;
 
   const navLinks = [
+    { label: 'Home', path: '/', icon: 'home' },
     { label: 'Dashboard', path: '/dashboard/student', icon: 'dashboard' },
     { label: 'Find Tutors', path: '/tutors', icon: 'search' },
     { label: 'My Sessions', path: '/dispo', icon: 'calendar_today' },
@@ -21,6 +22,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     { label: 'Messages', path: '#', icon: 'mail' },
     { label: 'Settings', path: '#', icon: 'settings' },
   ];
+
 
   return (
     <nav 
