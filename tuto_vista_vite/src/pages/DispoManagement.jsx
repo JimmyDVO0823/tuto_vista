@@ -1,5 +1,6 @@
 import React from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
+import AcademicCalendar from '../components/features/dashboard/AcademicCalendar/AcademicCalendar';
 
 const DispoManagement = () => {
   return (
@@ -19,24 +20,7 @@ const DispoManagement = () => {
                   <p className="text-gray-600 text-lg">Define tus horarios de enseñanza para el semestre.</p>
                </header>
 
-               <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="grid grid-cols-8 border-b border-gray-100 bg-[#f2f4f6]">
-                     <div className="p-4 bg-gray-50 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-gray-400">schedule</span>
-                     </div>
-                     {['LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB', 'DOM'].map(d => (
-                        <div key={d} className="p-4 text-center">
-                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{d}</p>
-                        </div>
-                      ))}
-                  </div>
-                  <div className="h-[500px] relative bg-white">
-                     {/* Mock Calendar Content */}
-                     <div className="absolute inset-0 flex items-center justify-center text-gray-300 italic">
-                        Contenedor de Calendario Interactivo
-                     </div>
-                  </div>
-               </div>
+               <AcademicCalendar />
             </div>
          </main>
       </div>
