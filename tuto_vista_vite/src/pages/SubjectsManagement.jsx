@@ -1,12 +1,49 @@
 import React from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
+import SubjectTable from '../components/SubjectTable';
 
 const SubjectsManagement = () => {
   const subjects = [
-    { code: 'MAT-101', name: 'Cálculo Diferencial e Integral I', dept: 'Departamento de Matemáticas', status: 'ACTIVO', sem: 'Semestre A' },
-    { code: 'CS-204', name: 'Programación Web Avanzada', dept: 'Ciencias de la Computación', status: 'ACTIVO', sem: 'Semestre B' },
-    { code: 'FIS-102', name: 'Física Mecánica', dept: 'Departamento de Física', status: 'INACTIVO', sem: 'Semestre A' },
-    { code: 'HUM-110', name: 'Ética y Pensamiento Crítico', dept: 'Humanidades y Artes', status: 'ACTIVO', sem: 'Transversal' },
+    { 
+      name: 'Cálculo Diferencial e Integral I', 
+      dept: 'Departamento de Matemáticas', 
+      status: 'ACTIVO', 
+      sem: 'Semestre A',
+      tutor: 'Dr. Roberto Gómez',
+      nextActivity: 'Mañana, 08:30 AM',
+      completedActivities: 3,
+      totalActivities: 5
+    },
+    { 
+      name: 'Programación Web Avanzada', 
+      dept: 'Ciencias de la Computación', 
+      status: 'ACTIVO', 
+      sem: 'Semestre B',
+      tutor: 'Ing. Elena Torres',
+      nextActivity: '24 Abr, 10:00 AM',
+      completedActivities: 2,
+      totalActivities: 4
+    },
+    { 
+      name: 'Física Mecánica', 
+      dept: 'Departamento de Física', 
+      status: 'INACTIVO', 
+      sem: 'Semestre A',
+      tutor: 'MSc. Carlos Ruiz',
+      nextActivity: 'Pendiente',
+      completedActivities: 1,
+      totalActivities: 6
+    },
+    { 
+      name: 'Ética y Pensamiento Crítico', 
+      dept: 'Humanidades y Artes', 
+      status: 'ACTIVO', 
+      sem: 'Transversal',
+      tutor: 'Dra. Sofía Mora',
+      nextActivity: '25 Abr, 02:00 PM',
+      completedActivities: 4,
+      totalActivities: 4
+    },
   ];
 
   return (
@@ -34,37 +71,7 @@ const SubjectsManagement = () => {
           </div>
         </div>
 
-        <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-[#f2f4f6]">
-              <tr>
-                {['Código', 'Nombre', 'Departamento', 'Estado', 'Acciones'].map(h => (
-                  <th key={h} className="px-8 py-6 text-[0.7rem] uppercase tracking-widest font-bold text-gray-400">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {subjects.map(s => (
-                <tr key={s.code} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-8 py-6"><span className="font-mono text-xs font-bold bg-[#f2f4f6] px-2 py-1 rounded">{s.code}</span></td>
-                  <td className="px-8 py-6">
-                    <div className="font-bold text-primary">{s.name}</div>
-                    <div className="text-xs text-gray-400 mt-1">{s.sem}</div>
-                  </td>
-                  <td className="px-8 py-6 text-sm text-gray-500">{s.dept}</td>
-                  <td className="px-8 py-6">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold ${s.status === 'ACTIVO' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {s.status}
-                    </span>
-                  </td>
-                  <td className="px-8 py-6 text-right">
-                    <button className="material-symbols-outlined text-gray-400 hover:text-primary transition-colors">edit</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        <SubjectTable subjects={subjects} />
 
         <footer className="mt-20 border-t border-gray-100 py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">
           <p>© 2024 The Academic Editorial. All rights reserved.</p>
