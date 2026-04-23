@@ -21,6 +21,7 @@ export default function AcademicCalendar() {
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin]}
         initialView="dayGridMonth"
+        aspectRatio={1.1}
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',

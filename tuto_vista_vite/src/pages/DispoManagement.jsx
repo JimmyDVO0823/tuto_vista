@@ -14,7 +14,7 @@ const DispoManagement = () => {
         </header>
 
         <main className="flex-1 p-10">
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                <header className="mb-12">
                   <h1 className="text-4xl font-extrabold text-primary font-display mb-4">Gestión de Disponibilidad</h1>
                   <p className="text-gray-600 text-lg">Define tus horarios de enseñanza para el semestre.</p>
