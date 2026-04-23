@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar/Sidebar';
+import Footer from '../Footer/Footer';
 
 const MainLayout = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -7,7 +8,7 @@ const MainLayout = ({ children }) => {
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
   return (
-    <div className="flex min-h-screen bg-[#f7f9fb] font-body">
+    <div className="flex min-h-screen bg-[#f7f9fb] font-body relative">
       {/* Sidebar with state control */}
       <Sidebar 
         isCollapsed={isCollapsed} 
@@ -18,11 +19,14 @@ const MainLayout = ({ children }) => {
       
       {/* Dynamic Content Area */}
       <div 
-        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out min-h-screen ${
           isCollapsed ? 'ml-20' : 'ml-64'
         }`}
       >
-        {children}
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
       </div>
     </div>
   );

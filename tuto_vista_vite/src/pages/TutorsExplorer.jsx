@@ -39,13 +39,6 @@ const TutorsExplorer = () => {
              </div>
           </section>
         </div>
-
-        <footer className="mt-24 pt-10 border-t border-gray-100 flex justify-between items-center opacity-40 grayscale">
-           <p className="text-[10px] font-bold uppercase tracking-widest text-primary">© 2024 THE ACADEMIC EDITORIAL</p>
-           <div className="flex gap-6">
-             {['Directory', 'Resource Hub', 'Tutor Guidelines'].map(l => <a key={l} href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-primary transition-colors">{l}</a>)}
-           </div>
-        </footer>
       </main>
     </MainLayout>
   );

@@ -93,13 +93,6 @@ const DashboardStudent = () => {
              </div>
           </aside>
         </section>
-
-        <footer className="mt-20 border-t border-gray-100 py-12 flex justify-between items-center text-[0.75rem] uppercase tracking-[0.05em] font-medium text-gray-500">
-          <p>© 2024 The Academic Editorial. All rights reserved.</p>
-          <div className="flex gap-8">
-            {['Privacy Policy', 'Terms of Service', 'Contact'].map(l => <a key={l} href="#" className="hover:text-primary transition-colors">{l}</a>)}
-          </div>
-        </footer>
       </main>
     </MainLayout>
   );
