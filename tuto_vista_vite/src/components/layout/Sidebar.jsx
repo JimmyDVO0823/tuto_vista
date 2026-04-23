@@ -17,7 +17,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     { label: 'Dashboard', path: '/dashboard/student', icon: 'dashboard' },
     { label: 'Find Tutors', path: '/tutors', icon: 'search' },
     { label: 'My Sessions', path: '#', icon: 'calendar_today' },
-    { label: 'Assignments', path: '#', icon: 'menu_book' },
+    { label: 'Assignments', path: '/subjects', icon: 'menu_book' },
     { label: 'Messages', path: '#', icon: 'mail' },
     { label: 'Settings', path: '#', icon: 'settings' },
   ];
