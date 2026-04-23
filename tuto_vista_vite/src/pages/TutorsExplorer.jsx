@@ -1,9 +1,9 @@
 import React from 'react';
-import MainLayout from '../components/layout/MainLayout';
-import TutorSearchHeader from '../components/features/tutors/TutorSearchHeader';
-import SearchFilters from '../components/features/tutors/SearchFilters';
-import TutorCard from '../components/features/tutors/TutorCard';
-import Pagination from '../components/ui/Pagination';
+import MainLayout from '../components/layout/MainLayout/MainLayout';
+import TutorSearchHeader from '../components/features/tutors/TutorSearchHeader/TutorSearchHeader';
+import SearchFilters from '../components/features/tutors/SearchFilters/SearchFilters';
+import TutorCard from '../components/features/tutors/TutorCard/TutorCard';
+import Pagination from '../components/ui/Pagination/Pagination';
 
 const TutorsExplorer = () => {
   const tutors = [

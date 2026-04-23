@@ -1,11 +1,11 @@
 import React from 'react';
-import MainLayout from '../components/layout/MainLayout';
-import HeroSection from '../components/features/home/HeroSection';
-import HowItWorksSection from '../components/features/home/HowItWorksSection';
-import CTASection from '../components/features/home/CTASection';
-import CategoriesSection from '../components/features/home/CategoriesSection';
-import TestimonialsSection from '../components/features/home/TestimonialsSection';
-import Footer from '../components/layout/Footer';
+import MainLayout from '../components/layout/MainLayout/MainLayout';
+import HeroSection from '../components/features/home/HeroSection/HeroSection';
+import HowItWorksSection from '../components/features/home/HowItWorksSection/HowItWorksSection';
+import CTASection from '../components/features/home/CTASection/CTASection';
+import CategoriesSection from '../components/features/home/CategoriesSection/CategoriesSection';
+import TestimonialsSection from '../components/features/home/TestimonialsSection/TestimonialsSection';
+import Footer from '../components/layout/Footer/Footer';
 
 const Home = () => {
   return (
