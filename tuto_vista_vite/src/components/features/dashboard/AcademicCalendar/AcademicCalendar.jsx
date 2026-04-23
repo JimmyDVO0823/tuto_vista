@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import EventPreviewCard from './EventPreviewCard';
+
 
 export default function AcademicCalendar() {
   const [hoveredEvent, setHoveredEvent] = useState(null);
@@ -57,28 +59,7 @@ export default function AcademicCalendar() {
         eventMouseLeave={handleMouseLeave}
       />
 
-      {/* Hover Preview Tooltip */}
-      {hoveredEvent && (
-        <div
-          className="fixed z-50 bg-white p-5 rounded-xl shadow-2xl border border-gray-100 pointer-events-none transform -translate-x-1/2 -translate-y-full mt-[-10px]"
-          style={{ top: hoveredEvent.y, left: hoveredEvent.x, minWidth: '260px' }}
-        >
-          <div className="space-y-2">
-            <span className="text-[10px] uppercase tracking-widest font-bold text-academic-gold">{hoveredEvent.category}</span>
-            <h4 className="text-sm font-bold text-primary leading-snug">{hoveredEvent.title}</h4>
-            <div className="flex flex-col gap-1.5 mt-3 pt-3 border-t border-gray-50">
-              <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
-                <span className="material-symbols-outlined text-[14px]">schedule</span>
-                {hoveredEvent.time}
-              </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-                <span className="material-symbols-outlined text-[14px]">label</span>
-                {hoveredEvent.status}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <EventPreviewCard event={hoveredEvent} />
     </div>
   );
 }
