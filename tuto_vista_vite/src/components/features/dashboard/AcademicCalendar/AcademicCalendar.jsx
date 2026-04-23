@@ -10,10 +10,12 @@ export default function AcademicCalendar() {
 
   const handleMouseEnter = (info) => {
     const { title, extendedProps } = info.event;
-    const { category, time, status } = extendedProps;
+    const { type, category, time, status } = extendedProps;
     setHoveredEvent({
       title,
+      type: type || 'Evento',
       category: category || 'General',
+
       time: time || 'Todo el día',
       status: status || 'Programado',
       x: info.jsEvent.clientX,
@@ -24,6 +26,29 @@ export default function AcademicCalendar() {
   const handleMouseLeave = () => {
     setHoveredEvent(null);
   };
+
+  const rawEvents = [
+    { 
+      title: 'Tutoría Física Avanzada', 
+      date: '2026-04-20', 
+      extendedProps: { type: 'Sesión', category: 'Ciencias Exactas', time: '10:00 AM - 11:30 AM', status: 'Confirmada' } 
+    },
+    { 
+      title: 'Entrega Ensayo Literatura', 
+      date: '2026-04-22', 
+      extendedProps: { type: 'Compromiso', category: 'Humanidades', time: '23:59 PM', status: 'Urgente' } 
+    },
+    { 
+      title: 'Tutoría Cálculo III', 
+      date: '2026-04-25', 
+      extendedProps: { type: 'Sesión', category: 'Ingeniería', time: '14:00 PM - 16:00 PM', status: 'En progreso' } 
+    }
+  ];
+
+  const calendarEvents = rawEvents.map(event => ({
+    ...event,
+    color: event.extendedProps.type === 'Compromiso' ? '#cba72f' : '#002045'
+  }));
 
   return (
     <div className="relative bg-surface-container-lowest p-8 rounded-lg shadow-ambient font-body
@@ -49,11 +74,9 @@ export default function AcademicCalendar() {
           center: 'title',
           right: 'dayGridMonth,timeGridWeek'
         }}
-        events={[
-          { title: 'Tutoría Física Avanzada', date: '2024-05-20', color: '#002045', extendedProps: { category: 'Ciencias Exactas', time: '10:00 AM - 11:30 AM', status: 'Confirmada' } },
-          { title: 'Entrega Ensayo Literatura', date: '2024-05-22', color: '#CEAE42', extendedProps: { category: 'Humanidades', time: '23:59 PM', status: 'Urgente' } },
-          { title: 'Revisión Tesis Maestría', date: '2024-05-25', color: '#002045', extendedProps: { category: 'Investigación', time: '14:00 PM - 16:00 PM', status: 'En progreso' } }
-        ]}
+        events={calendarEvents}
+
+
         eventClassNames="rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer"
         eventMouseEnter={handleMouseEnter}
         eventMouseLeave={handleMouseLeave}

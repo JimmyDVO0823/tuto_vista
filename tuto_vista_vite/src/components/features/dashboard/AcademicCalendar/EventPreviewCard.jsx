@@ -10,9 +10,10 @@ const EventPreviewCard = ({ event }) => {
     >
       <div className="space-y-2">
         <span className="text-[10px] uppercase tracking-widest font-bold text-academic-gold">
-          {event.category}
+          {event.type} • {event.category}
         </span>
         <h4 className="text-sm font-bold text-primary leading-snug">
+
           {event.title}
         </h4>
         <div className="flex flex-col gap-1.5 mt-3 pt-3 border-t border-gray-50">
