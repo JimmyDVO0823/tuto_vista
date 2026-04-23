@@ -23,3 +23,7 @@ export const Outline = {
 export const Ghost = {
   render: () => <Button variant="ghost">Secondary Action</Button>,
 };
+
+export const Boring = {
+  render: () => <Button variant="boring">Filters & More</Button>,
+};

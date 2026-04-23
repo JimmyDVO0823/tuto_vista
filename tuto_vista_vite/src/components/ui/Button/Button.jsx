@@ -8,7 +8,8 @@ const Button = ({ children, variant = 'primary', className = '', ...props }) => 
     secondary: 'tertiary-container text-primary shadow-sm hover:shadow-md',
     tertiary: 'bg-transparent text-primary hover:bg-surface-container-low',
     outline: 'border border-outline-variant bg-transparent text-primary hover:bg-surface-container-low',
-    ghost: 'bg-transparent text-primary/60 hover:text-primary'
+    ghost: 'bg-transparent text-primary/60 hover:text-primary',
+    boring: 'bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100 shadow-sm hover:shadow-md'
   };
 
   const variantStyles = variants[variant] || variants.primary;

@@ -1,6 +1,7 @@
 import React from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import SubjectTable from '../components/SubjectTable';
+import Button from '../components/ui/Button/Button';
 
 const SubjectsManagement = () => {
   const subjects = [
@@ -54,10 +55,10 @@ const SubjectsManagement = () => {
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">Administración del Sistema</p>
             <h2 className="text-5xl font-extrabold font-headline text-primary tracking-tight leading-tight">Gestión de Materias Académicas</h2>
           </div>
-          <button className="signature-gradient text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 shadow-lg transition-all active:scale-95">
+          <Button variant="primary" className="rounded-xl px-10">
             <span className="material-symbols-outlined">add_circle</span>
             <span>Agregar Nueva Materia</span>
-          </button>
+          </Button>
         </header>
 
         <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
@@ -66,8 +67,7 @@ const SubjectsManagement = () => {
              <input className="w-full bg-white border-none rounded-xl py-4 pl-12 pr-4 text-sm" placeholder="Buscar materia..." />
           </div>
           <div className="flex gap-2">
-             <button className="bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100 shadow-sm">Filtros</button>
-             <button className="bg-white px-6 py-4 rounded-xl text-sm font-semibold border border-gray-100 shadow-sm">Exportar</button>
+             <Button variant="boring">Filtros</Button>
           </div>
         </div>
 
