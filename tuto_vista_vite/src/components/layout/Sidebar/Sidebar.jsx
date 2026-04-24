@@ -13,6 +13,27 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const location = useLocation();
   const { user } = useAuth();
   
+  const navLinks = {
+    estudiante: [
+      { label: 'Librería', path: '/dashboard', icon: 'dashboard' },
+      { label: 'Explorar Tutores', path: '/tutors', icon: 'search' },
+      { label: 'Mis Sesiones', path: '/dispo', icon: 'calendar_today' },
+      { label: 'Mis Materias', path: '/subjects', icon: 'menu_book' },
+      { label: 'Mensajes', path: '#', icon: 'mail' },
+      { label: 'Ajustes', path: '#', icon: 'settings' },
+    ],
+    tutor: [
+      { label: 'Panel Instructor', path: '/dashboard', icon: 'dashboard' },
+      { label: 'Agenda Diaria', path: '/tutor-agenda', icon: 'event_note' },
+      { label: 'Disponibilidad', path: '/dispo', icon: 'schedule' },
+      { label: 'Mis Cursos', path: '/subjects', icon: 'school' },
+      { label: 'Ingresos', path: '#', icon: 'payments' },
+      { label: 'Ajustes', path: '#', icon: 'settings' },
+    ]
+  };
+
+  const currentNav = navLinks[user?.role] || navLinks.estudiante;
+
   const currentUser = user ? {
     name: user.name,
     role: user.role === 'tutor' ? 'Tutor Académico' : 'Estudiante',
@@ -23,17 +44,6 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
-
-  const navLinks = [
-    { label: 'Home', path: '/', icon: 'home' },
-    { label: 'Dashboard', path: '/dashboard/student', icon: 'dashboard' },
-    { label: 'Find Tutors', path: '/tutors', icon: 'search' },
-    { label: 'My Sessions', path: '/dispo', icon: 'calendar_today' },
-    { label: 'Assignments', path: '/subjects', icon: 'menu_book' },
-    { label: 'Messages', path: '#', icon: 'mail' },
-    { label: 'Settings', path: '#', icon: 'settings' },
-  ];
-
 
   return (
     <nav 
@@ -63,7 +73,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
 
       {/* Navigation */}
       <div className="flex-1 flex flex-col gap-1 overflow-y-auto no-scrollbar">
-        {navLinks.map((link) => (
+        {currentNav.map((link) => (
           <SidebarItem
             key={link.label}
             label={link.label}

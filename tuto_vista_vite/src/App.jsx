@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import TutorsExplorer from './pages/TutorsExplorer'
-import DashboardStudent from './pages/DashboardStudent'
+import DashboardSwitcher from './pages/DashboardSwitcher'
 import LoginForm from './components/features/auth/LoginForm/LoginForm'
 import RegisterForm from './components/features/auth/RegisterForm/RegisterForm'
 import SubjectsManagement from './pages/SubjectsManagement'
@@ -37,7 +37,7 @@ function App() {
           }
         />
         <Route path="/tutors" element={<TutorsExplorer />} />
-        <Route path="/dashboard/student" element={<DashboardStudent />} />
+        <Route path="/dashboard" element={<DashboardSwitcher />} />
         <Route path="/subjects" element={<SubjectsManagement />} />
         <Route path="/dispo" element={<DispoManagement />} />
         </Routes>

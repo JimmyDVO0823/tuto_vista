@@ -10,7 +10,7 @@ export default function Navbar() {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <Link className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" to="/tutors">Find Tutors</Link>
-            <Link className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" to="/dashboard/student">Library</Link>
+            <Link className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" to="/dashboard">Library</Link>
             <a className="text-[#191c1e]/60 hover:text-[#002045] transition-colors" href="#">Resources</a>
           </div>
         </div>

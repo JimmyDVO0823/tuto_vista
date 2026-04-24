@@ -24,7 +24,7 @@ const LoginForm = () => {
     if (signInError) {
       setError(signInError.message || 'Error al iniciar sesión. Comprueba tus credenciales.');
     } else {
-      navigate('/dashboard/student');
+      navigate('/dashboard');
     }
     
     setLoading(false);

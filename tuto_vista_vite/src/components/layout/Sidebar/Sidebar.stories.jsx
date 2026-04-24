@@ -10,7 +10,7 @@ export default {
   },
   decorators: [
     (Story) => (
-      <MemoryRouter initialEntries={['/dashboard/student']}>
+      <MemoryRouter initialEntries={['/dashboard']}>
         <div className="flex bg-[#f7f9fb] min-h-screen">
           <Story />
           <div className="flex-1 p-10">
