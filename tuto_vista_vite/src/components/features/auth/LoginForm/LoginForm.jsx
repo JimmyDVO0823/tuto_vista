@@ -1,8 +1,34 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../../../../lib/supabase';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      setError(signInError.message || 'Error al iniciar sesión. Comprueba tus credenciales.');
+    } else {
+      navigate('/dashboard/student');
+    }
+    
+    setLoading(false);
+  };
 
   return (
     <div className="space-y-6" id="login-form">
@@ -14,7 +40,12 @@ const LoginForm = () => {
           Ingresa tus credenciales para continuar con tus estudios.
         </p>
       </div>
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+            {error}
+          </div>
+        )}
         <div className="space-y-1">
           <label
             className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant"
@@ -81,10 +112,11 @@ const LoginForm = () => {
           </a>
         </div>
         <button
-          className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10"
+          className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10 disabled:opacity-70 disabled:cursor-not-allowed"
           type="submit"
+          disabled={loading}
         >
-          Acceder al Portal
+          {loading ? 'Ingresando...' : 'Acceder al Portal'}
         </button>
       </form>
       <div className="relative py-4">

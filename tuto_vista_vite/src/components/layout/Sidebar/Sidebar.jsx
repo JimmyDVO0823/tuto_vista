@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SidebarItem from './SidebarItem';
 import SessionView from './SessionView';
+import { useAuth } from '../../../context/AuthContext';
+import { supabase } from '../../../lib/supabase';
 
 /**
  * Sidebar Component - The Academic Editorial
@@ -9,9 +11,18 @@ import SessionView from './SessionView';
  */
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const location = useLocation();
+  const { user } = useAuth();
   
-  // Mock user - set to null to demonstrate logged-out state
-  const currentUser = null;
+  // Connect the true logged user or null
+  const currentUser = user ? {
+    name: user.name,
+    role: user.role === 'tutor' ? 'Tutor Académico' : 'Estudiante',
+    avatar: user.user_metadata?.avatar_url || ''
+  } : null;
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+  };
 
   const navLinks = [
     { label: 'Home', path: '/', icon: 'home' },
@@ -88,6 +99,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
           
           {currentUser ? (
             <button
+              onClick={handleLogout}
               className={`text-xs text-gray-500 hover:text-red-600 flex items-center gap-2 px-2 py-1 transition-colors font-medium text-left ${isCollapsed ? 'p-0' : ''}`}
               title="Logout"
             >
