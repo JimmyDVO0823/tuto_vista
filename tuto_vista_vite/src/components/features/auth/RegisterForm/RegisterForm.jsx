@@ -45,7 +45,7 @@ const RegisterForm = () => {
     setLoading(true);
 
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -58,7 +58,7 @@ const RegisterForm = () => {
 
       if (signUpError) throw signUpError;
       
-      setSuccess('¡Registro exitoso! Revisa tu correo electrónico para confirmar tu cuenta.');
+      setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
       setFormData({
         name: '',
         email: '',
