@@ -3,11 +3,28 @@ import MainLayout from '../components/layout/MainLayout/MainLayout';
 import SubjectTable from '../components/ui/SubjectTable/SubjectTable';
 import Button from '../components/ui/Button/Button';
 import Searcher from '../components/ui/Searcher/Searcher';
+import { useAuth } from '../context/AuthContext';
 
+/**
+ * SubjectsManagement Page.
+ * Logic Rationale: Orchestrates the view for both Students (enrolled courses) 
+ * and Tutors (taught subjects). It dynamically adjusts the UI hierarchy 
+ * based on the authenticated role.
+ * 
+ * @component
+ */
 const SubjectsManagement = () => {
+  const { user } = useAuth();
+  /** @type {'student'|'tutor'} */
+  const role = user?.role || 'student';
   const [searchQuery, setSearchQuery] = useState('');
 
-  const subjects = [
+  /**
+   * Mock Data Registry.
+   * Logic Rationale: For tutors, we filter or mock subjects where they 
+   * are the primary instruction lead.
+   */
+  const allSubjects = [
     { 
       name: 'Cálculo Diferencial e Integral I', 
       dept: 'Departamento de Matemáticas', 
@@ -50,10 +67,16 @@ const SubjectsManagement = () => {
     },
   ];
 
+  // Logic Rationale: If tutor, we mock their specific portfolio. 
+  // In a real scenario, this would be a filtered API call to 'tutor_materias'.
+  const displaySubjects = role === 'tutor' 
+    ? allSubjects.slice(0, 2).map(s => ({ ...s, tutor: user?.name || 'Tutor Actual' }))
+    : allSubjects;
+
   const normalizeString = (str) => 
     str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-  const filteredSubjects = subjects.filter((s) =>
+  const filteredSubjects = displaySubjects.filter((s) =>
     normalizeString(s.name).includes(normalizeString(searchQuery)) ||
     normalizeString(s.dept).includes(normalizeString(searchQuery))
   );
@@ -63,9 +86,20 @@ const SubjectsManagement = () => {
       <main className="p-12">
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
-            <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">Administración del Sistema</p>
-            <h2 className="text-5xl font-extrabold font-headline text-primary tracking-tight leading-tight">Gestión de Materias Académicas</h2>
+            <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">
+              {role === 'tutor' ? 'Catálogo del Tutor' : 'Administración del Sistema'}
+            </p>
+            <h2 className="text-5xl font-extrabold font-headline text-primary tracking-tight leading-tight">
+              {role === 'tutor' ? 'Mis Materias Dictadas' : 'Gestión de Materias Académicas'}
+            </h2>
           </div>
+          
+          {role === 'tutor' && (
+            <Button variant="primary" className="shadow-xl">
+              <span className="material-symbols-outlined">add</span>
+              Añadir materias
+            </Button>
+          )}
         </header>
 
         <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
@@ -79,7 +113,10 @@ const SubjectsManagement = () => {
           </div>
         </div>
 
-        <SubjectTable subjects={filteredSubjects} />
+        <SubjectTable 
+          subjects={filteredSubjects} 
+          showTutorColumn={role !== 'tutor'}
+        />
       </main>
     </MainLayout>
   );
