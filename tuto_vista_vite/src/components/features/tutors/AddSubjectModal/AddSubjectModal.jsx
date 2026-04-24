@@ -7,35 +7,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import Button from '../../../ui/Button/Button';
-
-/**
- * Mock Academic Catalog.
- * Logic Rationale: Centralized repository of departments and subjects 
- * to simulate the academic infrastructure.
- */
-const ACADEMIC_CATALOG = [
-  {
-    id: 'mat',
-    name: 'Departamento de Matemáticas',
-    subjects: ['Cálculo I', 'Cálculo II', 'Álgebra Lineal', 'Probabilidad y Estadística']
-  },
-  {
-    id: 'comp',
-    name: 'Ciencias de la Computación',
-    subjects: ['Estructuras de Datos', 'Bases de Datos I', 'Arquitectura de Software', 'Inteligencia Artificial']
-  },
-  {
-    id: 'phys',
-    name: 'Departamento de Física',
-    subjects: ['Física Mecánica', 'Física Electromagnética', 'Termodinámica']
-  },
-  {
-    id: 'hum',
-    name: 'Humanidades y Artes',
-    subjects: ['Ética', 'Pensamiento Crítico', 'Historia del Arte']
-  }
-];
+import Button from '../../../../components/ui/Button/Button';
+import { supabase } from '../../../../lib/supabase';
 
 /**
  * AddSubjectModal Component.
@@ -48,38 +21,67 @@ const ACADEMIC_CATALOG = [
  */
 const AddSubjectModal = ({ isOpen, onClose, onAdd }) => {
   const [selectedDeptId, setSelectedDeptId] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
+  const [departments, setDepartments] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   /**
-   * Cascading Filter Logic.
-   * Logic Rationale: Synchronizes the subject list with the selected department 
-   * to prevent invalid academic pairings.
+   * Initial Data Fetching.
+   * Logic Rationale: Retrieves the organizational structure of the university 
+   * to provide a starting point for the cascading select.
    */
   useEffect(() => {
-    if (selectedDeptId) {
-      const dept = ACADEMIC_CATALOG.find(d => d.id === selectedDeptId);
-      setAvailableSubjects(dept ? dept.subjects : []);
-      setSelectedSubject('');
-    } else {
-      setAvailableSubjects([]);
-      setSelectedSubject('');
-    }
+    const fetchDepartments = async () => {
+      const { data, error } = await supabase
+        .from('departamentos')
+        .select('id, nombre')
+        .order('nombre');
+      
+      if (!error && data) setDepartments(data);
+    };
+
+    if (isOpen) fetchDepartments();
+  }, [isOpen]);
+
+  /**
+   * Cascading Filter Logic (Remote).
+   * Logic Rationale: Connects to the 'materias' table to retrieve only 
+   * disciplines belonging to the selected department.
+   */
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      if (!selectedDeptId) {
+        setAvailableSubjects([]);
+        return;
+      }
+
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('materias')
+        .select('id, nombre')
+        .eq('departamento_id', selectedDeptId)
+        .order('nombre');
+      
+      if (!error && data) setAvailableSubjects(data);
+      setLoading(false);
+      setSelectedSubjectId('');
+    };
+
+    fetchSubjects();
   }, [selectedDeptId]);
 
   if (!isOpen) return null;
 
   const handleAdd = () => {
-    if (selectedDeptId && selectedSubject) {
-      const dept = ACADEMIC_CATALOG.find(d => d.id === selectedDeptId);
+    if (selectedSubjectId) {
+      const subject = availableSubjects.find(s => s.id === parseInt(selectedSubjectId));
+      const dept = departments.find(d => d.id === parseInt(selectedDeptId));
+      
       onAdd({
-        name: selectedSubject,
-        dept: dept.name,
-        status: 'ACTIVO',
-        sem: 'Semestre Actual',
-        nextActivity: 'Pendiente de asignar',
-        completedActivities: 0,
-        totalActivities: 10
+        materia_id: subject.id,
+        name: subject.nombre,
+        dept: dept.nombre
       });
       onClose();
     }
@@ -111,23 +113,23 @@ const AddSubjectModal = ({ isOpen, onClose, onAdd }) => {
                 className="w-full bg-[#f7f9fb] border-none rounded-xl px-4 py-4 text-primary font-medium focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
               >
                 <option value="">Seleccione un departamento...</option>
-                {ACADEMIC_CATALOG.map(dept => (
-                  <option key={dept.id} value={dept.id}>{dept.name}</option>
+                {departments.map(dept => (
+                  <option key={dept.id} value={dept.id}>{dept.nombre}</option>
                 ))}
               </select>
             </div>
 
             {/* Subject Selection (Cascaded) */}
-            <div className={`transition-opacity duration-300 ${!selectedDeptId ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`transition-opacity duration-300 ${!selectedDeptId || loading ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Materia</label>
               <select 
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
+                value={selectedSubjectId}
+                onChange={(e) => setSelectedSubjectId(e.target.value)}
                 className="w-full bg-[#f7f9fb] border-none rounded-xl px-4 py-4 text-primary font-medium focus:ring-2 focus:ring-primary/10 transition-all appearance-none cursor-pointer"
               >
-                <option value="">Seleccione la materia...</option>
+                <option value="">{loading ? 'Cargando materias...' : 'Seleccione la materia...'}</option>
                 {availableSubjects.map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
+                  <option key={sub.id} value={sub.id}>{sub.nombre}</option>
                 ))}
               </select>
             </div>
@@ -145,7 +147,7 @@ const AddSubjectModal = ({ isOpen, onClose, onAdd }) => {
               variant="primary" 
               className="flex-1 py-4 shadow-lg shadow-primary/20"
               onClick={handleAdd}
-              disabled={!selectedSubject}
+              disabled={!selectedSubjectId || loading}
             >
               Añadir al Catálogo
             </Button>

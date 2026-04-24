@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import SubjectTable from '../components/ui/SubjectTable/SubjectTable';
 import Button from '../components/ui/Button/Button';
 import Searcher from '../components/ui/Searcher/Searcher';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 import AddSubjectModal from '../components/features/tutors/AddSubjectModal/AddSubjectModal';
 
 /**
  * SubjectsManagement Page.
  * Logic Rationale: Orchestrates the view for both Students (enrolled courses) 
  * and Tutors (taught subjects). It dynamically adjusts the UI hierarchy 
- * based on the authenticated role.
+ * based on the authenticated role and persists data to Supabase.
  * 
  * @component
  */
@@ -20,77 +21,121 @@ const SubjectsManagement = () => {
   const role = user?.role || 'student';
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   /**
-   * Mock Data Registry.
-   * Logic Rationale: Initial set of subjects. For tutors, we augment 
-   * this state when they add a new subject via the modal.
+   * Data Fetching Orchestrator.
+   * Logic Rationale: Retrieves the subject catalog for the current user. 
+   * If tutor, it resolves the 'perfiles_tutor' identity to filter 'tutor_materias'.
    */
-  const initialSubjects = [
-    { 
-      name: 'Cálculo Diferencial e Integral I', 
-      dept: 'Departamento de Matemáticas', 
-      status: 'ACTIVO', 
-      sem: 'Semestre A',
-      tutor: 'Dr. Roberto Gómez',
-      nextActivity: 'Mañana, 08:30 AM',
-      completedActivities: 3,
-      totalActivities: 5
-    },
-    { 
-      name: 'Programación Web Avanzada', 
-      dept: 'Ciencias de la Computación', 
-      status: 'ACTIVO', 
-      sem: 'Semestre B',
-      tutor: 'Ing. Elena Torres',
-      nextActivity: '24 Abr, 10:00 AM',
-      completedActivities: 2,
-      totalActivities: 4
-    },
-    { 
-      name: 'Física Mecánica', 
-      dept: 'Departamento de Física', 
-      status: 'INACTIVO', 
-      sem: 'Semestre A',
-      tutor: 'MSc. Carlos Ruiz',
-      nextActivity: 'Pendiente',
-      completedActivities: 1,
-      totalActivities: 6
-    },
-    { 
-      name: 'Ética y Pensamiento Crítico', 
-      dept: 'Humanidades y Artes', 
-      status: 'ACTIVO', 
-      sem: 'Transversal',
-      tutor: 'Dra. Sofía Mora',
-      nextActivity: '25 Abr, 02:00 PM',
-      completedActivities: 4,
-      totalActivities: 4
-    },
-  ];
+  useEffect(() => {
+    const fetchTutorSubjects = async () => {
+      if (!user) return;
 
-  const [subjects, setSubjects] = useState(initialSubjects);
+      setLoading(true);
+      try {
+        // 1. Get Tutor Profile ID
+        const { data: tutorProfile, error: profileError } = await supabase
+          .from('perfiles_tutor')
+          .select('id')
+          .eq('usuario_id', user.id)
+          .single();
+
+        if (profileError) throw profileError;
+
+        // 2. Fetch Subjects via Join (simulated legacy join)
+        const { data, error } = await supabase
+          .from('tutor_materias')
+          .select(`
+            materia_id,
+            materias (
+              id,
+              nombre,
+              departamentos (nombre)
+            )
+          `)
+          .eq('tutor_id', tutorProfile.id);
+
+        if (error) throw error;
+
+        // 3. Map to UI format
+        const mappedSubjects = data.map(tm => ({
+          name: tm.materias.nombre,
+          dept: tm.materias.departamentos?.nombre || 'General',
+          status: 'ACTIVO',
+          sem: '2024-A',
+          tutor: user.name,
+          nextActivity: 'Pendiente',
+          completedActivities: 2,
+          totalActivities: 5
+        }));
+
+        setSubjects(mappedSubjects);
+      } catch (err) {
+        console.error('Error fetching tutor subjects:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (role === 'tutor') {
+      fetchTutorSubjects();
+    } else {
+      // Mock data for students until student enrollment table is ready
+      setSubjects([
+        { name: 'Cálculo Diferencial', dept: 'Matemáticas', status: 'ACTIVO', sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', nextActivity: 'Mañana', completedActivities: 3, totalActivities: 5 }
+      ]);
+      setLoading(false);
+    }
+  }, [user, role]);
 
   /**
    * Action Handlers.
-   * Logic Rationale: Local state persistence to simulate database updates 
-   * in the absence of a live backend.
+   * Logic Rationale: Persists the new tutor-subject relationship to 
+   * the 'tutor_materias' junction table.
    */
-  const handleAddSubject = (newSubject) => {
-    setSubjects(prev => [{ ...newSubject, tutor: user?.name || 'Tutor Actual' }, ...prev]);
-  };
+  const handleAddSubject = async (newSubjectData) => {
+    try {
+      const { data: tutorProfile } = await supabase
+        .from('perfiles_tutor')
+        .select('id')
+        .eq('usuario_id', user.id)
+        .single();
 
-  // Logic Rationale: If tutor, we show their specific portfolio.
-  const displaySubjects = role === 'tutor' 
-    ? subjects.filter(s => s.tutor === (user?.name || 'Dr. Roberto Gómez') || s.tutor === 'Tutor Actual')
-    : subjects;
+      const { error } = await supabase
+        .from('tutor_materias')
+        .insert([{ 
+          tutor_id: tutorProfile.id, 
+          materia_id: newSubjectData.materia_id 
+        }]);
+
+      if (error) throw error;
+
+      // Update local state for immediate feedback
+      setSubjects(prev => [{
+        name: newSubjectData.name,
+        dept: newSubjectData.dept,
+        status: 'ACTIVO',
+        sem: 'Reciente',
+        tutor: user.name,
+        nextActivity: 'Por programar',
+        completedActivities: 0,
+        totalActivities: 5
+      }, ...prev]);
+
+    } catch (err) {
+      console.error('Error adding subject:', err);
+      alert('Error al añadir la materia. Verifique si ya la dicta.');
+    }
+  };
 
   const normalizeString = (str) => 
     str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-  const filteredSubjects = displaySubjects.filter((s) =>
+  const filteredSubjects = subjects.filter((s) =>
     normalizeString(s.name).includes(normalizeString(searchQuery)) ||
-    normalizeString(s.dept).includes(normalizeString(searchQuery))
+    normalizeString(s.dept || '').includes(normalizeString(searchQuery))
   );
 
   return (
