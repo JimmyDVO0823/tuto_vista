@@ -1,13 +1,35 @@
+/**
+ * @fileoverview Feature Component - Advanced Academic Calendar
+ * @module components/features/dashboard/AcademicCalendar
+ * @description A high-fidelity scheduling interface powered by FullCalendar. 
+ * Orchestrates pedagogical sessions and academic commitments with a 
+ * focus on visual hierarchy and immediate event previews.
+ */
+
 import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import EventPreviewCard from './EventPreviewCard';
 
-
+/**
+ * AcademicCalendar Component.
+ * 
+ * @component
+ */
 export default function AcademicCalendar() {
+  /**
+   * Captures the coordinates and data of the event being hovered.
+   * Logic Rationale: Used to render a contextual floating preview (portal-like) 
+   * without affecting the main calendar layout.
+   * @state {Object|null} hoveredEvent
+   */
   const [hoveredEvent, setHoveredEvent] = useState(null);
 
+  /**
+   * Synchronizes UI state with the pointer position on event entry.
+   * @param {Object} info - FullCalendar event mouse event object.
+   */
   const handleMouseEnter = (info) => {
     const { title, extendedProps } = info.event;
     const { type, category, time, status } = extendedProps;

@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Feature Component - Social Proof Section
+ * @module components/features/home/TestimonialsSection
+ * @description Showcases community trust through student testimonials 
+ * and qualitative metrics. Adheres to asymmetric layout principles.
+ */
+
+/**
+ * TestimonialsSection Component.
+ * 
+ * @component
+ */
 export default function TestimonialsSection() {
   return (
     <section className="py-24 bg-surface overflow-hidden">

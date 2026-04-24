@@ -1,3 +1,16 @@
+/**
+ * @fileoverview Feature Component - Landing Page Hero Section
+ * @module components/features/home/HeroSection
+ * @description The primary 'entry moment' of the platform. It utilizes 
+ * asymmetric layouts and high-impact typography to establish the 
+ * 'Academic Editorial' brand identity.
+ */
+
+/**
+ * HeroSection Component.
+ * 
+ * @component
+ */
 export default function HeroSection() {
   return (
     <section className="relative min-h-[870px] flex items-center pt-20 overflow-hidden">

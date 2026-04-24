@@ -1,14 +1,24 @@
+/**
+ * @fileoverview Layout Sub-component - Navigation Link
+ * @module components/layout/Sidebar/SidebarItem
+ * @description An atomic navigational unit within the Sidebar. It encapsulates 
+ * the logic for active state visualization, grouping hover interactions, and 
+ * responsive tooltips when in collapsed mode.
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 /**
- * SidebarItem Component - Part of The Academic Editorial Design System
+ * SidebarItem Component.
  * 
- * @param {string} label - The text to display
- * @param {string} path - The navigation path
- * @param {string} icon - Material Symbols icon name
- * @param {boolean} isCollapsed - Whether the sidebar is in mini mode
- * @param {boolean} isActive - Whether this item is currently active
+ * @param {Object} props - Component properties.
+ * @param {string} props.label - The descriptive text label for the navigation intent.
+ * @param {string} props.path - The target route URL.
+ * @param {string} props.icon - The name of the Material Symbols ligature to render.
+ * @param {boolean} props.isCollapsed - Architectural switch for mini-mode rendering.
+ * @param {boolean} props.isActive - Visual flag indicating if the current route matches 'path'.
+ * @component
  */
 const SidebarItem = ({ label, path, icon, isCollapsed, isActive }) => {
   return (

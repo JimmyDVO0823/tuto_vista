@@ -1,5 +1,21 @@
+/**
+ * @fileoverview Dashboard Sub-component - Event Hover Preview
+ * @module components/features/dashboard/AcademicCalendar/EventPreviewCard
+ * @description A floating, portal-like widget that provides high-density 
+ * metadata for calendar events on hover. Adheres to strict spatial constraints 
+ * to avoid occluding the primary calendar interface.
+ */
+
 import React from 'react';
 
+/**
+ * EventPreviewCard Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {Object|null} props.event - The event data to render. 
+ * If null, the component renders nothing.
+ * @component
+ */
 const EventPreviewCard = ({ event }) => {
   if (!event) return null;
 

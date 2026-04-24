@@ -1,8 +1,29 @@
+/**
+ * @fileoverview Layout Component - Authenticated Shell
+ * @module components/layout/MainLayout
+ * @description The primary architectural wrapper for the dashboard experience. 
+ * Orchestrates the collapsible sidebar state and manages the dynamic 
+ * margin transition for content fluidity.
+ */
+
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar/Sidebar';
 import Footer from '../Footer/Footer';
 
+/**
+ * MainLayout Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {React.ReactNode} props.children - Route-specific content.
+ * @component
+ */
 const MainLayout = ({ children }) => {
+  /**
+   * Encapsulates the visibility state of the expanded navigation.
+   * Logic Rationale: Toggled via mouse entry/leave to maximize 
+   * horizontal space for academic data while maintaining navigation accessibility.
+   * @state {boolean} isCollapsed
+   */
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);

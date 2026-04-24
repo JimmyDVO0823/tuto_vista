@@ -1,6 +1,26 @@
+/**
+ * @fileoverview Dashboard Sub-component - Activity Record Card
+ * @module components/features/dashboard/ActivityCard
+ * @description A versatile list item used to represent both academic sessions 
+ * and pending assignments. It utilizes a bold 'initial' avatar and high-contrast 
+ * borders to maintain vertical rhythm in dense lists.
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+/**
+ * ActivityCard Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {string} props.initial - A single capital letter representing the activity's category.
+ * @param {string} props.title - Primary heading of the activity.
+ * @param {string} props.subtitle - Descriptive metadata (e.g., Tutor name or Subject).
+ * @param {string} props.time - Temporal information (e.g., span or deadline).
+ * @param {string} [props.buttonText="Unirse a sesión"] - Label for the primary CTA.
+ * @param {string} [props.actionPath="#"] - Navigation target for the CTA.
+ * @component
+ */
 const ActivityCard = ({ 
   initial, 
   title, 

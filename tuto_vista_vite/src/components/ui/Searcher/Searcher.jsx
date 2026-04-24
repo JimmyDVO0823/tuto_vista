@@ -1,5 +1,23 @@
+/**
+ * @fileoverview UI Atomic Component - Search Input
+ * @module components/ui/Searcher
+ * @description A refined search field designed for real-time filtering 
+ * of academic records. Orchestrates an icon-integrated input with 
+ * a focus on subtle shadows and focus-state rings.
+ */
+
 import React from 'react';
 
+/**
+ * Searcher Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {string} props.value - The current search query.
+ * @param {function(string): void} props.onChange - Callback for query updates.
+ * @param {string} [props.placeholder="Buscar..."] - Input hint.
+ * @param {string} [props.className=""] - Additional container styles.
+ * @component
+ */
 const Searcher = ({ 
   value, 
   onChange, 

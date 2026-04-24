@@ -1,8 +1,28 @@
+/**
+ * @fileoverview Feature Component - User Enrollment Form
+ * @module components/features/auth/RegisterForm
+ * @description Orchestrates the creation of new academic profiles. 
+ * It enforces structural integrity through Zod validation and 
+ * manages the propagation of user metadata (FullName, Role) 
+ * to the Supabase Auth system.
+ */
+
 import React, { useState } from 'react';
 import { supabase } from '../../../../lib/supabase';
 import { z } from 'zod';
 
+/**
+ * RegisterForm Component.
+ * 
+ * @component
+ */
 const RegisterForm = () => {
+  /**
+   * Encapsulates all enrollment inputs as a single state atomic unit.
+   * Logic Rationale: Grouped state simplifies change handling and 
+   * ensures data consistency before submission.
+   * @state {Object} formData
+   */
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -10,12 +30,23 @@ const RegisterForm = () => {
     confirmPassword: '',
     role: 'student'
   });
+
+  /** @state {boolean} loading - Submission lock */
   const [loading, setLoading] = useState(false);
+  /** @state {string|null} error - Validation or network error persistence */
   const [error, setError] = useState(null);
+  /** @state {boolean|string} success - Finalization state indicator */
   const [success, setSuccess] = useState(false);
+  
+  /** @state {boolean} showPassword - Visibility toggle for primary password */
   const [showPassword, setShowPassword] = useState(false);
+  /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  /**
+   * Generic handler for input synchronization.
+   * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e
+   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,8 +54,24 @@ const RegisterForm = () => {
     });
   };
 
+  /**
+   * Zod-based Email Schema.
+   * Logic Rationale: Enforces RFC compliance at the client-side to 
+   * minimize unnecessary server-side validation hits.
+   */
   const emailSchema = z.string().email('Por favor, ingresa un correo electrónico válido.');
 
+  /**
+   * Submission Sequence.
+   * Logic Rationale: 
+   * 1. Performs structural validation (Zod).
+   * 2. Validates password parity (Manual).
+   * 3. Invokes Supabase Auth with metadata payload, ensuring the 
+   *    'nombre_completo' and 'rol' are injected into the Auth JWT.
+   * 
+   * @param {React.FormEvent} e
+   * @async
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);

@@ -1,13 +1,58 @@
+/**
+ * @fileoverview Feature Component - Authentication Login Form
+ * @module components/features/auth/LoginForm
+ * @description Provides the primary interface for user ingress. 
+ * Designed with the 'Academic Editorial' philosophy, it balances security 
+ * requirements with a low-friction user experience.
+ */
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../../../lib/supabase';
 
+/**
+ * LoginForm Component.
+ * Encapsulates the state and logic for session initiation via Supabase Auth.
+ * 
+ * @component
+ */
 const LoginForm = () => {
+  /**
+   * Toggle for password field visibility. 
+   * Enhances UX by allowing users to verify their input in sensitive contexts.
+   * @state {boolean} showPassword
+   */
   const [showPassword, setShowPassword] = useState(false);
+
+  /**
+   * Captures and displays authentication exceptions.
+   * Logic Rationale: Errors are rendered in a distinct red-tinted micro-sheet 
+   * to provide immediate corrective feedback.
+   * @state {string|null} error
+   */
   const [error, setError] = useState(null);
+
+  /**
+   * Prevents duplicate form submissions during the asynchronous Auth handshake.
+   * @state {boolean} loading
+   */
   const [loading, setLoading] = useState(false);
+
+  /**
+   * Router navigation hook for post-authentication redirection.
+   * @type {function}
+   */
   const navigate = useNavigate();
 
+  /**
+   * Handlers for the form submission event.
+   * Logic Rationale: We utilize Supabase's `signInWithPassword` to maintain 
+   * compatibility with standard JWT-based flows, providing a robust 
+   * bridge to the academic dashboard.
+   * 
+   * @param {React.FormEvent} e - The form submission event.
+   * @async
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);

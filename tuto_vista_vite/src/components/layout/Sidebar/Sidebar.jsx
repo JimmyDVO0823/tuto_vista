@@ -1,3 +1,12 @@
+/**
+ * @fileoverview Layout Component - Navigation Sidebar
+ * @module components/layout/Sidebar
+ * @description The primary navigational column of the application, designed with the 
+ * 'Academic Editorial' aesthetic. It features a sophisticated collapsible mechanism 
+ * to preserve spatial integrity while offering distinct navigation paths based on 
+ * the user's academic role (Tutor vs. Estudiante).
+ */
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SidebarItem from './SidebarItem';
@@ -6,8 +15,19 @@ import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../lib/supabase';
 
 /**
- * Sidebar Component - The Academic Editorial
- * Enhanced with collapsible/mini mode support
+ * Sidebar Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.isCollapsed - Controls the visual width and detail level of the sidebar.
+ * @param {function} props.onMouseEnter - Handler for expanding the sidebar on hover (soft-expansion).
+ * @param {function} props.onMouseLeave - Handler for collapsing on mouse exit.
+ * @param {function} props.onToggle - Explicit toggle for manual expansion state management.
+ * @component
+ * 
+ * @example
+ * return (
+ *   <Sidebar isCollapsed={false} onToggle={() => console.log('toggle')} />
+ * )
  */
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const location = useLocation();
@@ -32,8 +52,21 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     ]
   };
 
+  /**
+   * Selection Logic:
+   * Dynamically filters the navigation registry based on the authenticated user's role.
+   * Defaults to 'estudiante' navigation if role is undefined or unrecognized, 
+   * ensuring system resilience.
+   * @type {Array<Object>}
+   */
   const currentNav = navLinks[user?.role] || navLinks.estudiante;
 
+  /**
+   * User Domain Mapper:
+   * Standardizes the raw 'User' state into a UI-friendly object.
+   * Adheres to the archival feel by mapping internal role codes to display labels.
+   * @type {Object|null}
+   */
   const currentUser = user ? {
     name: user.name,
     role: user.role === 'tutor' ? 'Tutor Académico' : 'Estudiante',
@@ -41,6 +74,12 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     email: user.email
   } : null;
 
+  /**
+   * Authentication Termination:
+   * Invokes the Supabase Auth layer to invalidate the current session.
+   * @async
+   * @function handleLogout
+   */
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };

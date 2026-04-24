@@ -1,5 +1,28 @@
+/**
+ * @fileoverview Feature Sub-component - Tutor Profile Card
+ * @module components/features/tutors/TutorCard
+ * @description A high-prestige representation of a tutor's academic profile. 
+ * Designed for the discovery interface, it emphasizes visual expertise 
+ * (avatar ring), pricing clarity, and social proof (ratings/reviews).
+ */
+
 import React from 'react';
 
+/**
+ * TutorCard Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {string} props.name - The full name of the academic professional.
+ * @param {string} props.image - URL of the profile portrait.
+ * @param {string} props.subject - The primary academic discipline.
+ * @param {number} props.price - Hourly rate in the system's base currency.
+ * @param {number} props.rating - Numerical average of student feedback (1.0 - 5.0).
+ * @param {number} props.reviews - Total count of verified student reviews.
+ * @param {string} props.quote - A distinguished personal bio or pedagogical statement.
+ * @param {boolean} [props.isTopRated] - Visual flag that triggers the 'Top Rated' 
+ * badge and signature ring styling.
+ * @component
+ */
 const TutorCard = ({ name, image, subject, price, rating, reviews, quote, isTopRated }) => {
   return (
     <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col gap-6 hover:shadow-[0_8px_40px_rgba(25,28,30,0.04)] transition-all group">

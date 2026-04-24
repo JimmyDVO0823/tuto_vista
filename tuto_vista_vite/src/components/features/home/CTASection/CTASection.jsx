@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Feature Component - Call to Action Section
+ * @module components/features/home/CTASection
+ * @description The final conversion point of the landing page. 
+ * Orchestrates a high-impact 'signature-gradient' container to drive enrollment.
+ */
+
+/**
+ * CTASection Component.
+ * 
+ * @component
+ */
 export default function CTASection() {
   return (
     <section className="py-24">

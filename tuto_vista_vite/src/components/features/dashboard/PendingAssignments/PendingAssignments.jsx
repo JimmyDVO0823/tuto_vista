@@ -1,7 +1,20 @@
+/**
+ * @fileoverview Dashboard Feature - Pending Commitments Registry
+ * @module components/features/dashboard/PendingAssignments
+ * @description Manages the display of urgent and upcoming academic tasks. 
+ * Reuses the ActivityCard pattern to maintain visual consistency while 
+ * shifting the context toward deadlines and assignment status.
+ */
+
 import React from 'react';
 import Pagination from '../../../ui/Pagination/Pagination';
 import ActivityCard from '../ActivityCard/ActivityCard';
 
+/**
+ * PendingAssignments Component.
+ * 
+ * @component
+ */
 const PendingAssignments = () => {
   const assignments = [
     { 

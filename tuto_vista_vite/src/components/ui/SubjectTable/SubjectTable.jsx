@@ -1,5 +1,20 @@
+/**
+ * @fileoverview UI Atomic Component - Academic Subjects Table
+ * @module components/ui/SubjectTable
+ * @description A high-density data representation for course enrollment. 
+ * It manages complex layouts including progress bars, tutor avatars, 
+ * and status indicators, following the 'No-Line' rule for row separation.
+ */
+
 import React from 'react';
 
+/**
+ * SubjectTable Component.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {Array<Object>} props.subjects - Array of subject data objects.
+ * @component
+ */
 const SubjectTable = ({ subjects }) => {
   return (
     <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">

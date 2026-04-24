@@ -1,9 +1,23 @@
+/**
+ * @fileoverview Routing Orchestrator - Dashboard Switcher
+ * @module pages/DashboardSwitcher
+ * @description Serves as the primary traffic controller for the dashboard entry point.
+ * It intelligently redirects the user based on their authenticated role, 
+ * maintaining the integrity of the 'Tutor' vs. 'Estudiante' experiences.
+ */
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DashboardStudent from './DashboardStudent';
 import DashboardTutor from './DashboardTutor';
 
+/**
+ * DashboardSwitcher Component.
+ * Acts as a logic gate for the landing page.
+ * 
+ * @component
+ */
 const DashboardSwitcher = () => {
     const { user, loading } = useAuth();
 

@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Feature Component - Discipline Categories Grid
+ * @module components/features/home/CategoriesSection
+ * @description A visual index of academic disciplines. It employs 
+ * large-scale imagery and tonal overlays to create a 'gallery' feel.
+ */
+
+/**
+ * CategoriesSection Component.
+ * 
+ * @component
+ */
 export default function CategoriesSection() {
   return (
     <section className="py-24 bg-surface">

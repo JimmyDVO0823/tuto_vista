@@ -1,3 +1,16 @@
+/**
+ * @fileoverview Feature Component - Process Overview
+ * @module components/features/home/HowItWorksSection
+ * @description Details the dual value proposition of the platform. 
+ * Orchestrates a comparative view between Student and Tutor experiences 
+ * using high-contrast surface architecture.
+ */
+
+/**
+ * HowItWorksSection Component.
+ * 
+ * @component
+ */
 export default function HowItWorksSection() {
   return (
     <section className="py-24 bg-surface-container-low">

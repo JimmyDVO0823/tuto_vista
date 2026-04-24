@@ -1,15 +1,35 @@
+/**
+ * @fileoverview Layout Sub-component - Session Micro-view
+ * @module components/layout/Sidebar/SessionView
+ * @description A high-precision UI widget dedicated to representing the active 
+ * user session within the Sidebar context. It prioritizes legibility and 
+ * sophisticated truncation of identity data.
+ */
+
 import React from 'react';
 
 /**
- * SessionView Component - Displays the current user state in the sidebar
+ * SessionView Component.
  * 
- * @param {Object} user - User object containing name, role, and image
- * @param {boolean} isCollapsed - Whether the sidebar is in mini mode
+ * @param {Object} props - Component properties.
+ * @param {Object} props.user - The standardized user object from AuthContext.
+ * @param {string} props.user.name - Full legal or display name of the user.
+ * @param {string} props.user.role - Academic designation (Tutor/Estudiante).
+ * @param {string} [props.user.avatar] - Optional URL for the profile image.
+ * @param {boolean} props.isCollapsed - Architectural switch that determines 
+ * if full text or only minimal iconography is rendered.
+ * @component
  */
 const SessionView = ({ user, isCollapsed }) => {
   const hasUser = !!user;
 
-  // Extraer el primer nombre y el primer apellido
+  /**
+   * Identity Truncation Logic:
+   * To maintain the 'Editorial' aesthetics, we limit the display name to the 
+   * first two tokens (typically First Name and Initial Surname). This prevents 
+   * layout overflow and maintains a clean typographic vertical rhythm.
+   * @type {string}
+   */
   let shortName = "Sesión no iniciada";
   if (hasUser && !!user.name) {
     const parts = user.name.split(' ');

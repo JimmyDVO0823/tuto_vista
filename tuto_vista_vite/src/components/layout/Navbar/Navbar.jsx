@@ -1,5 +1,19 @@
+/**
+ * @fileoverview Layout Component - Global Navigation Bar
+ * @module components/layout/Navbar
+ * @description The superior horizontal anchor of the site. It employs 
+ * 'Glassmorphism' (backdrop-blur) to provide a modern, premium academic 
+ * feel while maintaining navigational utility on desktop and mobile.
+ */
+
 import { Link } from 'react-router-dom';
 
+/**
+ * Navbar Component.
+ * Orchestrates top-level brand visibility and essential entry points.
+ * 
+ * @component
+ */
 export default function Navbar() {
   return (
     <nav className="bg-[#f7f9fb]/80 backdrop-blur-md top-0 sticky z-50 shadow-sm">

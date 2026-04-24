@@ -1,3 +1,16 @@
+/**
+ * @fileoverview Layout Component - Public Navigation Header
+ * @module components/layout/Header
+ * @description The primary navigational entry point for non-authenticated 
+ * sessions. Employs glassmorphism (backdrop-blur) and high-contrast 
+ * branding to establish immediate authority.
+ */
+
+/**
+ * Header Component.
+ * 
+ * @component
+ */
 const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-[#f7f9fb]/80 backdrop-blur-md shadow-sm">

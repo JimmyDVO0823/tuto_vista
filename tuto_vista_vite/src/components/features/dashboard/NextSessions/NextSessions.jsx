@@ -1,7 +1,20 @@
+/**
+ * @fileoverview Dashboard Feature - Upcoming Sessions Registry
+ * @module components/features/dashboard/NextSessions
+ * @description Orchestrates the visualization of future academic encounters. 
+ * It maps a local session registry into highly interactive ActivityCards, 
+ * integrating pagination for navigable session history.
+ */
+
 import React from 'react';
 import Pagination from '../../../ui/Pagination/Pagination';
 import ActivityCard from '../ActivityCard/ActivityCard';
 
+/**
+ * NextSessions Component.
+ * 
+ * @component
+ */
 const NextSessions = () => {
   const upcomingSessions = [
     { 
