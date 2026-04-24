@@ -1,4 +1,65 @@
+import React, { useState } from 'react';
+import { supabase } from '../../../../lib/supabase';
+
 const RegisterForm = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'student'
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(false);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Las contraseñas no coinciden.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            nombre_completo: formData.name,
+            rol: formData.role,
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+      
+      setSuccess('¡Registro exitoso! Revisa tu correo electrónico para confirmar tu cuenta.');
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'student'
+      });
+    } catch (err) {
+      setError(err.message || 'Error al registrar usuario.');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="space-y-6" id="register-form">
       <div className="space-y-2">
@@ -9,7 +70,17 @@ const RegisterForm = () => {
           Únete a nuestra red de excelencia académica.
         </p>
       </div>
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-50 text-green-600 p-3 rounded-md text-sm">
+            {success}
+          </div>
+        )}
         <div className="space-y-1">
           <label
             className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant"
@@ -24,6 +95,8 @@ const RegisterForm = () => {
             placeholder="Juan Pérez"
             required
             type="text"
+            value={formData.name}
+            onChange={handleChange}
           />
         </div>
         <div className="space-y-1">
@@ -40,6 +113,8 @@ const RegisterForm = () => {
             placeholder="juan@academia.com"
             required
             type="email"
+            value={formData.email}
+            onChange={handleChange}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -57,6 +132,8 @@ const RegisterForm = () => {
               placeholder="••••••••"
               required
               type="password"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
           <div className="space-y-1">
@@ -73,6 +150,8 @@ const RegisterForm = () => {
               placeholder="••••••••"
               required
               type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
             />
           </div>
         </div>
@@ -80,7 +159,12 @@ const RegisterForm = () => {
           <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
             Rol Académico
           </label>
-          <select className="w-full px-4 py-3 bg-[#f7f9fb] border-none focus:ring-2 focus:ring-[#002045]/20 rounded-md text-sm transition-all appearance-none cursor-pointer">
+          <select 
+            className="w-full px-4 py-3 bg-[#f7f9fb] border-none focus:ring-2 focus:ring-[#002045]/20 rounded-md text-sm transition-all appearance-none cursor-pointer"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+          >
             <option value="student">Estudiante</option>
             <option value="tutor">Tutor Académico</option>
           </select>
@@ -99,10 +183,11 @@ const RegisterForm = () => {
           </p>
         </div>
         <button
-          className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10"
+          className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10 disabled:opacity-70 disabled:cursor-not-allowed"
           type="submit"
+          disabled={loading}
         >
-          Crear mi Cuenta
+          {loading ? 'Procesando...' : 'Crear mi Cuenta'}
         </button>
       </form>
     </div>
