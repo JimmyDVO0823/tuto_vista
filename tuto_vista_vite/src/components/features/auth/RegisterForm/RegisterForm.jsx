@@ -60,14 +60,30 @@ const RegisterForm = () => {
             />
           </div>
           <div className="space-y-1">
-            <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              Rol Académico
+            <label
+              className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant"
+              htmlFor="reg-confirm-password"
+            >
+              Confirmar Contraseña
             </label>
-            <select className="w-full px-4 py-3 bg-[#f7f9fb] border-none focus:ring-2 focus:ring-[#002045]/20 rounded-md text-sm transition-all appearance-none cursor-pointer">
-              <option value="student">Estudiante</option>
-              <option value="tutor">Tutor Académico</option>
-            </select>
+            <input
+              className="w-full px-4 py-3 bg-[#f7f9fb] border-none focus:ring-2 focus:ring-[#002045]/20 rounded-md placeholder:text-outline-variant/60 text-sm transition-all"
+              id="reg-confirm-password"
+              name="confirmPassword"
+              placeholder="••••••••"
+              required
+              type="password"
+            />
           </div>
+        </div>
+        <div className="space-y-1">
+          <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+            Rol Académico
+          </label>
+          <select className="w-full px-4 py-3 bg-[#f7f9fb] border-none focus:ring-2 focus:ring-[#002045]/20 rounded-md text-sm transition-all appearance-none cursor-pointer">
+            <option value="student">Estudiante</option>
+            <option value="tutor">Tutor Académico</option>
+          </select>
         </div>
         <div className="py-2">
           <p className="text-[10px] text-on-surface-variant leading-relaxed text-gray-400">
