@@ -4,6 +4,7 @@ import SubjectTable from '../components/ui/SubjectTable/SubjectTable';
 import Button from '../components/ui/Button/Button';
 import Searcher from '../components/ui/Searcher/Searcher';
 import { useAuth } from '../context/AuthContext';
+import AddSubjectModal from '../components/features/tutors/AddSubjectModal/AddSubjectModal';
 
 /**
  * SubjectsManagement Page.
@@ -18,13 +19,14 @@ const SubjectsManagement = () => {
   /** @type {'student'|'tutor'} */
   const role = user?.role || 'student';
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   /**
    * Mock Data Registry.
-   * Logic Rationale: For tutors, we filter or mock subjects where they 
-   * are the primary instruction lead.
+   * Logic Rationale: Initial set of subjects. For tutors, we augment 
+   * this state when they add a new subject via the modal.
    */
-  const allSubjects = [
+  const initialSubjects = [
     { 
       name: 'Cálculo Diferencial e Integral I', 
       dept: 'Departamento de Matemáticas', 
@@ -67,11 +69,21 @@ const SubjectsManagement = () => {
     },
   ];
 
-  // Logic Rationale: If tutor, we mock their specific portfolio. 
-  // In a real scenario, this would be a filtered API call to 'tutor_materias'.
+  const [subjects, setSubjects] = useState(initialSubjects);
+
+  /**
+   * Action Handlers.
+   * Logic Rationale: Local state persistence to simulate database updates 
+   * in the absence of a live backend.
+   */
+  const handleAddSubject = (newSubject) => {
+    setSubjects(prev => [{ ...newSubject, tutor: user?.name || 'Tutor Actual' }, ...prev]);
+  };
+
+  // Logic Rationale: If tutor, we show their specific portfolio.
   const displaySubjects = role === 'tutor' 
-    ? allSubjects.slice(0, 2).map(s => ({ ...s, tutor: user?.name || 'Tutor Actual' }))
-    : allSubjects;
+    ? subjects.filter(s => s.tutor === (user?.name || 'Dr. Roberto Gómez') || s.tutor === 'Tutor Actual')
+    : subjects;
 
   const normalizeString = (str) => 
     str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -95,7 +107,11 @@ const SubjectsManagement = () => {
           </div>
           
           {role === 'tutor' && (
-            <Button variant="primary" className="shadow-xl">
+            <Button 
+              variant="primary" 
+              className="shadow-xl"
+              onClick={() => setIsModalOpen(true)}
+            >
               <span className="material-symbols-outlined">add</span>
               Añadir materias
             </Button>
@@ -116,6 +132,12 @@ const SubjectsManagement = () => {
         <SubjectTable 
           subjects={filteredSubjects} 
           showTutorColumn={role !== 'tutor'}
+        />
+
+        <AddSubjectModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onAdd={handleAddSubject}
         />
       </main>
     </MainLayout>
