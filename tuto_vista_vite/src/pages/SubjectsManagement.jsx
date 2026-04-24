@@ -31,20 +31,24 @@ const SubjectsManagement = () => {
    */
   useEffect(() => {
     const fetchTutorSubjects = async () => {
-      if (!user) return;
+      if (!user?.email) return;
 
       setLoading(true);
       try {
-        // 1. Get Tutor Profile ID
+        // Resolve Tutor Profile ID using email (consistent across Auth and DB)
         const { data: tutorProfile, error: profileError } = await supabase
           .from('perfiles_tutor')
-          .select('id')
-          .eq('usuario_id', user.id)
+          .select('id, perfiles!inner(id, correo)')
+          .eq('perfiles.correo', user.email)
           .single();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.warn('Este usuario no tiene un perfil de tutor activo:', profileError);
+          setSubjects([]);
+          return;
+        }
 
-        // 2. Fetch Subjects via Join (simulated legacy join)
+        // 2. Fetch Subjects using the resolved integer tutor_id
         const { data, error } = await supabase
           .from('tutor_materias')
           .select(`
@@ -82,7 +86,6 @@ const SubjectsManagement = () => {
     if (role === 'tutor') {
       fetchTutorSubjects();
     } else {
-      // Mock data for students until student enrollment table is ready
       setSubjects([
         { name: 'Cálculo Diferencial', dept: 'Matemáticas', status: 'ACTIVO', sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', nextActivity: 'Mañana', completedActivities: 3, totalActivities: 5 }
       ]);
@@ -93,15 +96,22 @@ const SubjectsManagement = () => {
   /**
    * Action Handlers.
    * Logic Rationale: Persists the new tutor-subject relationship to 
-   * the 'tutor_materias' junction table.
+   * the 'tutor_materias' junction table using resolved IDs.
    */
   const handleAddSubject = async (newSubjectData) => {
     try {
-      const { data: tutorProfile } = await supabase
+      if (!user?.email) throw new Error('Usuario no autenticado');
+
+      // Resolve Tutor Profile ID first to avoid UUID/Integer mismatch
+      const { data: tutorProfile, error: profileError } = await supabase
         .from('perfiles_tutor')
-        .select('id')
-        .eq('usuario_id', user.id)
+        .select('id, perfiles!inner(correo)')
+        .eq('perfiles.correo', user.email)
         .single();
+
+      if (profileError || !tutorProfile) {
+        throw new Error('No se pudo encontrar tu perfil de tutor.');
+      }
 
       const { error } = await supabase
         .from('tutor_materias')
@@ -126,7 +136,7 @@ const SubjectsManagement = () => {
 
     } catch (err) {
       console.error('Error adding subject:', err);
-      alert('Error al añadir la materia. Verifique si ya la dicta.');
+      alert(`Error: ${err.message || 'No se pudo añadir la materia'}`);
     }
   };
 
