@@ -14,10 +14,10 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser({
+          ...session.user,
           name: session.user.user_metadata?.nombre_completo || session.user.email,
           role: session.user.user_metadata?.rol || 'estudiante',
           email: session.user.email,
-          ...session.user
         });
       } else {
         setUser(null);
@@ -29,10 +29,10 @@ export const AuthProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser({
+          ...session.user,
           name: session.user.user_metadata?.nombre_completo || session.user.email,
           role: session.user.user_metadata?.rol || 'estudiante',
           email: session.user.email,
-          ...session.user
         });
       } else {
         setUser(null);
