@@ -13,11 +13,11 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const location = useLocation();
   const { user } = useAuth();
   
-  // Connect the true logged user or null
   const currentUser = user ? {
     name: user.name,
     role: user.role === 'tutor' ? 'Tutor Académico' : 'Estudiante',
-    avatar: user.user_metadata?.avatar_url || ''
+    avatar: user.user_metadata?.avatar_url || '',
+    email: user.email
   } : null;
 
   const handleLogout = async () => {

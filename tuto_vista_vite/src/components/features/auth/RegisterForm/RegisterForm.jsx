@@ -57,7 +57,7 @@ const RegisterForm = () => {
       });
 
       if (signUpError) throw signUpError;
-      
+
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
       setFormData({
         name: '',
@@ -203,7 +203,7 @@ const RegisterForm = () => {
           <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
             Rol Académico
           </label>
-          <select 
+          <select
             className="w-full px-4 py-3 bg-[#f7f9fb] border-none focus:ring-2 focus:ring-[#002045]/20 rounded-md text-sm transition-all appearance-none cursor-pointer"
             name="role"
             value={formData.role}
