@@ -1,19 +1,65 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import TutorSearchHeader from '../components/features/tutors/TutorSearchHeader/TutorSearchHeader';
 import SearchFilters from '../components/features/tutors/SearchFilters/SearchFilters';
 import TutorCard from '../components/features/tutors/TutorCard/TutorCard';
 import Pagination from '../components/ui/Pagination/Pagination';
+import { supabase } from '../lib/supabase';
 
 const TutorsExplorer = () => {
-  const tutors = [
-    { name: 'Dr. Elena Martínez', subject: 'Cálculo Multivariable', rating: 4.9, bio: 'Experta en análisis matemático aplicados a ingeniería.', image: 'https://i.pravatar.cc/150?u=elena' },
-    { name: 'Lic. Roberto Cano', subject: 'Literatura Latinoamericana', rating: 4.7, bio: 'Especialista en narrativa del siglo XX y análisis crítico.', image: 'https://i.pravatar.cc/150?u=robert' },
-    { name: 'Dra. Sarah Jenkins', subject: 'Bioquímica Celular', rating: 5.0, bio: 'Investigadora senior con enfoque en procesos metabólicos.', image: 'https://i.pravatar.cc/150?u=sarah' },
-    { name: 'Mtra. Clara Luz', subject: 'Historia del Arte', rating: 4.8, bio: 'Curadora y académica apasionada por el renacimiento.', image: 'https://i.pravatar.cc/150?u=clara' },
-    { name: 'Ing. Marco Polo', subject: 'Física Cuántica', rating: 4.6, bio: 'Divulgador científico y experto en mecánica teórica.', image: 'https://i.pravatar.cc/150?u=marco' },
-    { name: 'Dra. Isabela Riva', subject: 'Economía Política', rating: 4.9, bio: 'Consultora internacional en modelos económicos sostenibles.', image: 'https://i.pravatar.cc/150?u=isabela' },
-  ];
+  const [tutors, setTutors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchTutors();
+  }, []);
+
+  const fetchTutors = async () => {
+    try {
+      setLoading(true);
+      const { data, error: fetchError } = await supabase
+        .from('perfiles_tutor')
+        .select(`
+          id,
+          biografia,
+          precio_por_hora,
+          calificacion_promedio,
+          total_sesiones,
+          perfiles:usuario_id (
+            nombre_completo,
+            url_avatar
+          ),
+          tutor_materias (
+            materias (
+              nombre
+            )
+          )
+        `)
+        .eq('esta_disponible', true);
+
+      if (fetchError) throw fetchError;
+
+      const mappedTutors = data.map(t => ({
+        id: t.id,
+        name: t.perfiles?.nombre_completo || 'Tutor Anónimo',
+        image: t.perfiles?.url_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.perfiles?.nombre_completo || 'T')}&background=002045&color=fff`,
+        subject: t.tutor_materias?.map(tm => tm.materias?.nombre).filter(Boolean).join(', ') || 'Varias materias',
+        price: t.precio_por_hora || 0,
+        rating: t.calificacion_promedio || 0,
+        reviews: t.total_sesiones || 0,
+        quote: t.biografia || 'Comprometido con la excelencia académica y el éxito del estudiante.',
+        isTopRated: (t.calificacion_promedio || 0) >= 4.8
+      }));
+
+      setTutors(mappedTutors);
+    } catch (err) {
+      console.error('Error fetching tutors:', err);
+      setError('No se pudieron cargar los tutores. Por favor, intenta de nuevo más tarde.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <MainLayout>
@@ -28,15 +74,33 @@ const TutorsExplorer = () => {
 
           {/* Results Column */}
           <section className="col-span-9 space-y-10">
-             <div className="grid grid-cols-2 gap-8">
-               {tutors.map((tutor, i) => (
-                 <TutorCard key={i} tutor={tutor} />
-               ))}
-             </div>
+             {loading ? (
+               <div className="grid grid-cols-2 gap-8">
+                 {[1, 2, 3, 4].map((n) => (
+                   <div key={n} className="bg-surface-container-lowest animate-pulse rounded-xl h-80"></div>
+                 ))}
+               </div>
+             ) : error ? (
+               <div className="p-8 text-center bg-red-50 text-red-600 rounded-xl">
+                 {error}
+               </div>
+             ) : tutors.length === 0 ? (
+               <div className="p-8 text-center bg-surface-container-low text-on-surface-variant rounded-xl">
+                 No se encontraron tutores disponibles en este momento.
+               </div>
+             ) : (
+               <div className="grid grid-cols-2 gap-8">
+                 {tutors.map((tutor) => (
+                   <TutorCard key={tutor.id} {...tutor} />
+                 ))}
+               </div>
+             )}
              
-             <div className="pt-10 border-t border-gray-100 flex justify-center">
-               <Pagination />
-             </div>
+             {!loading && !error && tutors.length > 0 && (
+               <div className="pt-10 border-t border-gray-100 flex justify-center">
+                 <Pagination />
+               </div>
+             )}
           </section>
         </div>
       </main>
