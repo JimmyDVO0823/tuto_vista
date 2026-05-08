@@ -13,6 +13,7 @@ import SidebarItem from './SidebarItem';
 import SessionView from './SessionView';
 import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../lib/supabase';
+import { JWT_STORAGE_KEY } from '../../../lib/jwt';
 
 /**
  * Sidebar Component.
@@ -77,10 +78,18 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   /**
    * Authentication Termination:
    * Invokes the Supabase Auth layer to invalidate the current session.
+   *
+   * Defense-in-depth: The custom JWT is removed from localStorage first,
+   * before the Supabase call, so the token is always purged even if the
+   * onAuthStateChange listener fails to fire (e.g., network error).
+   * AuthContext's listener handles the same cleanup reactively, but this
+   * explicit call acts as a guaranteed fallback.
+   *
    * @async
    * @function handleLogout
    */
   const handleLogout = async () => {
+    localStorage.removeItem(JWT_STORAGE_KEY); // Explicit cleanup — defense in depth
     await supabase.auth.signOut();
   };
 

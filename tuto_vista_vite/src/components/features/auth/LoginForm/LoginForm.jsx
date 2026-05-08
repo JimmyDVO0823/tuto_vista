@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../../../lib/supabase';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 /**
  * LoginForm Component.
@@ -39,6 +40,12 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
 
   /**
+   * Stores the reCAPTCHA token upon successful verification.
+   * @state {string|null} recaptchaToken
+   */
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
+  /**
    * Router navigation hook for post-authentication redirection.
    * @type {function}
    */
@@ -56,6 +63,12 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!recaptchaToken) {
+      setError('Por favor, completa el reCAPTCHA para continuar.');
+      return;
+    }
+
     setLoading(true);
 
     const email = e.target.email.value;
@@ -156,10 +169,19 @@ const LoginForm = () => {
             Olvidé mi contraseña
           </a>
         </div>
+        
+        <div className="flex justify-center my-4">
+          <ReCAPTCHA
+            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ""}
+            onChange={(token) => setRecaptchaToken(token)}
+            onExpired={() => setRecaptchaToken(null)}
+          />
+        </div>
+
         <button
           className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10 disabled:opacity-70 disabled:cursor-not-allowed"
           type="submit"
-          disabled={loading}
+          disabled={loading || !recaptchaToken}
         >
           {loading ? 'Ingresando...' : 'Acceder al Portal'}
         </button>
