@@ -1,5 +1,4 @@
 /**
- * Capa de Seguridad.
- * Configuración de JWT, filtros y reglas de acceso.
+ * security: Configuración de JWT, BCrypt y reglas de acceso.
  */
 package com.tutorias.tutorias_backend.security;

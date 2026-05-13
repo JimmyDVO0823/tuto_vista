@@ -1,5 +1,4 @@
 /**
- * Capa de Excepciones.
- * Definición de errores personalizados y manejador global.
+ * exceptions: Manejador de errores global y excepciones personalizadas.
  */
 package com.tutorias.tutorias_backend.exceptions;

@@ -1,5 +1,4 @@
 /**
- * Capa de Servicios.
- * Contiene toda la lógica de negocio y reglas del sistema.
+ * services: Capa de servicios para la lógica de negocio y flujos obligatorios.
  */
 package com.tutorias.tutorias_backend.services;

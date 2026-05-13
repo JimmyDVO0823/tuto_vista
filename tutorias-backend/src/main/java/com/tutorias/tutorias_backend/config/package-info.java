@@ -1,5 +1,4 @@
 /**
- * Capa de Configuración.
- * Beans globales, CORS, Swagger y configuraciones del sistema.
+ * config: Configuraciones globales del sistema (CORS, Swagger, Beans).
  */
 package com.tutorias.tutorias_backend.config;
