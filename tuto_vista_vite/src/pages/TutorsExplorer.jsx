@@ -10,15 +10,37 @@ const TutorsExplorer = () => {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [departments, setDepartments] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [filters, setFilters] = useState({
+    departmentId: '',
+    subjectId: '',
+    minPrice: 20,
+    maxPrice: 150,
+    minRating: 4,
+    availability: 'Esta semana'
+  });
 
   useEffect(() => {
+    fetchMetadata();
     fetchTutors();
-  }, []);
+  }, [filters]);
+
+  const fetchMetadata = async () => {
+    try {
+      const { data: deptData } = await supabase.from('departamentos').select('*').order('nombre');
+      const { data: subjData } = await supabase.from('materias').select('*').order('nombre');
+      setDepartments(deptData || []);
+      setSubjects(subjData || []);
+    } catch (err) {
+      console.error('Error fetching metadata:', err);
+    }
+  };
 
   const fetchTutors = async () => {
     try {
       setLoading(true);
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from('perfiles_tutor')
         .select(`
           id,
@@ -30,13 +52,26 @@ const TutorsExplorer = () => {
             nombre_completo,
             url_avatar
           ),
-          tutor_materias (
+          tutor_materias!inner (
+            materia_id,
             materias (
-              nombre
+              nombre,
+              departamento_id
             )
           )
         `)
-        .eq('esta_disponible', true);
+        .eq('esta_disponible', true)
+        .gte('precio_por_hora', filters.minPrice)
+        .lte('precio_por_hora', filters.maxPrice)
+        .gte('calificacion_promedio', filters.minRating);
+
+      if (filters.subjectId) {
+        query = query.eq('tutor_materias.materia_id', filters.subjectId);
+      } else if (filters.departmentId) {
+        query = query.eq('tutor_materias.materias.departamento_id', filters.departmentId);
+      }
+
+      const { data, error: fetchError } = await query;
 
       if (fetchError) throw fetchError;
 
@@ -44,7 +79,7 @@ const TutorsExplorer = () => {
         id: t.id,
         name: t.perfiles?.nombre_completo || 'Tutor Anónimo',
         image: t.perfiles?.url_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.perfiles?.nombre_completo || 'T')}&background=002045&color=fff`,
-        subject: t.tutor_materias?.map(tm => tm.materias?.nombre).filter(Boolean).join(', ') || 'Varias materias',
+        subject: t.tutor_materias?.map(tm => tm.materias?.nombre).filter(Boolean).slice(0, 2).join(', ') || 'Varias materias',
         price: t.precio_por_hora || 0,
         rating: t.calificacion_promedio || 0,
         reviews: t.total_sesiones || 0,
@@ -61,6 +96,10 @@ const TutorsExplorer = () => {
     }
   };
 
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
   return (
     <MainLayout>
       <main className="flex-1 p-10 min-h-screen">
@@ -69,7 +108,12 @@ const TutorsExplorer = () => {
         <div className="grid grid-cols-12 gap-10 mt-12">
           {/* Filters Column */}
           <aside className="col-span-3">
-             <SearchFilters />
+             <SearchFilters 
+               departments={departments}
+               subjects={subjects}
+               filters={filters}
+               onFilterChange={handleFilterChange}
+             />
           </aside>
 
           {/* Results Column */}
