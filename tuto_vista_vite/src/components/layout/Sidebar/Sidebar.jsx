@@ -36,7 +36,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   
   const navLinks = {
     estudiante: [
-      { label: 'Librería', path: '/dashboard', icon: 'dashboard' },
+      { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
       { label: 'Explorar Tutores', path: '/tutors', icon: 'search' },
       { label: 'Mis Sesiones', path: '/dispo', icon: 'calendar_today' },
       { label: 'Mis Materias', path: '/subjects', icon: 'menu_book' },
