@@ -12,6 +12,8 @@ const TutorsExplorer = () => {
   const [error, setError] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [applyFilters, setApplyFilters] = useState(true);
   const [filters, setFilters] = useState({
     departmentId: '',
     subjectId: '',
@@ -23,8 +25,14 @@ const TutorsExplorer = () => {
 
   useEffect(() => {
     fetchMetadata();
-    fetchTutors();
-  }, [filters]);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchTutors();
+    }, 300); // Debounce search
+    return () => clearTimeout(timer);
+  }, [filters, searchQuery, applyFilters]);
 
   const fetchMetadata = async () => {
     try {
@@ -48,7 +56,7 @@ const TutorsExplorer = () => {
           precio_por_hora,
           calificacion_promedio,
           total_sesiones,
-          perfiles:usuario_id (
+          perfiles!inner (
             nombre_completo,
             url_avatar
           ),
@@ -60,15 +68,25 @@ const TutorsExplorer = () => {
             )
           )
         `)
-        .eq('esta_disponible', true)
-        .gte('precio_por_hora', filters.minPrice)
-        .lte('precio_por_hora', filters.maxPrice)
-        .gte('calificacion_promedio', filters.minRating);
+        .eq('esta_disponible', true);
 
-      if (filters.subjectId) {
-        query = query.eq('tutor_materias.materia_id', filters.subjectId);
-      } else if (filters.departmentId) {
-        query = query.eq('tutor_materias.materias.departamento_id', filters.departmentId);
+      // Search by name (always applied if present)
+      if (searchQuery) {
+        query = query.ilike('perfiles.nombre_completo', `%${searchQuery}%`);
+      }
+
+      // Other filters (conditionally applied)
+      if (applyFilters) {
+        query = query
+          .gte('precio_por_hora', filters.minPrice)
+          .lte('precio_por_hora', filters.maxPrice)
+          .gte('calificacion_promedio', filters.minRating);
+
+        if (filters.subjectId) {
+          query = query.eq('tutor_materias.materia_id', filters.subjectId);
+        } else if (filters.departmentId) {
+          query = query.eq('tutor_materias.materias.departamento_id', filters.departmentId);
+        }
       }
 
       const { data, error: fetchError } = await query;
@@ -103,7 +121,10 @@ const TutorsExplorer = () => {
   return (
     <MainLayout>
       <main className="flex-1 p-10 min-h-screen">
-        <TutorSearchHeader />
+        <TutorSearchHeader 
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         
         <div className="grid grid-cols-12 gap-10 mt-12">
           {/* Filters Column */}
@@ -113,6 +134,8 @@ const TutorsExplorer = () => {
                subjects={subjects}
                filters={filters}
                onFilterChange={handleFilterChange}
+               applyFilters={applyFilters}
+               onToggleFilters={setApplyFilters}
              />
           </aside>
 
