@@ -5,6 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
 
+/**
+ * Entidad base para todos los perfiles de usuario.
+ * ID mapeado a BIGSERIAL en la base de datos.
+ */
 @Entity
 @Table(name = "perfiles")
 @Getter
@@ -12,7 +16,6 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Perfil {
 
     @Id
@@ -42,4 +45,11 @@ public class Perfil {
     @Column(name = "creado_en", nullable = false, updatable = false)
     @Builder.Default
     private OffsetDateTime creadoEn = OffsetDateTime.now();
+
+    // Relaciones 1:1
+    @OneToOne(mappedBy = "perfil", cascade = CascadeType.ALL)
+    private Tutor tutor;
+
+    @OneToOne(mappedBy = "perfil", cascade = CascadeType.ALL)
+    private Estudiante estudiante;
 }
