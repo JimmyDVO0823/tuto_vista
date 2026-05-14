@@ -2,251 +2,217 @@
 trigger: always_on
 ---
 
-## Table `calificaciones`
+en este archivo esta el ddl de la base de datos del proyecto, debes tener esto en cuenta siempre que trabajas en el proyecto.
+CREATE TABLE perfiles (
+  id              SERIAL      PRIMARY KEY,
+  nombre_completo TEXT        NOT NULL,
+  correo          TEXT        NOT NULL UNIQUE,
+  contrasena_hash TEXT        NOT NULL,
+  url_avatar      TEXT,
+  rol             TEXT        NOT NULL CHECK (rol IN ('estudiante', 'tutor', 'administrador')),
+  esta_activo     BOOLEAN     NOT NULL DEFAULT TRUE,
+  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-### Columns
+CREATE TABLE departamento (
+  id        SERIAL      PRIMARY KEY,
+  nombre    TEXT        NOT NULL UNIQUE
+);
 
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `sesion_id` | `int4` |  Unique |
-| `estudiante_id` | `int4` |  |
-| `tutor_id` | `int4` |  |
-| `puntuacion` | `numeric` |  |
-| `comentario` | `text` |  Nullable |
-| `creado_en` | `timestamptz` |  |
+CREATE TABLE materia (
+  id              SERIAL      PRIMARY KEY,
+  nombre          TEXT        NOT NULL,
+  departamento_id INT         NOT NULL REFERENCES departamento(id) ON DELETE RESTRICT
+);
 
-## Table `departamentos`
 
-### Columns
+CREATE TABLE conversacion (
+  id        SERIAL      PRIMARY KEY,
+  creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-| Name | Type | Constraints |
-|------|------|-------------|# Data Architecture & Business Rules: The Academic Editorial
 
-## 1. Project Context
-Este documento define el esquema de base de datos y las reglas de integridad para una plataforma de tutorías académicas premium. El flujo principal es: **Perfil -> Disponibilidad -> Solicitud -> Sesión -> Pago/Calificación.**
+CREATE TABLE tutor (
+  id                    INT           PRIMARY KEY REFERENCES perfiles(id) ON DELETE CASCADE,
+  biografia             TEXT,
+  frase_personal        TEXT,
+  anios_experiencia     INT           NOT NULL DEFAULT 0  CHECK (anios_experiencia >= 0),
+  precio_por_hora       NUMERIC(10,2) NOT NULL DEFAULT 0  CHECK (precio_por_hora >= 0),
+  duracion_sesion_min   INT           NOT NULL DEFAULT 90 CHECK (duracion_sesion_min > 0),
+  esta_disponible       BOOLEAN       NOT NULL DEFAULT TRUE,
+  calificacion_promedio NUMERIC(3,2)  NOT NULL DEFAULT 0
+                          CHECK (calificacion_promedio BETWEEN 0 AND 5),
+  total_sesiones        INT           NOT NULL DEFAULT 0  CHECK (total_sesiones >= 0),
+  titulos               TEXT[],   
+  logros                TEXT[],   
+  creado_en             TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
 
-## 2. Business Logic Rules (AI Instructions)
-- **Role Mapping:** Los usuarios se dividen en `estudiante` y `tutor` mediante la columna `rol` en `perfiles`.
-- **Tutor Integrity:** Un `perfiles_tutor` NO puede existir sin un `perfiles` correspondiente (`usuario_id`).
-- **Academic Catalog:** Las búsquedas se realizan sobre `materias`. La tabla `tutor_materias` es la fuente de verdad para saber qué enseña cada tutor.
-- **Session Lifecycle:** Una `sesion` nace únicamente de una `solicitud_tutoria` con estado 'aceptada'.
-- **Financial Calculation:** El `pago_tutor` es el resultado de `monto` - `comision_plataforma`.
 
-## 3. Database Schema
+CREATE TABLE estudiante (
+  id              INT         PRIMARY KEY REFERENCES perfiles(id) ON DELETE CASCADE,
+  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-### Table `perfiles`
-| Name | Type | Constraints | Description |
-|------|------|-------------|-------------|
-| `id` | `int4` | Primary | |
-| `nombre_completo` | `text` | | Usar para UI Display |
-| `correo` | `text` | Unique | |
-| `url_avatar` | `text` | Nullable | Imagen de perfil |
-| `rol` | `text` | | 'estudiante' o 'tutor' |
-| `creado_en` | `timestamptz` | | |
 
-### Table `perfiles_tutor`
-| Name | Type | Constraints | Description |
-|------|------|-------------|-------------|
-| `id` | `int4` | Primary | |
-| `usuario_id` | `int4` | Unique | FK a perfiles.id |
-| `biografia` | `text` | Nullable | |
-| `anios_experiencia` | `int4` | Nullable | |
-| `precio_por_hora` | `numeric` | | Base para cálculos de pago |
-| `esta_disponible` | `bool` | | Switch global de visibilidad |
-| `titulos` | `_text` | Nullable | Array de strings |
+CREATE TABLE notificaciones (
+  id            SERIAL      PRIMARY KEY,
+  perfil_id     INT         NOT NULL REFERENCES perfiles(id) ON DELETE CASCADE,
+  tipo          TEXT        NOT NULL,
+  titulo        TEXT        NOT NULL,
+  cuerpo        TEXT        NOT NULL,
+  leida         BOOLEAN     NOT NULL DEFAULT FALSE,
+  creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-### Table `materias` & `departamentos`
-| Table | Column | Type | Constraints |
-|-------|--------|------|-------------|
-| `departamentos` | `nombre` | `text` | Unique |
-| `materias` | `nombre` | `text` | |
-| `materias` | `departamento_id` | `int4` | FK a departamentos |
+CREATE TABLE disponibilidad (
+  id          SERIAL      PRIMARY KEY,
+  tutor_id    INT         NOT NULL REFERENCES tutor(id) ON DELETE CASCADE,
+  dia_semana  INT         NOT NULL CHECK (dia_semana BETWEEN 0 AND 6),
+  hora_inicio TIME        NOT NULL,
+  hora_fin    TIME        NOT NULL,
+  esta_activo BOOLEAN     NOT NULL DEFAULT TRUE,
+  creado_en   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT chk_orden_horas CHECK (hora_inicio < hora_fin)
+);
 
-### Table `disponibilidad_tutor`
-| Name | Type | Constraints | Description |
-|------|------|-------------|-------------|
-| `tutor_id` | `int4` | | FK a perfiles.id (Tutor) |
-| `dia_semana` | `int4` | | 0 (Dom) a 6 (Sáb) |
-| `hora_inicio` | `time` | | |
-| `hora_fin` | `time` | | |
 
-### Table `sesiones`
-| Name | Type | Constraints | Description |
-|------|------|-------------|-------------|
-| `id` | `int4` | Primary | |
-| `estudiante_id` | `int4` | | FK a perfiles |
-| `tutor_id` | `int4` | | FK a perfiles |
-| `materia_id` | `int4` | | |
-| `programada_para` | `timestamptz` | | Fecha y hora del encuentro |
-| `estado` | `text` | | 'programada', 'completada', 'cancelada' |
-| `enlace_reunion` | `text` | Nullable | Link a Zoom/Meet |
+CREATE TABLE solicitud (
+  id              SERIAL      PRIMARY KEY,
+  estudiante_id   INT         NOT NULL REFERENCES estudiante(id) ON DELETE CASCADE,
+  tutor_id        INT         NOT NULL REFERENCES tutor(id)      ON DELETE CASCADE,
+  materia_id      INT         NOT NULL REFERENCES materia(id)    ON DELETE RESTRICT,
+  fecha_preferida DATE        NOT NULL,
+  hora_preferida  TIME        NOT NULL,
+  duracion_min    INT         NOT NULL DEFAULT 90 CHECK (duracion_min > 0),
+  mensaje         TEXT,
+  estado          TEXT        NOT NULL DEFAULT 'pendiente'
+                                CHECK (estado IN ('pendiente','aceptada','rechazada','cancelada')),
+  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-### Table `pagos`
-| Name | Type | Constraints | Description |
-|------|------|-------------|-------------|
-| `sesion_id` | `int4` | | FK a sesiones |
-| `monto` | `numeric` | | Total pagado por estudiante |
-| `comision_plataforma`| `numeric` | | Fee del sitio |
-| `pago_tutor` | `numeric` | | Neto para el tutor |
-| `estado` | `text` | | 'pendiente', 'pagado' |
 
-### Table `calificaciones`
-| Name | Type | Constraints | Description |
-|------|------|-------------|-------------|
-| `sesion_id` | `int4` | Unique | 1 calificación por sesión |
-| `puntuacion` | `numeric` | | 1.0 a 5.0 |
-| `comentario` | `text` | Nullable | |
+CREATE TABLE sesion_tutoria (
+  id                 SERIAL        PRIMARY KEY,
+  solicitud_id       INT           UNIQUE REFERENCES solicitud(id) ON DELETE SET NULL,
+  tutor_id           INT           NOT NULL REFERENCES tutor(id)      ON DELETE CASCADE,
+  estudiante_id      INT           NOT NULL REFERENCES estudiante(id) ON DELETE CASCADE,
+  materia_id         INT           NOT NULL REFERENCES materia(id)    ON DELETE RESTRICT,
+  programada_para    TIMESTAMPTZ   NOT NULL,
+  duracion_min       INT           NOT NULL DEFAULT 90 CHECK (duracion_min > 0),
+  precio             NUMERIC(10,2) NOT NULL DEFAULT 0  CHECK (precio >= 0),
+  enlace_reunion     TEXT,
+  estado             TEXT          NOT NULL DEFAULT 'programada'
+                                     CHECK (estado IN (
+                                       'programada','en_progreso','completada',
+                                       'cancelada','no_asistio'
+                                     )),
+  cancelada_por      INT           REFERENCES perfiles(id) ON DELETE SET NULL,
+  motivo_cancelacion TEXT,
+  creado_en          TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
 
-## 4. Coding Standards for Agent
-- **Naming:** Backend usa `snake_case`, Frontend usa `camelCase`. Mapear automáticamente.
-- **Filtering:** Al consultar `sesiones` o `pagos`, filtrar siempre por el `id` del usuario en sesión.
-- **Formatting:** Precios en `numeric` deben formatearse según la moneda de la tabla `pagos`.
-- **Modality:** Las tablas de `solicitudes_tutoria` y `sesiones` son el corazón del Dashboard.
-| `id` | `int4` | Primary |
-| `nombre` | `text` |  Unique |
+CREATE TABLE pago (
+  id                  SERIAL        PRIMARY KEY,
+  sesion_id           INT           NOT NULL UNIQUE REFERENCES sesion_tutoria(id) ON DELETE RESTRICT,
+  estudiante_id       INT           NOT NULL REFERENCES estudiante(id) ON DELETE RESTRICT,
+  tutor_id            INT           NOT NULL REFERENCES tutor(id)      ON DELETE RESTRICT,
+  monto               NUMERIC(10,2) NOT NULL CHECK (monto >= 0),
+  comision_plataforma NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (comision_plataforma >= 0),
+  pago_tutor          NUMERIC(10,2) GENERATED ALWAYS AS (monto - comision_plataforma) STORED,
+  moneda              TEXT          NOT NULL DEFAULT 'COP',
+  estado              TEXT          NOT NULL DEFAULT 'pendiente'
+                        CHECK (estado IN ('pendiente','completado','reembolsado','fallido')),
+  pagado_en           TIMESTAMPTZ,
+  creado_en           TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
 
-## Table `disponibilidad_tutor`
+CREATE TABLE resena (
+  id            SERIAL        PRIMARY KEY,
+  sesion_id     INT           NOT NULL UNIQUE REFERENCES sesion_tutoria(id) ON DELETE CASCADE,
+  estudiante_id INT           NOT NULL REFERENCES estudiante(id) ON DELETE CASCADE,
+  tutor_id      INT           NOT NULL REFERENCES tutor(id)      ON DELETE CASCADE,
+  puntuacion    NUMERIC(2,1)  NOT NULL CHECK (puntuacion BETWEEN 1.0 AND 5.0),
+  comentario    TEXT,
+  creado_en     TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
 
-### Columns
+CREATE TABLE recursos (
+  id          SERIAL      PRIMARY KEY,
+  tutor_id    INT         NOT NULL REFERENCES tutor(id)   ON DELETE CASCADE,
+  materia_id  INT         NOT NULL REFERENCES materia(id) ON DELETE CASCADE,
+  titulo      TEXT        NOT NULL,
+  descripcion TEXT,
+  url_archivo TEXT,
+  tipo        TEXT        CHECK (tipo IN ('documento','video','enlace','imagen','otro')),
+  creado_en   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `tutor_id` | `int4` |  |
-| `dia_semana` | `int4` |  |
-| `hora_inicio` | `time` |  |
-| `hora_fin` | `time` |  |
-| `esta_activo` | `bool` |  |
+CREATE TABLE mensajes (
+  id              SERIAL      PRIMARY KEY,
+  conversacion_id INT         NOT NULL REFERENCES conversacion(id) ON DELETE CASCADE,
+  remitente_id    INT         NOT NULL REFERENCES perfiles(id)     ON DELETE CASCADE,
+  contenido       TEXT        NOT NULL,
+  leido           BOOLEAN     NOT NULL DEFAULT FALSE,
+  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-## Table `materias`
+CREATE TABLE conversacion_participantes (
+  conversacion_id INT         NOT NULL REFERENCES conversacion(id) ON DELETE CASCADE,
+  perfil_id       INT         NOT NULL REFERENCES perfiles(id)     ON DELETE CASCADE,
+  unido_en        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (conversacion_id, perfil_id)
+);
+CREATE TABLE tutor_materias (
+  tutor_id   INT NOT NULL,
+  materia_id INT NOT NULL,
 
-### Columns
+  PRIMARY KEY (tutor_id, materia_id),
 
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `nombre` | `text` |  |
-| `departamento_id` | `int4` |  Nullable |
+  CONSTRAINT fk_tutor
+    FOREIGN KEY (tutor_id)
+    REFERENCES tutor(id)
+    ON DELETE CASCADE,
 
-## Table `notificaciones`
+  CONSTRAINT fk_materia
+    FOREIGN KEY (materia_id)
+    REFERENCES materia(id)
+    ON DELETE RESTRICT
+);
 
-### Columns
+CREATE OR REPLACE FUNCTION fn_recalcular_calificacion_tutor()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE tutor
+  SET calificacion_promedio = (
+    SELECT COALESCE(ROUND(AVG(puntuacion)::NUMERIC, 2), 0)
+    FROM resena
+    WHERE tutor_id = NEW.tutor_id
+  )
+  WHERE id = NEW.tutor_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `usuario_id` | `int4` |  |
-| `titulo` | `text` |  |
-| `cuerpo` | `text` |  |
-| `creado_en` | `timestamptz` |  |
+CREATE TRIGGER trg_recalcular_calificacion
+  AFTER INSERT OR UPDATE ON resena
+  FOR EACH ROW EXECUTE FUNCTION fn_recalcular_calificacion_tutor();
 
-## Table `pagos`
 
-### Columns
+CREATE OR REPLACE FUNCTION fn_actualizar_total_sesiones()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.estado = 'completada' AND OLD.estado <> 'completada' THEN
+    UPDATE tutor
+    SET total_sesiones = total_sesiones + 1
+    WHERE id = NEW.tutor_id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `sesion_id` | `int4` |  |
-| `estudiante_id` | `int4` |  |
-| `tutor_id` | `int4` |  |
-| `monto` | `numeric` |  |
-| `comision_plataforma` | `numeric` |  |
-| `pago_tutor` | `numeric` |  Nullable |
-| `moneda` | `text` |  |
-| `estado` | `text` |  |
-| `pagado_en` | `timestamptz` |  Nullable |
-| `creado_en` | `timestamptz` |  |
+CREATE TRIGGER trg_total_sesiones
+  AFTER UPDATE ON sesion_tutoria
+  FOR EACH ROW EXECUTE FUNCTION fn_actualizar_total_sesiones();
 
-## Table `perfiles`
 
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `nombre_completo` | `text` |  |
-| `correo` | `text` |  Unique |
-| `url_avatar` | `text` |  Nullable |
-| `rol` | `text` |  |
-| `creado_en` | `timestamptz` |  |
-
-## Table `perfiles_tutor`
-
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `usuario_id` | `int4` |  Unique |
-| `biografia` | `text` |  Nullable |
-| `anios_experiencia` | `int4` |  Nullable |
-| `precio_por_hora` | `numeric` |  Nullable |
-| `duracion_sesion_min` | `int4` |  Nullable |
-| `esta_disponible` | `bool` |  |
-| `calificacion_promedio` | `numeric` |  Nullable |
-| `total_sesiones` | `int4` |  Nullable |
-| `titulos` | `_text` |  Nullable |
-| `logros` | `_text` |  Nullable |
-| `creado_en` | `timestamptz` |  |
-
-## Table `recursos`
-
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `tutor_id` | `int4` |  |
-| `materia_id` | `int4` |  Nullable |
-| `titulo` | `text` |  |
-| `descripcion` | `text` |  Nullable |
-| `url_archivo` | `text` |  Nullable |
-| `creado_en` | `timestamptz` |  |
-
-## Table `sesiones`
-
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `solicitud_id` | `int4` |  Nullable Unique |
-| `estudiante_id` | `int4` |  |
-| `tutor_id` | `int4` |  |
-| `materia_id` | `int4` |  |
-| `programada_para` | `timestamptz` |  |
-| `duracion_min` | `int4` |  |
-| `precio` | `numeric` |  |
-| `enlace_reunion` | `text` |  Nullable |
-| `estado` | `text` |  |
-| `cancelada_por` | `int4` |  Nullable |
-| `motivo_cancelacion` | `text` |  Nullable |
-| `creado_en` | `timestamptz` |  |
-
-## Table `solicitudes_tutoria`
-
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| `id` | `int4` | Primary |
-| `estudiante_id` | `int4` |  |
-| `tutor_id` | `int4` |  |
-| `materia_id` | `int4` |  |
-| `fecha_preferida` | `date` |  |
-| `hora_preferida` | `time` |  |
-| `duracion_min` | `int4` |  |
-| `mensaje` | `text` |  Nullable |
-| `estado` | `text` |  |
-| `creado_en` | `timestamptz` |  |
-
-## Table `tutor_materias`
-
-### Columns
-
-| Name | Type | Constraints |
-|------|------|-------------|
-| `tutor_id` | `int4` | Primary |
-| `materia_id` | `int4` | Primary |

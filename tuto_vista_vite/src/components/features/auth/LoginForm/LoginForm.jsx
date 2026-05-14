@@ -8,7 +8,8 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../../../../lib/supabase';
+import { api } from '../../../../lib/api';
+import { useAuth } from '../../../../context/AuthContext';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 /**
@@ -18,6 +19,8 @@ import ReCAPTCHA from 'react-google-recaptcha';
  * @component
  */
 const LoginForm = () => {
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({ email: '', password: '' });
   /**
    * Toggle for password field visibility. 
    * Enhances UX by allowing users to verify their input in sensitive contexts.
@@ -70,22 +73,28 @@ const LoginForm = () => {
     }
 
     setLoading(true);
+    try {
+      const response = await api.post('/auth/login', {
+        correo: formData.email,
+        password: formData.password
+      });
 
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+      // Guardar sesión en el contexto
+      login(response, response.token);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      // Redirigir según el rol
+      const roleRedirects = {
+        'estudiante': '/dashboard',
+        'tutor': '/dashboard',
+        'administrador': '/dashboard'
+      };
 
-    if (signInError) {
-      setError(signInError.message || 'Error al iniciar sesión. Comprueba tus credenciales.');
-    } else {
-      navigate('/dashboard');
+      navigate(roleRedirects[response.rol] || '/');
+    } catch (err) {
+      setError(err.message || 'Error al iniciar sesión. Comprueba tus credenciales.');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -118,6 +127,8 @@ const LoginForm = () => {
             placeholder="ejemplo@academia.com"
             required
             type="email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           />
         </div>
         <div className="space-y-1">
@@ -135,6 +146,8 @@ const LoginForm = () => {
               placeholder="••••••••"
               required
               type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
             <button
               type="button"
@@ -169,7 +182,7 @@ const LoginForm = () => {
             Olvidé mi contraseña
           </a>
         </div>
-        
+
         <div className="flex justify-center my-4">
           <ReCAPTCHA
             sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY || ""}
@@ -226,7 +239,7 @@ const LoginForm = () => {
           <span className="text-xs font-semibold">Facebook</span>
         </button>
       </div>
-      
+
       <div className="text-center pt-4 border-t border-gray-100">
         <p className="text-sm text-gray-500">
           ¿No tienes una cuenta?{" "}

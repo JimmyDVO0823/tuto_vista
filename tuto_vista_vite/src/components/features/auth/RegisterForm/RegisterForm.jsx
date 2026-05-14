@@ -8,7 +8,8 @@
  */
 
 import React, { useState } from 'react';
-import { supabase } from '../../../../lib/supabase';
+import { api } from '../../../../lib/api';
+import { useAuth } from '../../../../context/AuthContext';
 import { z } from 'zod';
 
 /**
@@ -17,6 +18,7 @@ import { z } from 'zod';
  * @component
  */
 const RegisterForm = () => {
+  const { login } = useAuth();
   /**
    * Encapsulates all enrollment inputs as a single state atomic unit.
    * Logic Rationale: Grouped state simplifies change handling and 
@@ -28,7 +30,7 @@ const RegisterForm = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'student'
+    role: 'estudiante'
   });
 
   /** @state {boolean} loading - Submission lock */
@@ -92,18 +94,15 @@ const RegisterForm = () => {
     setLoading(true);
 
     try {
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
+      const response = await api.post('/auth/register', {
+        nombreCompleto: formData.name,
+        correo: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            nombre_completo: formData.name,
-            rol: formData.role,
-          }
-        }
+        rol: formData.role
       });
 
-      if (signUpError) throw signUpError;
+      // Guardar sesión en el contexto
+      login(response, response.token);
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
       setFormData({
@@ -111,7 +110,7 @@ const RegisterForm = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'student'
+        role: 'estudiante'
       });
     } catch (err) {
       setError(err.message || 'Error al registrar usuario.');
@@ -256,7 +255,7 @@ const RegisterForm = () => {
             value={formData.role}
             onChange={handleChange}
           >
-            <option value="student">Estudiante</option>
+            <option value="estudiante">Estudiante</option>
             <option value="tutor">Tutor Académico</option>
           </select>
         </div>
