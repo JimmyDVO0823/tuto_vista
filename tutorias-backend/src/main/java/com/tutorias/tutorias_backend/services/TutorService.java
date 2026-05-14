@@ -1,0 +1,85 @@
+package com.tutorias.tutorias_backend.services;
+
+import com.tutorias.tutorias_backend.dto.MateriaDTO;
+import com.tutorias.tutorias_backend.dto.TutorDTO;
+import com.tutorias.tutorias_backend.entities.Tutor;
+import com.tutorias.tutorias_backend.repositories.TutorRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class TutorService {
+
+    private final TutorRepository tutorRepository;
+
+    /**
+     * Obtiene todos los tutores disponibles con filtros opcionales.
+     */
+    public List<TutorDTO> getTutoresDisponibles(
+            BigDecimal minPrecio,
+            BigDecimal maxPrecio,
+            BigDecimal minCalificacion,
+            Long materiaId
+    ) {
+        return tutorRepository.findAll().stream()
+                .filter(t -> t.getEstaDisponible())
+                .filter(t -> minPrecio == null || t.getPrecioPorHora().compareTo(minPrecio) >= 0)
+                .filter(t -> maxPrecio == null || t.getPrecioPorHora().compareTo(maxPrecio) <= 0)
+                .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
+                .filter(t -> materiaId == null || t.getMaterias().stream()
+                        .anyMatch(m -> m.getId().equals(materiaId)))
+                .map(this::toDTO)
+                .toList();
+    }
+
+    /**
+     * Obtiene las materias asignadas a un tutor específico.
+     */
+    public List<MateriaDTO> getMateriasByTutor(Long tutorId) {
+        Tutor tutor = tutorRepository.findById(tutorId)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+
+        return tutor.getMaterias().stream()
+                .map(m -> MateriaDTO.builder()
+                        .id(m.getId())
+                        .nombre(m.getNombre())
+                        .departamentoId(m.getDepartamento().getId())
+                        .departamentoNombre(m.getDepartamento().getNombre())
+                        .build())
+                .toList();
+    }
+
+    /**
+     * Mapeador de Tutor entidad a TutorDTO.
+     */
+    private TutorDTO toDTO(Tutor t) {
+        List<MateriaDTO> materiasDTO = t.getMaterias() == null ? List.of() :
+                t.getMaterias().stream()
+                        .map(m -> MateriaDTO.builder()
+                                .id(m.getId())
+                                .nombre(m.getNombre())
+                                .departamentoId(m.getDepartamento().getId())
+                                .departamentoNombre(m.getDepartamento().getNombre())
+                                .build())
+                        .toList();
+
+        return TutorDTO.builder()
+                .id(t.getId())
+                .nombreCompleto(t.getPerfil().getNombreCompleto())
+                .urlAvatar(t.getPerfil().getUrlAvatar())
+                .biografia(t.getBiografia())
+                .frasePersonal(t.getFrasePersonal())
+                .precioPorHora(t.getPrecioPorHora())
+                .calificacionPromedio(t.getCalificacionPromedio())
+                .totalSesiones(t.getTotalSesiones())
+                .aniosExperiencia(t.getAniosExperiencia())
+                .estaDisponible(t.getEstaDisponible())
+                .titulos(t.getTitulos())
+                .logros(t.getLogros())
+                .materias(materiasDTO)
+                .build();
+    }
+}

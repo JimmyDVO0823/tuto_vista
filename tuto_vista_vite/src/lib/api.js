@@ -1,12 +1,14 @@
 const BASE_URL = 'http://localhost:8080';
 
 export const api = {
-  async post(endpoint, data) {
+  async post(endpoint, data, token) {
+    const headers = { 'Content-Type': 'application/json' };
+    const storedToken = token || localStorage.getItem('token');
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(data),
     });
 
@@ -18,19 +20,40 @@ export const api = {
     return response.json();
   },
 
-  async get(endpoint) {
-    const token = localStorage.getItem('token');
+  async get(endpoint, token) {
+    const storedToken = token || localStorage.getItem('token');
+    const headers = {};
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'GET',
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : '',
-      },
+      headers,
     });
 
     if (!response.ok) {
-      throw new Error('Error en la petición');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error en la petición');
     }
 
     return response.json();
-  }
+  },
+
+  async patch(endpoint, data, token) {
+    const storedToken = token || localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error en la petición');
+    }
+
+    return response.json();
+  },
 };

@@ -4,125 +4,66 @@ import SubjectTable from '../components/ui/SubjectTable/SubjectTable';
 import Button from '../components/ui/Button/Button';
 import Searcher from '../components/ui/Searcher/Searcher';
 import { useAuth } from '../context/AuthContext';
-import { supabase } from '../lib/supabase';
+import { api } from '../lib/api';
 import AddSubjectModal from '../components/features/tutors/AddSubjectModal/AddSubjectModal';
 
 /**
  * SubjectsManagement Page.
- * Logic Rationale: Orchestrates the view for both Students (enrolled courses) 
- * and Tutors (taught subjects). It dynamically adjusts the UI hierarchy 
- * based on the authenticated role and persists data to Supabase.
- * 
- * @component
+ * Migrada de Supabase a Spring Boot backend.
  */
 const SubjectsManagement = () => {
-  const { user } = useAuth();
-  /** @type {'student'|'tutor'} */
-  const role = user?.role || 'student';
+  const { user, token } = useAuth();
+  const role = user?.role || 'estudiante';
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  /**
-   * Data Fetching Orchestrator.
-   * Logic Rationale: Retrieves the subject catalog for the current user. 
-   * If tutor, it resolves the 'perfiles_tutor' identity to filter 'tutor_materias'.
-   */
   useEffect(() => {
-    const fetchTutorSubjects = async () => {
-      if (!user?.email) return;
-
+    const fetchSubjects = async () => {
+      if (!user?.id) return;
       setLoading(true);
       try {
-        // Resolve Tutor Profile ID using email (consistent across Auth and DB)
-        const { data: tutorProfile, error: profileError } = await supabase
-          .from('perfiles_tutor')
-          .select('id, perfiles!inner(id, correo)')
-          .eq('perfiles.correo', user.email)
-          .single();
-
-        if (profileError) {
-          console.warn('Este usuario no tiene un perfil de tutor activo:', profileError);
-          setSubjects([]);
-          return;
+        if (role === 'tutor') {
+          // Obtener materias del tutor desde el backend
+          const data = await api.get(`/tutores/${user.id}/materias`);
+          const mapped = (data || []).map(m => ({
+            name: m.nombre,
+            dept: m.departamentoNombre || 'General',
+            status: 'ACTIVO',
+            sem: '2024-A',
+            tutor: user.name,
+            nextActivity: 'Pendiente',
+            completedActivities: 2,
+            totalActivities: 5,
+          }));
+          setSubjects(mapped);
+        } else {
+          // Mock para estudiantes (hasta que exista el endpoint)
+          setSubjects([
+            { name: 'Cálculo Diferencial', dept: 'Matemáticas', status: 'ACTIVO', sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', nextActivity: 'Mañana', completedActivities: 3, totalActivities: 5 },
+          ]);
         }
-
-        // 2. Fetch Subjects using the resolved integer tutor_id
-        const { data, error } = await supabase
-          .from('tutor_materias')
-          .select(`
-            materia_id,
-            materias (
-              id,
-              nombre,
-              departamentos (nombre)
-            )
-          `)
-          .eq('tutor_id', tutorProfile.id);
-
-        if (error) throw error;
-
-        // 3. Map to UI format
-        const mappedSubjects = data.map(tm => ({
-          name: tm.materias.nombre,
-          dept: tm.materias.departamentos?.nombre || 'General',
-          status: 'ACTIVO',
-          sem: '2024-A',
-          tutor: user.name,
-          nextActivity: 'Pendiente',
-          completedActivities: 2,
-          totalActivities: 5
-        }));
-
-        setSubjects(mappedSubjects);
       } catch (err) {
-        console.error('Error fetching tutor subjects:', err);
+        console.error('Error cargando materias:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    if (role === 'tutor') {
-      fetchTutorSubjects();
-    } else {
-      setSubjects([
-        { name: 'Cálculo Diferencial', dept: 'Matemáticas', status: 'ACTIVO', sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', nextActivity: 'Mañana', completedActivities: 3, totalActivities: 5 }
-      ]);
-      setLoading(false);
-    }
+    fetchSubjects();
   }, [user, role]);
 
-  /**
-   * Action Handlers.
-   * Logic Rationale: Persists the new tutor-subject relationship to 
-   * the 'tutor_materias' junction table using resolved IDs.
-   */
   const handleAddSubject = async (newSubjectData) => {
     try {
-      if (!user?.email) throw new Error('Usuario no autenticado');
+      if (!user?.id) throw new Error('Usuario no autenticado');
 
-      // Resolve Tutor Profile ID first to avoid UUID/Integer mismatch
-      const { data: tutorProfile, error: profileError } = await supabase
-        .from('perfiles_tutor')
-        .select('id, perfiles!inner(correo)')
-        .eq('perfiles.correo', user.email)
-        .single();
+      await api.post(
+        `/tutores/${user.id}/materias`,
+        { materiaId: newSubjectData.materia_id },
+        token
+      );
 
-      if (profileError || !tutorProfile) {
-        throw new Error('No se pudo encontrar tu perfil de tutor.');
-      }
-
-      const { error } = await supabase
-        .from('tutor_materias')
-        .insert([{ 
-          tutor_id: tutorProfile.id, 
-          materia_id: newSubjectData.materia_id 
-        }]);
-
-      if (error) throw error;
-
-      // Update local state for immediate feedback
       setSubjects(prev => [{
         name: newSubjectData.name,
         dept: newSubjectData.dept,
@@ -131,17 +72,16 @@ const SubjectsManagement = () => {
         tutor: user.name,
         nextActivity: 'Por programar',
         completedActivities: 0,
-        totalActivities: 5
+        totalActivities: 5,
       }, ...prev]);
-
     } catch (err) {
-      console.error('Error adding subject:', err);
+      console.error('Error añadiendo materia:', err);
       alert(`Error: ${err.message || 'No se pudo añadir la materia'}`);
     }
   };
 
-  const normalizeString = (str) => 
-    str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const normalizeString = (str) =>
+    str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
   const filteredSubjects = subjects.filter((s) =>
     normalizeString(s.name).includes(normalizeString(searchQuery)) ||
@@ -160,10 +100,10 @@ const SubjectsManagement = () => {
               {role === 'tutor' ? 'Mis Materias Dictadas' : 'Gestión de Materias Académicas'}
             </h2>
           </div>
-          
+
           {role === 'tutor' && (
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               className="shadow-xl"
               onClick={() => setIsModalOpen(true)}
             >
@@ -174,22 +114,22 @@ const SubjectsManagement = () => {
         </header>
 
         <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
-          <Searcher 
-            value={searchQuery} 
-            onChange={setSearchQuery} 
-            placeholder="Buscar materia o departamento..." 
+          <Searcher
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Buscar materia o departamento..."
           />
           <div className="flex gap-2">
-             <Button variant="boring">Filtros</Button>
+            <Button variant="boring">Filtros</Button>
           </div>
         </div>
 
-        <SubjectTable 
-          subjects={filteredSubjects} 
+        <SubjectTable
+          subjects={filteredSubjects}
           showTutorColumn={role !== 'tutor'}
         />
 
-        <AddSubjectModal 
+        <AddSubjectModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onAdd={handleAddSubject}

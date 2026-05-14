@@ -31,10 +31,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/auth/register")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.POST, "/auth/login")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/auth/test")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
+                // Endpoints públicos según backend.md regla 11
+                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/tutores")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/tutores/**")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/materias")).permitAll()
+                .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/departamentos")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/v3/api-docs/**"), AntPathRequestMatcher.antMatcher("/swagger-ui/**"), AntPathRequestMatcher.antMatcher("/swagger-ui.html")).permitAll()
                 .anyRequest().authenticated()
             );
