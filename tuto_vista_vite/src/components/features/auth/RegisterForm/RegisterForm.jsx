@@ -4,7 +4,7 @@
  * @description Orchestrates the creation of new academic profiles. 
  * It enforces structural integrity through Zod validation and 
  * manages the propagation of user metadata (FullName, Role) 
- * to the Supabase Auth system.
+ * to the Spring Boot backend.
  */
 
 import React, { useState } from 'react';
@@ -39,7 +39,7 @@ const RegisterForm = () => {
   const [error, setError] = useState(null);
   /** @state {boolean|string} success - Finalization state indicator */
   const [success, setSuccess] = useState(false);
-  
+
   /** @state {boolean} showPassword - Visibility toggle for primary password */
   const [showPassword, setShowPassword] = useState(false);
   /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
@@ -79,10 +79,11 @@ const RegisterForm = () => {
     setError(null);
     setSuccess(false);
 
-    try {
-      emailSchema.parse(formData.email);
-    } catch (validationError) {
-      setError(validationError.errors[0].message);
+    console.log('Valor de email capturado:', `"${formData.email}"`);
+    const validation = emailSchema.safeParse(formData.email);
+    if (!validation.success) {
+      console.error('Error de validación:', validation.error);
+      setError(validation.error.issues[0]?.message || 'Correo electrónico inválido');
       return;
     }
 
