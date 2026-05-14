@@ -1,0 +1,51 @@
+package com.tutorias.tutorias_backend.entities;
+
+import com.tutorias.tutorias_backend.enums.EstadoPago;
+import jakarta.persistence.*;
+import lombok.*;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+
+@Entity
+@Table(name = "pago")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Pago {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "sesion_id", nullable = false, unique = true)
+    private SesionTutoria sesion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estudiante_id", nullable = false)
+    private Estudiante estudiante;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tutor_id", nullable = false)
+    private Tutor tutor;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal monto;
+
+    @Column(name = "comision_plataforma", nullable = false, precision = 10, scale = 2)
+    private BigDecimal comisionPlataforma = BigDecimal.ZERO;
+
+    @Column(nullable = false)
+    private String moneda = "COP";
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoPago estado = EstadoPago.pendiente;
+
+    @Column(name = "pagado_en")
+    private OffsetDateTime pagadoEn;
+
+    @Column(name = "creado_en", nullable = false, updatable = false)
+    private OffsetDateTime creadoEn = OffsetDateTime.now();
+}
