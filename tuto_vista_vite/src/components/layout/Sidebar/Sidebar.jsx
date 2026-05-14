@@ -2,16 +2,15 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SidebarItem from './SidebarItem';
 import SessionView from './SessionView';
+import { useAuth } from '../../../context/AuthContext';
 
 /**
  * Sidebar Component - The Academic Editorial
  * Enhanced with collapsible/mini mode support
  */
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
+  const { user: currentUser, logout } = useAuth();
   const location = useLocation();
-  
-  // Mock user - set to null to demonstrate logged-out state
-  const currentUser = null;
 
   const navLinks = [
     { label: 'Home', path: '/', icon: 'home' },
@@ -88,6 +87,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
           
           {currentUser ? (
             <button
+              onClick={logout}
               className={`text-xs text-gray-500 hover:text-red-600 flex items-center gap-2 px-2 py-1 transition-colors font-medium text-left ${isCollapsed ? 'p-0' : ''}`}
               title="Logout"
             >

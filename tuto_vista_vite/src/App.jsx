@@ -8,9 +8,12 @@ import RegisterForm from './components/features/auth/RegisterForm/RegisterForm'
 import SubjectsManagement from './pages/SubjectsManagement'
 import DispoManagement from './pages/DispoManagement'
 
+import { AuthProvider } from './context/AuthContext'
+
 function App() {
   return (
-    <Router basename={import.meta.env.BASE_URL}>
+    <AuthProvider>
+      <Router basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
@@ -38,7 +41,8 @@ function App() {
         <Route path="/subjects" element={<SubjectsManagement />} />
         <Route path="/dispo" element={<DispoManagement />} />
       </Routes>
-    </Router>
+      </Router>
+    </AuthProvider>
   )
 }
 
