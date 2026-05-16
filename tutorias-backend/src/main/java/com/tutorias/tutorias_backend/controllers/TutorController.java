@@ -42,4 +42,16 @@ public class TutorController {
     public ResponseEntity<List<MateriaDTO>> getMateriasByTutor(@PathVariable Long id) {
         return ResponseEntity.ok(tutorService.getMateriasByTutor(id));
     }
+    /**
+     * POST /tutores/{id}/materias
+     * Asigna una materia al catálogo del tutor.
+     */
+    @PostMapping("/{id}/materias")
+    public ResponseEntity<String> asignarMateria(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Long> payload) {
+        Long materiaId = payload.get("materiaId");
+        tutorService.asignarMateria(id, materiaId);
+        return ResponseEntity.ok("Materia asignada exitosamente");
+    }
 }

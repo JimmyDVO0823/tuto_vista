@@ -14,6 +14,23 @@ import java.util.List;
 public class TutorService {
 
     private final TutorRepository tutorRepository;
+    private final com.tutorias.tutorias_backend.repositories.MateriaRepository materiaRepository;
+
+    /**
+     * Asigna una materia a un tutor.
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public void asignarMateria(Long tutorId, Long materiaId) {
+        Tutor tutor = tutorRepository.findById(tutorId)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+        com.tutorias.tutorias_backend.entities.Materia materia = materiaRepository.findById(materiaId)
+                .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
+
+        if (!tutor.getMaterias().contains(materia)) {
+            tutor.getMaterias().add(materia);
+            tutorRepository.save(tutor);
+        }
+    }
 
     /**
      * Obtiene todos los tutores disponibles con filtros opcionales.
