@@ -4,11 +4,12 @@
  * @description Orchestrates the creation of new academic profiles. 
  * It enforces structural integrity through Zod validation and 
  * manages the propagation of user metadata (FullName, Role) 
- * to the Supabase Auth system.
+ * to the Spring Boot backend.
  */
 
 import React, { useState } from 'react';
-import { supabase } from '../../../../lib/supabase';
+import { api } from '../../../../lib/api';
+import { useAuth } from '../../../../context/AuthContext';
 import { z } from 'zod';
 
 /**
@@ -17,6 +18,7 @@ import { z } from 'zod';
  * @component
  */
 const RegisterForm = () => {
+  const { login } = useAuth();
   /**
    * Encapsulates all enrollment inputs as a single state atomic unit.
    * Logic Rationale: Grouped state simplifies change handling and 
@@ -28,7 +30,7 @@ const RegisterForm = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'student'
+    role: 'estudiante'
   });
 
   /** @state {boolean} loading - Submission lock */
@@ -37,7 +39,7 @@ const RegisterForm = () => {
   const [error, setError] = useState(null);
   /** @state {boolean|string} success - Finalization state indicator */
   const [success, setSuccess] = useState(false);
-  
+
   /** @state {boolean} showPassword - Visibility toggle for primary password */
   const [showPassword, setShowPassword] = useState(false);
   /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
@@ -77,10 +79,11 @@ const RegisterForm = () => {
     setError(null);
     setSuccess(false);
 
-    try {
-      emailSchema.parse(formData.email);
-    } catch (validationError) {
-      setError(validationError.errors[0].message);
+    console.log('Valor de email capturado:', `"${formData.email}"`);
+    const validation = emailSchema.safeParse(formData.email);
+    if (!validation.success) {
+      console.error('Error de validación:', validation.error);
+      setError(validation.error.issues[0]?.message || 'Correo electrónico inválido');
       return;
     }
 
@@ -92,18 +95,15 @@ const RegisterForm = () => {
     setLoading(true);
 
     try {
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
+      const response = await api.post('/auth/register', {
+        nombreCompleto: formData.name,
+        correo: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            nombre_completo: formData.name,
-            rol: formData.role,
-          }
-        }
+        rol: formData.role
       });
 
-      if (signUpError) throw signUpError;
+      // Guardar sesión en el contexto
+      login(response, response.token);
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
       setFormData({
@@ -111,7 +111,7 @@ const RegisterForm = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'student'
+        role: 'estudiante'
       });
     } catch (err) {
       setError(err.message || 'Error al registrar usuario.');
@@ -256,7 +256,7 @@ const RegisterForm = () => {
             value={formData.role}
             onChange={handleChange}
           >
-            <option value="student">Estudiante</option>
+            <option value="estudiante">Estudiante</option>
             <option value="tutor">Tutor Académico</option>
           </select>
         </div>

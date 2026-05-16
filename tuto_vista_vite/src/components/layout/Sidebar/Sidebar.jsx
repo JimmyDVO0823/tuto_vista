@@ -12,8 +12,6 @@ import { Link, useLocation } from 'react-router-dom';
 import SidebarItem from './SidebarItem';
 import SessionView from './SessionView';
 import { useAuth } from '../../../context/AuthContext';
-import { supabase } from '../../../lib/supabase';
-import { JWT_STORAGE_KEY } from '../../../lib/jwt';
 
 /**
  * Sidebar Component.
@@ -31,8 +29,8 @@ import { JWT_STORAGE_KEY } from '../../../lib/jwt';
  * )
  */
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
+  const { user, logout } = useAuth();
   const location = useLocation();
-  const { user } = useAuth();
   
   const navLinks = {
     estudiante: [
@@ -88,9 +86,8 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
    * @async
    * @function handleLogout
    */
-  const handleLogout = async () => {
-    localStorage.removeItem(JWT_STORAGE_KEY); // Explicit cleanup — defense in depth
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    logout();
   };
 
   return (

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const SearchFilters = ({ departments, subjects, filters, onFilterChange, applyFilters, onToggleFilters }) => {
+const SearchFilters = ({ departments, subjects, filters, onFilterChange }) => {
   const [hoverRating, setHoverRating] = useState(0);
 
   const filteredSubjects = subjects.filter(
@@ -15,9 +15,9 @@ const SearchFilters = ({ departments, subjects, filters, onFilterChange, applyFi
     onFilterChange({
       departmentId: '',
       subjectId: '',
-      minPrice: 0,
-      maxPrice: 200,
-      minRating: 0,
+      minPrice: '',
+      maxPrice: '',
+      minRating: '',
       availability: 'Esta semana'
     });
   };
@@ -29,19 +29,9 @@ const SearchFilters = ({ departments, subjects, filters, onFilterChange, applyFi
           <h3 className="text-sm font-label font-bold uppercase tracking-widest text-on-surface-variant">
             Filtros
           </h3>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input 
-              type="checkbox" 
-              className="sr-only peer" 
-              checked={applyFilters}
-              onChange={(e) => onToggleFilters(e.target.checked)}
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-            <span className="ml-3 text-xs font-bold text-gray-500 uppercase tracking-tighter">Aplicar</span>
-          </label>
         </div>
 
-        <div className={`space-y-8 transition-opacity duration-300 ${applyFilters ? 'opacity-100' : 'opacity-40 pointer-events-none'}`}>
+        <div className="space-y-8 transition-opacity duration-300">
           {/* Materia & Departamento Section */}
           <section className="space-y-4">
             <div>
