@@ -29,7 +29,7 @@ const SubjectsManagement = () => {
           const data = await api.get(`/tutores/${user.id}/materias`);
           const mapped = (data || []).map(m => ({
             name: m.nombre,
-            dept: m.departamentoNombre || 'General',
+            dept: m.departamento_nombre || 'General',
             status: 'ACTIVO',
             sem: '2024-A',
             tutor: user.name,
@@ -60,7 +60,7 @@ const SubjectsManagement = () => {
 
       await api.post(
         `/tutores/${user.id}/materias`,
-        { materiaId: newSubjectData.materia_id },
+        { materiaId: newSubjectData.materiaId },
         token
       );
 

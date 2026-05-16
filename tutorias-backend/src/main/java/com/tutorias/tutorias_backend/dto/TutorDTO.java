@@ -11,15 +11,15 @@ import java.util.List;
 @Builder
 public class TutorDTO {
     private Long id;
-    private String nombreCompleto;
-    private String urlAvatar;
+    private String nombre_completo;
+    private String url_avatar;
     private String biografia;
-    private String frasePersonal;
-    private BigDecimal precioPorHora;
-    private BigDecimal calificacionPromedio;
-    private Integer totalSesiones;
-    private Integer aniosExperiencia;
-    private Boolean estaDisponible;
+    private String frase_personal;
+    private BigDecimal precio_por_hora;
+    private BigDecimal calificacion_promedio;
+    private Integer total_sesiones;
+    private Integer anios_experiencia;
+    private Boolean esta_disponible;
     private String[] titulos;
     private String[] logros;
     private List<MateriaDTO> materias;

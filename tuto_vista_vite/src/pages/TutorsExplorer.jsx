@@ -67,20 +67,20 @@ const TutorsExplorer = () => {
       // Filtrar por nombre en el cliente (búsqueda rápida)
       const filtered = searchQuery
         ? data.filter(t =>
-            t.nombreCompleto?.toLowerCase().includes(searchQuery.toLowerCase())
+            t.nombre_completo?.toLowerCase().includes(searchQuery.toLowerCase())
           )
         : data;
 
       const mappedTutors = filtered.map(t => ({
         id: t.id,
-        name: t.nombreCompleto || 'Tutor Anónimo',
-        image: t.urlAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.nombreCompleto || 'T')}&background=002045&color=fff`,
+        name: t.nombre_completo || 'Tutor Anónimo',
+        image: t.url_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.nombre_completo || 'T')}&background=002045&color=fff`,
         subject: t.materias?.slice(0, 2).map(m => m.nombre).join(', ') || 'Varias materias',
-        price: t.precioPorHora || 0,
-        rating: t.calificacionPromedio || 0,
-        reviews: t.totalSesiones || 0,
+        price: t.precio_por_hora || 0,
+        rating: t.calificacion_promedio || 0,
+        reviews: t.total_sesiones || 0,
         quote: t.biografia || 'Comprometido con la excelencia académica y el éxito del estudiante.',
-        isTopRated: (t.calificacionPromedio || 0) >= 4.8,
+        isTopRated: (t.calificacion_promedio || 0) >= 4.8,
       }));
 
       setTutors(mappedTutors);

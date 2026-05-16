@@ -72,7 +72,7 @@ const AddSubjectModal = ({ isOpen, onClose, onAdd }) => {
       const dept = departments.find(d => String(d.id) === String(selectedDeptId));
 
       onAdd({
-        materia_id: subject.id,
+        materiaId: subject.id,
         name: subject.nombre,
         dept: dept?.nombre || 'General',
       });

@@ -10,6 +10,6 @@ import lombok.*;
 public class MateriaDTO {
     private Long id;
     private String nombre;
-    private Long departamentoId;
-    private String departamentoNombre;
+    private Long departamento_id;
+    private String departamento_nombre;
 }

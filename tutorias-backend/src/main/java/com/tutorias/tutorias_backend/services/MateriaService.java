@@ -17,8 +17,8 @@ public class MateriaService {
                 .map(m -> MateriaDTO.builder()
                         .id(m.getId())
                         .nombre(m.getNombre())
-                        .departamentoId(m.getDepartamento().getId())
-                        .departamentoNombre(m.getDepartamento().getNombre())
+                        .departamento_id(m.getDepartamento().getId())
+                        .departamento_nombre(m.getDepartamento().getNombre())
                         .build())
                 .toList();
     }
@@ -28,8 +28,8 @@ public class MateriaService {
                 .map(m -> MateriaDTO.builder()
                         .id(m.getId())
                         .nombre(m.getNombre())
-                        .departamentoId(m.getDepartamento().getId())
-                        .departamentoNombre(m.getDepartamento().getNombre())
+                        .departamento_id(m.getDepartamento().getId())
+                        .departamento_nombre(m.getDepartamento().getNombre())
                         .build())
                 .toList();
     }
