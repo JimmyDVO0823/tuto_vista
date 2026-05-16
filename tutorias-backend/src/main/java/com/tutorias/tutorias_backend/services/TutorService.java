@@ -39,7 +39,8 @@ public class TutorService {
             BigDecimal minPrecio,
             BigDecimal maxPrecio,
             BigDecimal minCalificacion,
-            Long materiaId
+            Long materiaId,
+            Long departamentoId
     ) {
         return tutorRepository.findAll().stream()
                 .filter(t -> t.getEstaDisponible())
@@ -48,6 +49,8 @@ public class TutorService {
                 .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
                 .filter(t -> materiaId == null || t.getMaterias().stream()
                         .anyMatch(m -> m.getId().equals(materiaId)))
+                .filter(t -> departamentoId == null || t.getMaterias().stream()
+                        .anyMatch(m -> m.getDepartamento().getId().equals(departamentoId)))
                 .map(this::toDTO)
                 .toList();
     }

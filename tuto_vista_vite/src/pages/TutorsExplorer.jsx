@@ -13,13 +13,12 @@ const TutorsExplorer = () => {
   const [departments, setDepartments] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [applyFilters, setApplyFilters] = useState(true);
   const [filters, setFilters] = useState({
     departmentId: '',
     subjectId: '',
-    minPrice: 20,
-    maxPrice: 150,
-    minRating: 4,
+    minPrice: '',
+    maxPrice: '',
+    minRating: '',
   });
 
   // Cargar metadata (departamentos y materias) al inicio
@@ -33,7 +32,7 @@ const TutorsExplorer = () => {
       fetchTutors();
     }, 300);
     return () => clearTimeout(timer);
-  }, [filters, searchQuery, applyFilters]);
+  }, [filters, searchQuery]);
 
   const fetchMetadata = async () => {
     try {
@@ -52,14 +51,13 @@ const TutorsExplorer = () => {
     try {
       setLoading(true);
 
-      // Construir query params
+      // Construir query params dinámicos
       const params = new URLSearchParams();
-      if (applyFilters) {
-        if (filters.minPrice) params.append('minPrecio', filters.minPrice);
-        if (filters.maxPrice) params.append('maxPrecio', filters.maxPrice);
-        if (filters.minRating) params.append('minCalificacion', filters.minRating);
-        if (filters.subjectId) params.append('materiaId', filters.subjectId);
-      }
+      if (filters.minPrice) params.append('minPrecio', filters.minPrice);
+      if (filters.maxPrice) params.append('maxPrecio', filters.maxPrice);
+      if (filters.minRating) params.append('minCalificacion', filters.minRating);
+      if (filters.subjectId) params.append('materiaId', filters.subjectId);
+      if (filters.departmentId) params.append('departamentoId', filters.departmentId);
 
       const queryString = params.toString();
       const data = await api.get(`/tutores${queryString ? `?${queryString}` : ''}`);
@@ -111,8 +109,6 @@ const TutorsExplorer = () => {
               subjects={subjects}
               filters={filters}
               onFilterChange={handleFilterChange}
-              applyFilters={applyFilters}
-              onToggleFilters={setApplyFilters}
             />
           </aside>
 

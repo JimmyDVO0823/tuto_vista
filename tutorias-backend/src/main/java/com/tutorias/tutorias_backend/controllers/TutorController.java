@@ -28,9 +28,10 @@ public class TutorController {
             @RequestParam(required = false) BigDecimal minPrecio,
             @RequestParam(required = false) BigDecimal maxPrecio,
             @RequestParam(required = false) BigDecimal minCalificacion,
-            @RequestParam(required = false) Long materiaId) {
+            @RequestParam(required = false) Long materiaId,
+            @RequestParam(required = false) Long departamentoId) {
         return ResponseEntity.ok(
-                tutorService.getTutoresDisponibles(minPrecio, maxPrecio, minCalificacion, materiaId)
+                tutorService.getTutoresDisponibles(minPrecio, maxPrecio, minCalificacion, materiaId, departamentoId)
         );
     }
 
