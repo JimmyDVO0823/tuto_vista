@@ -10,36 +10,32 @@ import React, { useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import EventPreviewCard from './EventPreviewCard';
 
-/**
- * AcademicCalendar Component.
- * 
- * @component
- */
-export default function AcademicCalendar() {
-  /**
-   * Captures the coordinates and data of the event being hovered.
-   * Logic Rationale: Used to render a contextual floating preview (portal-like) 
-   * without affecting the main calendar layout.
-   * @state {Object|null} hoveredEvent
-   */
+export default function AcademicCalendar({ 
+  events = [], 
+  initialView = 'dayGridMonth',
+  headerToolbar = { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+  selectable = false,
+  editable = false,
+  onSelect = null,
+  onEventClick = null,
+  slotMinTime = '06:00:00',
+  slotMaxTime = '22:00:00',
+  allDaySlot = false
+}) {
   const [hoveredEvent, setHoveredEvent] = useState(null);
+  const [currentView, setCurrentView] = useState(initialView);
 
-  /**
-   * Synchronizes UI state with the pointer position on event entry.
-   * @param {Object} info - FullCalendar event mouse event object.
-   */
   const handleMouseEnter = (info) => {
     const { title, extendedProps } = info.event;
-    const { type, category, time, status } = extendedProps;
     setHoveredEvent({
       title,
-      type: type || 'Evento',
-      category: category || 'General',
-
-      time: time || 'Todo el día',
-      status: status || 'Programado',
+      type: extendedProps.type || 'Evento',
+      category: extendedProps.category || 'General',
+      time: extendedProps.time || 'Todo el día',
+      status: extendedProps.status || 'Programado',
       x: info.jsEvent.clientX,
       y: info.jsEvent.clientY,
     });
@@ -49,31 +45,10 @@ export default function AcademicCalendar() {
     setHoveredEvent(null);
   };
 
-  const rawEvents = [
-    { 
-      title: 'Tutoría Física Avanzada', 
-      date: '2026-04-20', 
-      extendedProps: { type: 'Sesión', category: 'Ciencias Exactas', time: '10:00 AM - 11:30 AM', status: 'Confirmada' } 
-    },
-    { 
-      title: 'Entrega Ensayo Literatura', 
-      date: '2026-04-22', 
-      extendedProps: { type: 'Compromiso', category: 'Humanidades', time: '23:59 PM', status: 'Urgente' } 
-    },
-    { 
-      title: 'Tutoría Cálculo III', 
-      date: '2026-04-25', 
-      extendedProps: { type: 'Sesión', category: 'Ingeniería', time: '14:00 PM - 16:00 PM', status: 'En progreso' } 
-    }
-  ];
-
-  const calendarEvents = rawEvents.map(event => ({
-    ...event,
-    color: event.extendedProps.type === 'Compromiso' ? '#cba72f' : '#002045'
-  }));
+  const isViewSelectable = selectable && currentView !== 'dayGridMonth';
 
   return (
-    <div className="relative bg-surface-container-lowest p-8 rounded-lg shadow-ambient font-body
+    <div className={`relative bg-surface-container-lowest p-8 rounded-lg shadow-ambient font-body
       [--fc-button-bg-color:theme(colors.primary)]
       [--fc-button-border-color:theme(colors.primary)]
       [--fc-button-hover-bg-color:theme(colors.primary-container)]
@@ -86,19 +61,34 @@ export default function AcademicCalendar() {
       [&_.fc-toolbar-title]:font-headline [&_.fc-toolbar-title]:font-bold [&_.fc-toolbar-title]:text-primary [&_.fc-toolbar-title]:text-2xl
       [&_.fc-button]:font-body [&_.fc-button]:font-semibold [&_.fc-button]:capitalize [&_.fc-button]:rounded-xl
       [&_.fc-col-header-cell-cushion]:font-headline [&_.fc-col-header-cell-cushion]:font-semibold [&_.fc-col-header-cell-cushion]:text-elegant-gray [&_.fc-col-header-cell-cushion]:no-underline
-      [&_.fc-daygrid-day-number]:font-body [&_.fc-daygrid-day-number]:text-elegant-gray [&_.fc-daygrid-day-number]:no-underline [&_.fc-daygrid-day-number]:p-2">
+      [&_.fc-daygrid-day-number]:font-body [&_.fc-daygrid-day-number]:text-elegant-gray [&_.fc-daygrid-day-number]:no-underline [&_.fc-daygrid-day-number]:p-2
+      ${isViewSelectable ? `
+        [&_.fc-timegrid]:cursor-cell
+        [&_.fc-timegrid-slots_tr]:cursor-cell
+        [&_.fc-timegrid-slots_td]:cursor-cell
+        [&_.fc-timegrid-slot]:cursor-cell
+        [&_.fc-timegrid-slots_tr:hover]:bg-gray-50/20
+        [&_.fc-timegrid-col]:cursor-cell
+        [&_.fc-timegrid-col-frame]:cursor-cell
+        [&_.fc-timegrid-col-bg]:cursor-cell
+        [&_.fc-timegrid-col-bg:hover]:bg-gray-50/20
+        [&_.fc-timegrid-cols_td]:cursor-cell
+      ` : ''}`}>
       <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin]}
-        initialView="dayGridMonth"
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        initialView={initialView}
         aspectRatio={1.1}
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek'
-        }}
-        events={calendarEvents}
-
-
+        headerToolbar={headerToolbar}
+        events={events}
+        selectable={isViewSelectable}
+        editable={editable}
+        select={onSelect}
+        eventClick={onEventClick}
+        slotMinTime={slotMinTime}
+        slotMaxTime={slotMaxTime}
+        allDaySlot={allDaySlot}
+        displayEventTime={false}
+        datesSet={(arg) => setCurrentView(arg.view.type)}
         eventClassNames="rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer"
         eventMouseEnter={handleMouseEnter}
         eventMouseLeave={handleMouseLeave}

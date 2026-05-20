@@ -56,4 +56,27 @@ export const api = {
 
     return response.json();
   },
+
+  async delete(endpoint, token) {
+    const storedToken = token || localStorage.getItem('token');
+    const headers = {};
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Error en la petición');
+    }
+
+    // Return empty object for 204 No Content
+    if (response.status === 204) {
+      return {};
+    }
+
+    return response.json().catch(() => ({}));
+  },
 };
