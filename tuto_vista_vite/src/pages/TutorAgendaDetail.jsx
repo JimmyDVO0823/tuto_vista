@@ -150,7 +150,7 @@ const TutorAgendaDetail = () => {
 
     try {
       setSubmitting(true);
-      
+
       const payload = {
         tutorId: parseInt(id),
         materiaId: parseInt(selectedSubjectId),
@@ -162,7 +162,7 @@ const TutorAgendaDetail = () => {
 
       await api.post('/solicitudes', payload);
       setSuccessMessage('¡Solicitud de tutoría enviada exitosamente! El tutor revisará tu propuesta.');
-      
+
       // Reset form
       setSelectedSlot(null);
       setSelectedTime('');
@@ -236,10 +236,10 @@ const TutorAgendaDetail = () => {
           {/* Columna Izquierda: Foto y Metadata */}
           <aside className="col-span-12 lg:col-span-4 space-y-12">
             <div className="aspect-[4/5] bg-surface-container-low rounded-2xl overflow-hidden shadow-ambient relative group">
-              <img 
-                src={tutor.url_avatar || defaultAvatar} 
-                alt={tutor.nombre_completo} 
-                className="w-full h-full object-cover" 
+              <img
+                src={tutor.url_avatar || defaultAvatar}
+                alt={tutor.nombre_completo}
+                className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                 <span className="text-white text-xs uppercase font-bold tracking-widest">
@@ -254,8 +254,8 @@ const TutorAgendaDetail = () => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {tutor.materias?.map(m => (
-                  <span 
-                    key={m.id} 
+                  <span
+                    key={m.id}
                     className="px-4 py-2 bg-surface-container-lowest text-primary text-xs font-bold rounded-full border border-outline-variant/20 shadow-sm"
                   >
                     {m.nombre}
@@ -334,11 +334,10 @@ const TutorAgendaDetail = () => {
                             <button
                               key={slot.id}
                               onClick={() => handleSlotSelect(slot)}
-                              className={`w-full py-3 px-2 rounded-xl text-xs font-bold transition-all text-center border ${
-                                isSelected
-                                  ? 'bg-academic-gold/10 border-academic-gold text-academic-gold shadow-sm scale-[1.02]'
-                                  : 'bg-surface-container-low border-outline-variant/10 text-primary hover:border-academic-gold hover:text-academic-gold hover:bg-academic-gold/5'
-                              }`}
+                              className={`w-full py-3 px-2 rounded-xl text-xs font-bold transition-all text-center border ${isSelected
+                                ? 'bg-academic-gold/10 border-academic-gold text-academic-gold shadow-sm scale-[1.02]'
+                                : 'bg-surface-container-low border-outline-variant/10 text-primary hover:border-academic-gold hover:text-academic-gold hover:bg-academic-gold/5'
+                                }`}
                             >
                               {slot.horaInicio.substring(0, 5)} - {slot.horaFin.substring(0, 5)}
                             </button>
@@ -447,7 +446,7 @@ const TutorAgendaDetail = () => {
                     <div>
                       <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Inversión por hora</p>
                       <p className="text-3xl font-black text-primary">
-                        ${tutor.precio_por_hora?.toLocaleString('es-CO')} COP 
+                        ${tutor.precio_por_hora?.toLocaleString('es-CO')} COP
                         <span className="text-sm font-medium text-gray-400"> / h</span>
                       </p>
                     </div>
