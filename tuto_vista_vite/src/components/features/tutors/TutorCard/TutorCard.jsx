@@ -7,11 +7,13 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 /**
  * TutorCard Component.
  * 
  * @param {Object} props - Component properties.
+ * @param {number} props.id - The unique identifier of the tutor.
  * @param {string} props.name - The full name of the academic professional.
  * @param {string} props.image - URL of the profile portrait.
  * @param {string} props.subject - The primary academic discipline.
@@ -23,7 +25,7 @@ import React from 'react';
  * badge and signature ring styling.
  * @component
  */
-const TutorCard = ({ name, image, subject, price, rating, reviews, quote, isTopRated }) => {
+const TutorCard = ({ id, name, image, subject, price, rating, reviews, quote, isTopRated }) => {
   return (
     <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col gap-6 hover:shadow-[0_8px_40px_rgba(25,28,30,0.04)] transition-all group">
       <div className="flex items-start justify-between">
@@ -71,9 +73,11 @@ const TutorCard = ({ name, image, subject, price, rating, reviews, quote, isTopR
         </span>
       </div>
       <div className="pt-4 mt-auto border-t border-outline-variant/10">
-        <button className="w-full py-3 border-2 border-primary/10 hover:border-primary text-primary font-bold text-sm rounded-md transition-all active:scale-[0.98]">
-          Ver Perfil
-        </button>
+        <Link to={`/tutors/${id}`} className="block">
+          <button className="w-full py-3 border-2 border-primary/10 hover:border-primary text-primary font-bold text-sm rounded-md transition-all active:scale-[0.98]">
+            Ver Perfil
+          </button>
+        </Link>
       </div>
     </div>
   );

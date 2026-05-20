@@ -18,6 +18,7 @@ public class SolicitudService {
     private final EstudianteRepository estudianteRepository;
     private final TutorRepository tutorRepository;
     private final MateriaRepository materiaRepository;
+    private final DisponibilidadRepository disponibilidadRepository;
 
     @Transactional
     public SolicitudDTO crear(Long estudianteId, SolicitudRequest request) {
@@ -28,13 +29,41 @@ public class SolicitudService {
         Materia materia = materiaRepository.findById(request.getMateriaId())
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
 
+        // Validar disponibilidad
+        if (request.getHoraPreferida() == null) {
+            throw new RuntimeException("La hora preferida es obligatoria.");
+        }
+        
+        java.util.List<Disponibilidad> disponibilidades = disponibilidadRepository.findByTutorIdAndEstaActivoTrue(request.getTutorId());
+        
+        int diaSemanaJava = request.getFechaPreferida().getDayOfWeek().getValue(); // 1 = Lunes, ..., 7 = Domingo
+        int diaSemanaDB = diaSemanaJava == 7 ? 0 : diaSemanaJava; // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+        
+        java.time.LocalTime horaInicioSesion = request.getHoraPreferida();
+        int duracion = request.getDuracionMin() != null ? request.getDuracionMin() : 90;
+        java.time.LocalTime horaFinSesion = horaInicioSesion.plusMinutes(duracion);
+        
+        boolean horarioValido = false;
+        for (Disponibilidad d : disponibilidades) {
+            if (d.getDiaSemana() == diaSemanaDB) {
+                if (!horaInicioSesion.isBefore(d.getHoraInicio()) && !horaFinSesion.isAfter(d.getHoraFin())) {
+                    horarioValido = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!horarioValido) {
+            throw new RuntimeException("El horario seleccionado o la duración excede la disponibilidad configurada del tutor para este día.");
+        }
+
         Solicitud solicitud = new Solicitud();
         solicitud.setEstudiante(estudiante);
         solicitud.setTutor(tutor);
         solicitud.setMateria(materia);
         solicitud.setFechaPreferida(request.getFechaPreferida());
         solicitud.setHoraPreferida(request.getHoraPreferida());
-        solicitud.setDuracionMin(request.getDuracionMin() != null ? request.getDuracionMin() : 90);
+        solicitud.setDuracionMin(duracion);
         solicitud.setMensaje(request.getMensaje());
         solicitud.setEstado(EstadoSolicitud.pendiente);
 

@@ -33,6 +33,15 @@ public class TutorService {
     }
 
     /**
+     * Obtiene un tutor por su ID.
+     */
+    public TutorDTO getTutorById(Long id) {
+        Tutor tutor = tutorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+        return toDTO(tutor);
+    }
+
+    /**
      * Obtiene todos los tutores disponibles con filtros opcionales.
      */
     public List<TutorDTO> getTutoresDisponibles(

@@ -8,6 +8,7 @@ import RegisterForm from './components/features/auth/RegisterForm/RegisterForm'
 import SubjectsManagement from './pages/SubjectsManagement'
 import DispoManagement from './pages/DispoManagement'
 import ProtectedRoute from './components/features/auth/ProtectedRoute/ProtectedRoute'
+import TutorAgendaDetail from './pages/TutorAgendaDetail'
 
 import { AuthProvider } from './context/AuthContext'
 
@@ -50,6 +51,7 @@ function App() {
             }
           />
           <Route path="/tutors" element={<TutorsExplorer />} />
+          <Route path="/tutors/:id" element={<TutorAgendaDetail />} />
 
           {/* ── PRIVATE ROUTES (JWT + Session required) ─────────────────── */}
           <Route

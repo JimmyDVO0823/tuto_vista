@@ -36,6 +36,15 @@ public class TutorController {
     }
 
     /**
+     * GET /tutores/{id}
+     * Obtiene el perfil de un tutor específico por su ID.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<TutorDTO> getTutorById(@PathVariable Long id) {
+        return ResponseEntity.ok(tutorService.getTutorById(id));
+    }
+
+    /**
      * GET /tutores/{id}/materias
      * Devuelve las materias de un tutor específico.
      */

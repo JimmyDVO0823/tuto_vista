@@ -15,13 +15,16 @@ import java.util.List;
 public class SolicitudController {
 
     private final SolicitudService solicitudService;
+    private final com.tutorias.tutorias_backend.repositories.PerfilRepository perfilRepository;
 
     @PostMapping
-    public ResponseEntity<SolicitudDTO> crear(@RequestBody SolicitudRequest request) {
-        // TODO: Obtener el ID del estudiante desde el token JWT
-        // Por ahora usamos un ID fijo o lo pasaremos en el request para pruebas rápidas
-        // En producción se sacará del SecurityContextHolder
-        Long estudianteId = 1L; 
+    public ResponseEntity<SolicitudDTO> crear(
+            @RequestBody SolicitudRequest request,
+            org.springframework.security.core.Authentication authentication) {
+        String email = authentication.getName();
+        com.tutorias.tutorias_backend.entities.Perfil perfil = perfilRepository.findByCorreo(email)
+                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
+        Long estudianteId = perfil.getId(); 
         return ResponseEntity.ok(solicitudService.crear(estudianteId, request));
     }
 
