@@ -34,6 +34,10 @@ public class SesionTutoria {
     @JoinColumn(name = "materia_id", nullable = false)
     private Materia materia;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estudiante_plan_id")
+    private EstudiantePlan estudiantePlan;
+
     @Column(name = "programada_para", nullable = false)
     private OffsetDateTime programadaPara;
 

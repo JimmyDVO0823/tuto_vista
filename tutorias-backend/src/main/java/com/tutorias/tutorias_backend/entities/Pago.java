@@ -19,8 +19,18 @@ public class Pago {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "sesion_id", nullable = false, unique = true)
+    @JoinColumn(name = "sesion_id", unique = true)
     private SesionTutoria sesion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estudiante_plan_id")
+    private EstudiantePlan estudiantePlan;
+
+    @Column(nullable = false)
+    private String tipo = "sesion";
+
+    @Column(name = "pago_tutor", insertable = false, updatable = false, precision = 10, scale = 2)
+    private BigDecimal pagoTutor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "estudiante_id", nullable = false)
