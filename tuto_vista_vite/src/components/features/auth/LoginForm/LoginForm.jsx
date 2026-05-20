@@ -14,7 +14,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 
 /**
  * LoginForm Component.
- * Encapsulates the state and logic for session initiation via Supabase Auth.
+ * Encapsulates the state and logic for session initiation via backend JWT.
  * 
  * @component
  */
@@ -56,9 +56,6 @@ const LoginForm = () => {
 
   /**
    * Handlers for the form submission event.
-   * Logic Rationale: We utilize Supabase's `signInWithPassword` to maintain 
-   * compatibility with standard JWT-based flows, providing a robust 
-   * bridge to the academic dashboard.
    * 
    * @param {React.FormEvent} e - The form submission event.
    * @async

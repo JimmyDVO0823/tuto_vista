@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 
 const DashboardTutor = () => {
+  const { user } = useAuth();
+  const [sessions, setSessions] = useState([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      api.get(`/sesiones/tutor/${user.id}`)
+         .then(data => setSessions(data || []))
+         .catch(err => console.error('Error cargando sesiones:', err));
+    }
+  }, [user]);
+
   return (
     <MainLayout>
       <main className="p-10">
@@ -11,7 +24,7 @@ const DashboardTutor = () => {
               Panel del Instructor
             </p>
             <h1 className="text-5xl font-extrabold font-headline text-primary tracking-tight">
-              Bienvenido, Julian.
+              Bienvenido, {user?.name || 'Tutor'}.
             </h1>
           </div>
           <div className="bg-white p-4 rounded-xl flex items-center gap-6 shadow-sm border border-gray-100">
@@ -59,30 +72,32 @@ const DashboardTutor = () => {
         {/* Session List */}
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-8 space-y-6">
-            <h2 className="text-2xl font-bold font-headline text-primary tracking-tight">Clases de Hoy</h2>
+            <h2 className="text-2xl font-bold font-headline text-primary tracking-tight">Próximas Sesiones</h2>
             <div className="space-y-4">
-              {[1, 2, 3].map((s) => (
-                <div key={s} className="bg-white p-6 rounded-lg flex items-center justify-between group hover:translate-x-2 transition-transform duration-300 shadow-sm border border-gray-50">
+              {sessions.length > 0 ? sessions.map((s, i) => (
+                <div key={s.id || i} className="bg-white p-6 rounded-lg flex items-center justify-between group hover:translate-x-2 transition-transform duration-300 shadow-sm border border-gray-50">
                   <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-full bg-mini-gray overflow-hidden border-2 border-white">
-                      <img src={`https://i.pravatar.cc/150?u=student${s}`} alt="Student" className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 rounded-full bg-mini-gray overflow-hidden border-2 border-white flex items-center justify-center text-xl font-bold text-gray-500">
+                      {s.estudianteNombre ? s.estudianteNombre.charAt(0) : 'E'}
                     </div>
                     <div>
-                      <h4 className="font-bold text-lg text-primary">Estudiante {s}</h4>
-                      <p className="text-sm text-gray-500">Materia Académica • Nivel Avanzado</p>
+                      <h4 className="font-bold text-lg text-primary">{s.estudianteNombre || `Estudiante ${i+1}`}</h4>
+                      <p className="text-sm text-gray-500">{s.materiaNombre || 'Materia Académica'}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-2 text-primary font-bold mb-1">
                       <span className="material-symbols-outlined text-sm">schedule</span>
-                      <span>09:00 - 10:30 AM</span>
+                      <span>{s.programadaPara ? new Date(s.programadaPara).toLocaleString() : 'Pendiente'}</span>
                     </div>
                     <span className="text-[0.65rem] uppercase tracking-widest font-bold text-academic-gold px-2 py-1 bg-academic-gold/10 rounded">
-                      Programada
+                      {s.estado || 'Programada'}
                     </span>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <p className="text-gray-500">No tienes sesiones programadas.</p>
+              )}
             </div>
           </div>
 

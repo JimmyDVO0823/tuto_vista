@@ -15,50 +15,34 @@ import ActivityCard from '../ActivityCard/ActivityCard';
  * 
  * @component
  */
-const NextSessions = () => {
-  const upcomingSessions = [
-    { 
-      title: 'Econometría Avanzada', 
-      time: '14:00 - 15:30', 
-      tutor: 'Dra. Elena Vargas', 
-      type: 'Editorial',
-      initial: 'E'
-    },
-    { 
-      title: 'Escritura Académica II', 
-      time: '17:00 - 18:30', 
-      tutor: 'Dr. Julián Reed', 
-      type: 'Revision',
-      initial: 'A'
-    },
-    { 
-      title: 'Cálculo Multivariable', 
-      time: '09:00 - 10:30', 
-      tutor: 'Dra. Sarah Jenkins', 
-      type: 'Masterclass',
-      initial: 'C'
-    }
-  ];
-
+const NextSessions = ({ sessions = [], isTutor = false }) => {
   return (
     <article className="space-y-8">
       <h2 className="text-2xl font-bold font-headline text-primary">Próximas Sesiones</h2>
       <div className="space-y-4">
-        {upcomingSessions.map((session, i) => (
-          <ActivityCard 
-            key={i}
-            initial={session.initial}
-            title={session.title}
-            subtitle={`${session.tutor} • ${session.type}`}
-            time={session.time}
-            buttonText="Unirse a sesión"
-            actionPath="#"
-          />
-        ))}
+        {sessions.length > 0 ? sessions.map((session, i) => {
+          const initial = session.materiaNombre ? session.materiaNombre.charAt(0) : 'S';
+          const otherPerson = isTutor ? session.estudianteNombre : session.tutorNombre;
+          const dateStr = session.programadaPara ? new Date(session.programadaPara).toLocaleString() : 'Pendiente';
+          
+          return (
+            <ActivityCard 
+              key={session.id || i}
+              initial={initial}
+              title={session.materiaNombre || 'Sesión'}
+              subtitle={`${otherPerson || 'Usuario'} • ${session.estado || 'PROGRAMADA'}`}
+              time={dateStr}
+              buttonText="Unirse a sesión"
+              actionPath={session.enlaceReunion || "#"}
+            />
+          );
+        }) : (
+          <p className="text-gray-500">No hay sesiones programadas.</p>
+        )}
       </div>
       
       {/* Pagination Component */}
-      <Pagination />
+      {sessions.length > 0 && <Pagination />}
     </article>
   );
 };

@@ -73,19 +73,6 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     email: user.email
   } : null;
 
-  /**
-   * Authentication Termination:
-   * Invokes the Supabase Auth layer to invalidate the current session.
-   *
-   * Defense-in-depth: The custom JWT is removed from localStorage first,
-   * before the Supabase call, so the token is always purged even if the
-   * onAuthStateChange listener fails to fire (e.g., network error).
-   * AuthContext's listener handles the same cleanup reactively, but this
-   * explicit call acts as a guaranteed fallback.
-   *
-   * @async
-   * @function handleLogout
-   */
   const handleLogout = () => {
     logout();
   };

@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import NextSessions from '../components/features/dashboard/NextSessions/NextSessions';
 import PendingAssignments from '../components/features/dashboard/PendingAssignments/PendingAssignments';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 
 const DashboardStudent = () => {
+  const { user } = useAuth();
+  const [sessions, setSessions] = useState([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      api.get(`/sesiones/estudiante/${user.id}`)
+         .then(data => setSessions(data || []))
+         .catch(err => console.error('Error cargando sesiones:', err));
+    }
+  }, [user]);
 
   return (
     <MainLayout>
@@ -23,7 +35,7 @@ const DashboardStudent = () => {
 
         <section className="grid grid-cols-12 gap-10 mb-20">
           <article className="col-span-8">
-            <NextSessions />
+            <NextSessions sessions={sessions} isTutor={false} />
             <PendingAssignments />
           </article>
 

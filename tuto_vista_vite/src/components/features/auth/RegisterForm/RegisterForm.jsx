@@ -68,8 +68,7 @@ const RegisterForm = () => {
    * Logic Rationale: 
    * 1. Performs structural validation (Zod).
    * 2. Validates password parity (Manual).
-   * 3. Invokes Supabase Auth with metadata payload, ensuring the 
-   *    'nombre_completo' and 'rol' are injected into the Auth JWT.
+   * 3. Invokes backend Auth with metadata payload.
    * 
    * @param {React.FormEvent} e
    * @async
