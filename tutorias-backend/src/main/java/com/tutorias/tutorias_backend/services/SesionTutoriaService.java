@@ -3,6 +3,7 @@ package com.tutorias.tutorias_backend.services;
 import com.tutorias.tutorias_backend.dto.SesionTutoriaDTO;
 import com.tutorias.tutorias_backend.entities.*;
 import com.tutorias.tutorias_backend.enums.EstadoSesion;
+import com.tutorias.tutorias_backend.enums.EstadoSolicitud;
 import com.tutorias.tutorias_backend.repositories.SesionTutoriaRepository;
 import com.tutorias.tutorias_backend.repositories.SolicitudRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,18 +25,72 @@ public class SesionTutoriaService {
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
 
-        SesionTutoria sesion = new SesionTutoria();
-        sesion.setSolicitud(solicitud);
-        sesion.setTutor(solicitud.getTutor());
-        sesion.setEstudiante(solicitud.getEstudiante());
-        sesion.setMateria(solicitud.getMateria());
-        
-        // Combinar fecha y hora preferida para programar
+        if (solicitud.getEstado() != EstadoSolicitud.pendiente) {
+            throw new RuntimeException("La solicitud no está pendiente, por lo que no puede ser aceptada.");
+        }
+
+        // Combinar fecha y hora preferida para programar la nueva sesión
         OffsetDateTime programada = OffsetDateTime.of(
             solicitud.getFechaPreferida(), 
             solicitud.getHoraPreferida(), 
             ZoneOffset.UTC
         );
+        OffsetDateTime nuevaInicio = programada;
+        OffsetDateTime nuevaFin = programada.plusMinutes(solicitud.getDuracionMin());
+
+        // 1. Validar solapamiento con sesiones existentes (programadas o en progreso)
+        List<SesionTutoria> activeSessions = sesionTutoriaRepository.findByTutorIdAndEstadoIn(
+            solicitud.getTutor().getId(),
+            List.of(EstadoSesion.programada, EstadoSesion.en_progreso)
+        );
+
+        for (SesionTutoria s : activeSessions) {
+            OffsetDateTime extInicio = s.getProgramadaPara();
+            OffsetDateTime extFin = extInicio.plusMinutes(s.getDuracionMin());
+
+            // Solapamiento si: nuevaInicio < extFin AND nuevaFin > extInicio
+            if (nuevaInicio.isBefore(extFin) && nuevaFin.isAfter(extInicio)) {
+                throw new RuntimeException("El tutor ya tiene otra sesión activa programada en esta franja horaria: " +
+                        extInicio.toLocalTime() + " - " + extFin.toLocalTime());
+            }
+        }
+
+        // 2. Cambiar estado de la solicitud actual a aceptada
+        solicitud.setEstado(EstadoSolicitud.aceptada);
+        solicitudRepository.save(solicitud);
+
+        // 3. Auto-rechazar otras solicitudes pendientes que se solapen
+        List<Solicitud> pendingRequests = solicitudRepository.findByTutorIdAndEstado(
+            solicitud.getTutor().getId(),
+            EstadoSolicitud.pendiente
+        );
+
+        for (Solicitud p : pendingRequests) {
+            if (p.getId().equals(solicitud.getId())) {
+                continue;
+            }
+
+            OffsetDateTime reqInicio = OffsetDateTime.of(
+                p.getFechaPreferida(),
+                p.getHoraPreferida(),
+                ZoneOffset.UTC
+            );
+            OffsetDateTime reqFin = reqInicio.plusMinutes(p.getDuracionMin());
+
+            if (reqInicio.isBefore(nuevaFin) && reqFin.isAfter(nuevaInicio)) {
+                p.setEstado(EstadoSolicitud.rechazada);
+                p.setMensaje(p.getMensaje() == null 
+                    ? "Cruce de horarios con otra sesión ya confirmada" 
+                    : p.getMensaje() + " [Rechazada automáticamente por cruce de horarios con otra tutoría confirmada]");
+                solicitudRepository.save(p);
+            }
+        }
+
+        SesionTutoria sesion = new SesionTutoria();
+        sesion.setSolicitud(solicitud);
+        sesion.setTutor(solicitud.getTutor());
+        sesion.setEstudiante(solicitud.getEstudiante());
+        sesion.setMateria(solicitud.getMateria());
         sesion.setProgramadaPara(programada);
         sesion.setDuracionMin(solicitud.getDuracionMin());
         sesion.setPrecio(solicitud.getTutor().getPrecioPorHora());

@@ -12,4 +12,5 @@ public interface SesionTutoriaRepository extends JpaRepository<SesionTutoria, Lo
     List<SesionTutoria> findByEstudianteId(Long estudianteId);
     List<SesionTutoria> findByTutorIdAndEstado(Long tutorId, EstadoSesion estado);
     List<SesionTutoria> findByEstudianteIdAndEstado(Long estudianteId, EstadoSesion estado);
+    List<SesionTutoria> findByTutorIdAndEstadoIn(Long tutorId, List<EstadoSesion> estados);
 }
