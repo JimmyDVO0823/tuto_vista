@@ -22,6 +22,7 @@ const TutorAgendaDetail = () => {
 
   const [tutor, setTutor] = useState(null);
   const [disponibilidad, setDisponibilidad] = useState([]);
+  const [sesionesOcupadas, setSesionesOcupadas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -52,13 +53,17 @@ const TutorAgendaDetail = () => {
       setError(null);
 
       // Fetch tutor info and availability in parallel
-      const [tutorData, dispoData] = await Promise.all([
+      const [tutorData, dispoData, sesionesData] = await Promise.all([
         api.get(`/tutores/${id}`),
         api.get(`/disponibilidad/tutor/${id}`),
+        api.get(`/sesiones/tutor/${id}`).catch(() => []) // Catch error just in case
       ]);
 
       setTutor(tutorData);
       setDisponibilidad(dispoData || []);
+      
+      const ocupadas = (sesionesData || []).filter(s => s.estado === 'programada' || s.estado === 'en_progreso');
+      setSesionesOcupadas(ocupadas);
 
       // Pre-select first subject if available
       if (tutorData?.materias?.length > 0) {
@@ -145,6 +150,29 @@ const TutorAgendaDetail = () => {
 
     if (sessionEndMin > slotEndMin) {
       alert(`La sesión excede el horario de disponibilidad del tutor (finaliza a las ${Math.floor(sessionEndMin / 60).toString().padStart(2, '0')}:${(sessionEndMin % 60).toString().padStart(2, '0')} pero el tutor está disponible hasta las ${selectedSlot.horaFin.substring(0, 5)}).`);
+      return;
+    }
+
+    // Validate overlap with occupied sessions on this date
+    const sessionStart = new Date(`${selectedDate}T${selectedTime}:00`);
+    const sessionEnd = new Date(sessionStart.getTime() + selectedDuration * 60000);
+
+    const ocupadasDelDia = sesionesOcupadas.filter(s => {
+      const localDate = new Date(s.programadaPara);
+      const localDateStr = localDate.getFullYear() + '-' +
+        String(localDate.getMonth() + 1).padStart(2, '0') + '-' +
+        String(localDate.getDate()).padStart(2, '0');
+      return localDateStr === selectedDate;
+    });
+
+    const hasOverlap = ocupadasDelDia.some(s => {
+      const occStart = new Date(s.programadaPara);
+      const occEnd = new Date(occStart.getTime() + s.duracionMin * 60000);
+      return sessionStart < occEnd && sessionEnd > occStart;
+    });
+
+    if (hasOverlap) {
+      alert("El horario seleccionado se cruza con una sesión ya confirmada del tutor. Por favor revisa los horarios ocupados y elige otro espacio.");
       return;
     }
 
@@ -363,6 +391,40 @@ const TutorAgendaDetail = () => {
                       Horario: <span className="font-bold text-primary">{selectedSlot.horaInicio.substring(0, 5)} - {selectedSlot.horaFin.substring(0, 5)}</span>
                     </p>
                   </div>
+
+                  {(() => {
+                    const ocupadasDelDia = !selectedDate ? [] : sesionesOcupadas.filter(s => {
+                      const localDate = new Date(s.programadaPara);
+                      const localDateStr = localDate.getFullYear() + '-' +
+                        String(localDate.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(localDate.getDate()).padStart(2, '0');
+                      return localDateStr === selectedDate;
+                    });
+
+                    return ocupadasDelDia.length > 0 && (
+                      <div className="bg-orange-50 border border-orange-200 p-4 rounded-xl mb-6 animate-fadeIn">
+                        <h6 className="text-orange-800 font-bold text-xs uppercase tracking-wider mb-2 flex items-center gap-1">
+                          <span className="material-symbols-outlined text-sm">warning</span>
+                          Horarios Ocupados Este Día
+                        </h6>
+                        <ul className="text-sm text-orange-700 space-y-1">
+                          {ocupadasDelDia.map(s => {
+                            const start = new Date(s.programadaPara);
+                            const end = new Date(start.getTime() + s.duracionMin * 60000);
+                            return (
+                              <li key={s.id} className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
+                                <span className="font-medium">{start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                        <p className="text-xs text-orange-600 mt-2 font-medium">
+                          Por favor elige una hora que no se cruce con estos horarios.
+                        </p>
+                      </div>
+                    );
+                  })()}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">

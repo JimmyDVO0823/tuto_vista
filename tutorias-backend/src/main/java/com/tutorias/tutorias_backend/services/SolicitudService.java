@@ -19,6 +19,7 @@ public class SolicitudService {
     private final TutorRepository tutorRepository;
     private final MateriaRepository materiaRepository;
     private final DisponibilidadRepository disponibilidadRepository;
+    private final SesionTutoriaRepository sesionTutoriaRepository;
 
     @Transactional
     public SolicitudDTO crear(Long estudianteId, SolicitudRequest request) {
@@ -55,6 +56,29 @@ public class SolicitudService {
         
         if (!horarioValido) {
             throw new RuntimeException("El horario seleccionado o la duración excede la disponibilidad configurada del tutor para este día.");
+        }
+
+        // Validar solapamiento con sesiones existentes (programadas o en progreso) en esa fecha exacta
+        java.time.OffsetDateTime nuevaInicio = java.time.OffsetDateTime.of(
+            request.getFechaPreferida(), 
+            request.getHoraPreferida(), 
+            java.time.ZoneOffset.UTC
+        );
+        java.time.OffsetDateTime nuevaFin = nuevaInicio.plusMinutes(duracion);
+
+        java.util.List<SesionTutoria> activeSessions = sesionTutoriaRepository.findByTutorIdAndEstadoIn(
+            request.getTutorId(),
+            java.util.List.of(com.tutorias.tutorias_backend.enums.EstadoSesion.programada, com.tutorias.tutorias_backend.enums.EstadoSesion.en_progreso)
+        );
+
+        for (SesionTutoria s : activeSessions) {
+            java.time.OffsetDateTime extInicio = s.getProgramadaPara();
+            java.time.OffsetDateTime extFin = extInicio.plusMinutes(s.getDuracionMin());
+
+            if (nuevaInicio.isBefore(extFin) && nuevaFin.isAfter(extInicio)) {
+                throw new RuntimeException("El tutor ya está ocupado en ese horario exacto (" + 
+                        extInicio.toLocalTime() + " - " + extFin.toLocalTime() + ") por otra tutoría confirmada.");
+            }
         }
 
         Solicitud solicitud = new Solicitud();
