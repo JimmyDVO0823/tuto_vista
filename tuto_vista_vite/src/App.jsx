@@ -9,6 +9,7 @@ import SubjectsManagement from './pages/SubjectsManagement'
 import DispoManagement from './pages/DispoManagement'
 import ProtectedRoute from './components/features/auth/ProtectedRoute/ProtectedRoute'
 import TutorAgendaDetail from './pages/TutorAgendaDetail'
+import GestionTutorias from './pages/GestionTutorias'
 
 import { AuthProvider } from './context/AuthContext'
 
@@ -75,6 +76,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DispoManagement />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tutor-agenda"
+            element={
+              <ProtectedRoute>
+                <GestionTutorias />
               </ProtectedRoute>
             }
           />

@@ -43,7 +43,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     ],
     tutor: [
       { label: 'Panel Instructor', path: '/dashboard', icon: 'dashboard' },
-      { label: 'Agenda Diaria', path: '/tutor-agenda', icon: 'event_note' },
+      { label: 'Gestionar Tutorías', path: '/tutor-agenda', icon: 'event_note' },
       { label: 'Disponibilidad', path: '/dispo', icon: 'schedule' },
       { label: 'Mis Cursos', path: '/subjects', icon: 'school' },
       { label: 'Ingresos', path: '#', icon: 'payments' },

@@ -1,5 +1,19 @@
 const BASE_URL = 'http://localhost:8080';
 
+const handleApiError = async (response) => {
+  const errorData = await response.json().catch(() => ({}));
+  const errorMessage = errorData.message || 'Error en la petición';
+  
+  if (response.status === 401 || errorMessage.includes('JWT expired')) {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.href = '/loginform';
+    throw new Error('Tu sesión ha expirado por inactividad. Por favor, inicia sesión nuevamente.');
+  }
+  
+  throw new Error(errorMessage);
+};
+
 export const api = {
   async post(endpoint, data, token) {
     const headers = { 'Content-Type': 'application/json' };
@@ -13,8 +27,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Error en la petición');
+      await handleApiError(response);
     }
 
     return response.json();
@@ -31,8 +44,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Error en la petición');
+      await handleApiError(response);
     }
 
     return response.json();
@@ -50,8 +62,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Error en la petición');
+      await handleApiError(response);
     }
 
     return response.json();
@@ -68,8 +79,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Error en la petición');
+      await handleApiError(response);
     }
 
     // Return empty object for 204 No Content
