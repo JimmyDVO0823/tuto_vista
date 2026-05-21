@@ -61,7 +61,7 @@ const TutorAgendaDetail = () => {
 
       setTutor(tutorData);
       setDisponibilidad(dispoData || []);
-      
+
       const ocupadas = (sesionesData || []).filter(s => s.estado === 'programada' || s.estado === 'en_progreso');
       setSesionesOcupadas(ocupadas);
 
@@ -153,15 +153,16 @@ const TutorAgendaDetail = () => {
       return;
     }
 
-    // Validate overlap with occupied sessions on this date
-    const sessionStart = new Date(`${selectedDate}T${selectedTime}:00`);
+    // Validate overlap with occupied sessions on this date (using UTC to prevent timezone shift)
+    const sessionStart = new Date(`${selectedDate}T${selectedTime}:00Z`);
     const sessionEnd = new Date(sessionStart.getTime() + selectedDuration * 60000);
 
     const ocupadasDelDia = sesionesOcupadas.filter(s => {
       const localDate = new Date(s.programadaPara);
-      const localDateStr = localDate.getFullYear() + '-' +
-        String(localDate.getMonth() + 1).padStart(2, '0') + '-' +
-        String(localDate.getDate()).padStart(2, '0');
+      const utcYear = localDate.getUTCFullYear();
+      const utcMonth = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+      const utcDay = String(localDate.getUTCDate()).padStart(2, '0');
+      const localDateStr = `${utcYear}-${utcMonth}-${utcDay}`;
       return localDateStr === selectedDate;
     });
 
@@ -395,9 +396,10 @@ const TutorAgendaDetail = () => {
                   {(() => {
                     const ocupadasDelDia = !selectedDate ? [] : sesionesOcupadas.filter(s => {
                       const localDate = new Date(s.programadaPara);
-                      const localDateStr = localDate.getFullYear() + '-' +
-                        String(localDate.getMonth() + 1).padStart(2, '0') + '-' +
-                        String(localDate.getDate()).padStart(2, '0');
+                      const utcYear = localDate.getUTCFullYear();
+                      const utcMonth = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+                      const utcDay = String(localDate.getUTCDate()).padStart(2, '0');
+                      const localDateStr = `${utcYear}-${utcMonth}-${utcDay}`;
                       return localDateStr === selectedDate;
                     });
 
@@ -414,7 +416,9 @@ const TutorAgendaDetail = () => {
                             return (
                               <li key={s.id} className="flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
-                                <span className="font-medium">{start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                <span className="font-medium">
+                                  {start.toLocaleTimeString([], { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - {end.toLocaleTimeString([], { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
+                                </span>
                               </li>
                             );
                           })}

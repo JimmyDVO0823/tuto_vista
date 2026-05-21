@@ -23,7 +23,7 @@ const NextSessions = ({ sessions = [], isTutor = false }) => {
         {sessions.length > 0 ? sessions.map((session, i) => {
           const initial = session.materiaNombre ? session.materiaNombre.charAt(0) : 'S';
           const otherPerson = isTutor ? session.estudianteNombre : session.tutorNombre;
-          const dateStr = session.programadaPara ? new Date(session.programadaPara).toLocaleString() : 'Pendiente';
+          const dateStr = session.programadaPara ? new Date(session.programadaPara).toLocaleString([], { timeZone: 'UTC' }) : 'Pendiente';
           
           return (
             <ActivityCard 

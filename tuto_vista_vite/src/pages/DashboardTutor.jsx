@@ -88,7 +88,7 @@ const DashboardTutor = () => {
                   <div className="text-right">
                     <div className="flex items-center gap-2 text-primary font-bold mb-1">
                       <span className="material-symbols-outlined text-sm">schedule</span>
-                      <span>{s.programadaPara ? new Date(s.programadaPara).toLocaleString() : 'Pendiente'}</span>
+                      <span>{s.programadaPara ? new Date(s.programadaPara).toLocaleString([], { timeZone: 'UTC' }) : 'Pendiente'}</span>
                     </div>
                     <span className="text-[0.65rem] uppercase tracking-widest font-bold text-academic-gold px-2 py-1 bg-academic-gold/10 rounded">
                       {s.estado || 'Programada'}
