@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://localhost:8081';
 
 const handleApiError = async (response) => {
   const errorData = await response.json().catch(() => ({}));
