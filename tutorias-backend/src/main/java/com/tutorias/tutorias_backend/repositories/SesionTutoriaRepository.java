@@ -13,4 +13,10 @@ public interface SesionTutoriaRepository extends JpaRepository<SesionTutoria, Lo
     List<SesionTutoria> findByTutorIdAndEstado(Long tutorId, EstadoSesion estado);
     List<SesionTutoria> findByEstudianteIdAndEstado(Long estudianteId, EstadoSesion estado);
     List<SesionTutoria> findByTutorIdAndEstadoIn(Long tutorId, List<EstadoSesion> estados);
+
+    @org.springframework.data.jpa.repository.Query("SELECT SUM(s.duracionMin) FROM SesionTutoria s WHERE s.tutor.id = :tutorId AND s.estado = 'completada' AND s.programadaPara >= :startOfMonth")
+    Long sumDuracionMinByTutorAndMonth(
+            @org.springframework.data.repository.query.Param("tutorId") Long tutorId,
+            @org.springframework.data.repository.query.Param("startOfMonth") java.time.OffsetDateTime startOfMonth
+    );
 }

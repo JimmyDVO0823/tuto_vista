@@ -15,6 +15,37 @@ public class TutorService {
 
     private final TutorRepository tutorRepository;
     private final com.tutorias.tutorias_backend.repositories.MateriaRepository materiaRepository;
+    private final com.tutorias.tutorias_backend.repositories.SesionTutoriaRepository sesionTutoriaRepository;
+    private final com.tutorias.tutorias_backend.repositories.PagoRepository pagoRepository;
+    private final com.tutorias.tutorias_backend.repositories.ResenaRepository resenaRepository;
+
+    /**
+     * Obtiene estadísticas calculadas en tiempo real para el dashboard del tutor.
+     */
+    public com.tutorias.tutorias_backend.dto.TutorStatsDTO getTutorStats(Long tutorId) {
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
+        java.time.OffsetDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        
+        java.time.OffsetDateTime startOfLastMonth = startOfMonth.minusMonths(1);
+        java.time.OffsetDateTime startOfCurrentMonth = startOfMonth;
+
+        // 1. Horas dictadas este mes
+        Long totalMin = sesionTutoriaRepository.sumDuracionMinByTutorAndMonth(tutorId, startOfMonth);
+        Double hoursThisMonth = totalMin != null ? totalMin / 60.0 : 0.0;
+
+        // 2. Calificación promedio
+        Double averageRating = resenaRepository.avgPuntuacionByTutorId(tutorId);
+        if (averageRating == null) {
+            Tutor tutor = tutorRepository.findById(tutorId).orElse(null);
+            averageRating = tutor != null ? tutor.getCalificacionPromedio().doubleValue() : 0.0;
+        }
+
+        // 3. Ingresos el mes pasado
+        BigDecimal incomeLastMonth = pagoRepository.sumPagoTutorByTutorAndLastMonth(tutorId, startOfLastMonth, startOfCurrentMonth);
+        if (incomeLastMonth == null) incomeLastMonth = BigDecimal.ZERO;
+
+        return new com.tutorias.tutorias_backend.dto.TutorStatsDTO(hoursThisMonth, averageRating, incomeLastMonth);
+    }
 
     /**
      * Asigna una materia a un tutor.

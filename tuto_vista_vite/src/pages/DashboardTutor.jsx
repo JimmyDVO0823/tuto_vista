@@ -6,12 +6,23 @@ import { api } from '../lib/api';
 const DashboardTutor = () => {
   const { user } = useAuth();
   const [sessions, setSessions] = useState([]);
+  const [stats, setStats] = useState({
+    hoursThisMonth: 0,
+    averageRating: 0,
+    incomeLastMonth: 0
+  });
 
   useEffect(() => {
     if (user?.id) {
+      // Cargar sesiones próximas
       api.get(`/sesiones/tutor/${user.id}`)
          .then(data => setSessions(data || []))
          .catch(err => console.error('Error cargando sesiones:', err));
+
+      // Cargar estadísticas
+      api.get(`/tutores/${user.id}/stats`)
+         .then(data => setStats(data))
+         .catch(err => console.error('Error cargando estadísticas:', err));
     }
   }, [user]);
 
@@ -42,9 +53,25 @@ const DashboardTutor = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-12 gap-6 mb-12">
           {[
-            { label: 'Horas dictadas este mes', value: '128.5', icon: 'history_edu', color: 'border-primary' },
-            { label: 'Calificación promedio', value: '4.92', icon: 'star', color: 'border-academic-gold', highlight: 'TOP' },
-            { label: 'Ingresos totales', value: '$4,850.00', icon: 'payments', gradient: true }
+            { 
+              label: 'Horas dictadas este mes', 
+              value: stats.hoursThisMonth?.toFixed(1) || '0.0', 
+              icon: 'history_edu', 
+              color: 'border-primary' 
+            },
+            { 
+              label: 'Calificación promedio', 
+              value: stats.averageRating?.toFixed(2) || '0.00', 
+              icon: 'star', 
+              color: 'border-academic-gold', 
+              highlight: stats.averageRating >= 4.5 ? 'TOP' : null 
+            },
+            { 
+              label: 'Ingresos el mes pasado', 
+              value: new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(stats.incomeLastMonth || 0), 
+              icon: 'payments', 
+              gradient: true 
+            }
           ].map((stat, i) => (
             <div key={i} className={`col-span-4 p-8 rounded-lg shadow-sm flex flex-col justify-between h-48 ${stat.gradient ? 'signature-gradient text-white' : `bg-white border-l-4 ${stat.color}`}`}>
               <span className={`material-symbols-outlined text-4xl self-end ${stat.gradient ? 'text-white/30' : 'text-gray-200'}`}>

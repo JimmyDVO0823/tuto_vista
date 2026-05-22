@@ -64,4 +64,13 @@ public class TutorController {
         tutorService.asignarMateria(id, materiaId);
         return ResponseEntity.ok("Materia asignada exitosamente");
     }
+
+    /**
+     * GET /tutores/{id}/stats
+     * Obtiene estadísticas dinámicas (horas, rating, ingresos) para el dashboard.
+     */
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.TutorStatsDTO> getTutorStats(@PathVariable Long id) {
+        return ResponseEntity.ok(tutorService.getTutorStats(id));
+    }
 }

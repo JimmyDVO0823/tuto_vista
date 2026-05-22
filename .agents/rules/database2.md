@@ -164,3 +164,25 @@ CREATE TABLE factura (
   moneda     TEXT          NOT NULL DEFAULT 'COP',
   emitida_en TIMESTAMPTZ   NOT NULL DEFAULT NOW()
 );
+
+
+CREATE TABLE disponibilidad_especifica (
+    id BIGSERIAL PRIMARY KEY,
+
+    tutor_id BIGINT NOT NULL
+        REFERENCES tutor(id)
+        ON DELETE CASCADE,
+
+    fecha DATE NOT NULL,
+
+    hora_inicio TIME NOT NULL,
+
+    hora_fin TIME NOT NULL,
+
+    esta_disponible BOOLEAN NOT NULL DEFAULT TRUE,
+
+    creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_horas_especificas
+    CHECK (hora_inicio < hora_fin)
+);
