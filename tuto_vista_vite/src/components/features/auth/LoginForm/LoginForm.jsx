@@ -21,6 +21,33 @@ import ReCAPTCHA from 'react-google-recaptcha';
 const LoginForm = () => {
   const { login } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, email: value }));
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) {
+      setEmailError('');
+    } else if (!emailRegex.test(value)) {
+      setEmailError('El formato del correo electrónico no es válido.');
+    } else {
+      setEmailError('');
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, password: value }));
+    if (!value) {
+      setPasswordError('');
+    } else if (value.length < 8) {
+      setPasswordError('La contraseña debe tener al menos 8 caracteres.');
+    } else {
+      setPasswordError('');
+    }
+  };
   /**
    * Toggle for password field visibility. 
    * Enhances UX by allowing users to verify their input in sensitive contexts.
@@ -125,8 +152,15 @@ const LoginForm = () => {
             required
             type="email"
             value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={handleEmailChange}
+            aria-describedby={emailError ? "email-error" : undefined}
+            aria-invalid={emailError ? "true" : "false"}
           />
+          {emailError && (
+            <p className="text-red-600 text-xs mt-1" id="email-error">
+              {emailError}
+            </p>
+          )}
         </div>
         <div className="space-y-1">
           <label
@@ -144,13 +178,16 @@ const LoginForm = () => {
               required
               type={showPassword ? "text" : "password"}
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={handlePasswordChange}
+              aria-describedby={passwordError ? "password-error" : undefined}
+              aria-invalid={passwordError ? "true" : "false"}
             />
             <button
               type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
               onClick={() => setShowPassword(!showPassword)}
               tabIndex="-1"
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 {showPassword ? (
@@ -161,10 +198,16 @@ const LoginForm = () => {
               </svg>
             </button>
           </div>
+          {passwordError && (
+            <p className="text-red-600 text-xs mt-1" id="password-error">
+              {passwordError}
+            </p>
+          )}
         </div>
         <div className="flex items-center justify-between py-2">
-          <label className="flex items-center gap-2 cursor-pointer group">
+          <label className="flex items-center gap-2 cursor-pointer group" htmlFor="remember-me">
             <input
+              id="remember-me"
               className="w-4 h-4 rounded border-outline-variant text-[#002045] focus:ring-[#002045]/20 cursor-pointer"
               type="checkbox"
             />
@@ -191,7 +234,7 @@ const LoginForm = () => {
         <button
           className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10 disabled:opacity-70 disabled:cursor-not-allowed"
           type="submit"
-          disabled={loading || !recaptchaToken}
+          disabled={loading || !recaptchaToken || !formData.email || !formData.password || !!emailError || !!passwordError}
         >
           {loading ? 'Ingresando...' : 'Acceder al Portal'}
         </button>
@@ -205,7 +248,10 @@ const LoginForm = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <button className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]">
+        <button 
+          className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]"
+          aria-label="Iniciar sesión con Google"
+        >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -226,7 +272,10 @@ const LoginForm = () => {
           </svg>
           <span className="text-xs font-semibold">Google</span>
         </button>
-        <button className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]">
+        <button 
+          className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]"
+          aria-label="Iniciar sesión con Facebook"
+        >
           <svg className="w-5 h-5 text-[#1877F2]" viewBox="0 0 24 24">
             <path
               d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
