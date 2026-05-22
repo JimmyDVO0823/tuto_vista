@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import IncomeChart from '../components/features/dashboard/Rechart/IncomeChart';
+
 
 const DashboardTutor = () => {
   const { user } = useAuth();
@@ -137,6 +139,7 @@ const DashboardTutor = () => {
           </aside>
         </div>
       </main>
+      <IncomeChart />
     </MainLayout>
   );
 };
