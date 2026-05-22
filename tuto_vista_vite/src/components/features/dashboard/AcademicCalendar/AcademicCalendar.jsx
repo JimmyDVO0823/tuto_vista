@@ -55,8 +55,6 @@ export default function AcademicCalendar({
       [--fc-button-hover-border-color:theme(colors.primary-container)]
       [--fc-button-active-bg-color:theme(colors.academic-gold)]
       [--fc-button-active-border-color:theme(colors.academic-gold)]
-      [--fc-event-bg-color:theme(colors.primary)]
-      [--fc-event-border-color:theme(colors.primary)]
       [--fc-today-bg-color:theme(colors.mini-gray)]
       [&_.fc-toolbar-title]:font-headline [&_.fc-toolbar-title]:font-bold [&_.fc-toolbar-title]:text-primary [&_.fc-toolbar-title]:text-2xl
       [&_.fc-button]:font-body [&_.fc-button]:font-semibold [&_.fc-button]:capitalize [&_.fc-button]:rounded-xl
@@ -89,7 +87,16 @@ export default function AcademicCalendar({
         allDaySlot={allDaySlot}
         displayEventTime={false}
         datesSet={(arg) => setCurrentView(arg.view.type)}
-        eventClassNames="rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer"
+        eventClassNames={(arg) => {
+          const colorType = arg.event.extendedProps.colorType;
+          let colorClass = 'bg-primary'; // Default blue
+          if (colorType === 'academic-gold') {
+            colorClass = 'bg-academic-gold text-white';
+          } else if (colorType === 'academic-blue') {
+            colorClass = 'bg-primary text-white';
+          }
+          return `rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer ${colorClass}`;
+        }}
         eventMouseEnter={handleMouseEnter}
         eventMouseLeave={handleMouseLeave}
       />
