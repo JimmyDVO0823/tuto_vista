@@ -51,7 +51,7 @@ const DashboardTutor = () => {
             </label>
           </div>
         </header>
-
+        
         {/* Stats Grid */}
         <div className="grid grid-cols-12 gap-6 mb-12">
           {[
@@ -97,7 +97,7 @@ const DashboardTutor = () => {
             </div>
           ))}
         </div>
-
+        <IncomeChart />
         {/* Session List */}
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-8 space-y-6">
@@ -139,7 +139,6 @@ const DashboardTutor = () => {
           </aside>
         </div>
       </main>
-      <IncomeChart />
     </MainLayout>
   );
 };
