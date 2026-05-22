@@ -2,6 +2,7 @@ package com.tutorias.tutorias_backend.services;
 
 import com.tutorias.tutorias_backend.dto.ConversacionDTO;
 import com.tutorias.tutorias_backend.dto.MensajeDTO;
+import com.tutorias.tutorias_backend.dto.PerfilDTO;
 import com.tutorias.tutorias_backend.entities.*;
 import com.tutorias.tutorias_backend.repositories.*;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,12 @@ public class ChatService {
 
     @Transactional
     public ConversacionDTO crearOObtenerConversacion(Long p1, Long p2) {
-        // Lógica simplificada: buscar si ya existe una conversación entre ambos
-        // Para este MVP, crearemos una nueva si no se encuentra una exacta
+        // Buscar si ya existe una conversación entre ambos
+        List<Conversacion> existentes = conversacionRepository.findExactConversation(p1, p2);
+        if (!existentes.isEmpty()) {
+            return toConvDTO(existentes.get(0));
+        }
+
         Perfil perfil1 = perfilRepository.findById(p1).orElseThrow();
         Perfil perfil2 = perfilRepository.findById(p2).orElseThrow();
 
@@ -70,7 +75,15 @@ public class ChatService {
         return ConversacionDTO.builder()
                 .id(c.getId())
                 .creadoEn(c.getCreadoEn())
-                .participantesIds(c.getParticipantes().stream().map(Perfil::getId).toList())
+                .participantes(c.getParticipantes().stream()
+                        .map(p -> PerfilDTO.builder()
+                                .id(p.getId())
+                                .nombreCompleto(p.getNombreCompleto())
+                                .urlAvatar(p.getUrlAvatar())
+                                .rol(p.getRol().name())
+                                .build())
+                        .toList())
+                .ultimoMensaje(c.getMensajes().isEmpty() ? null : toMsgDTO(c.getMensajes().get(c.getMensajes().size() - 1)))
                 .build();
     }
 }

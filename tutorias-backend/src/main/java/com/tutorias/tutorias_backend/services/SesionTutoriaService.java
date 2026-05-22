@@ -19,6 +19,7 @@ public class SesionTutoriaService {
 
     private final SesionTutoriaRepository sesionTutoriaRepository;
     private final SolicitudRepository solicitudRepository;
+    private final ChatService chatService;
 
     @Transactional
     public SesionTutoriaDTO crearDesdeSolicitud(Long solicitudId) {
@@ -96,7 +97,15 @@ public class SesionTutoriaService {
         sesion.setPrecio(solicitud.getTutor().getPrecioPorHora());
         sesion.setEstado(EstadoSesion.programada);
 
-        return toDTO(sesionTutoriaRepository.save(sesion));
+        SesionTutoria guardada = sesionTutoriaRepository.save(sesion);
+
+        // Crear u obtener conversación entre tutor y estudiante
+        chatService.crearOObtenerConversacion(
+            solicitud.getTutor().getPerfil().getId(),
+            solicitud.getEstudiante().getPerfil().getId()
+        );
+
+        return toDTO(guardada);
     }
 
     public List<SesionTutoriaDTO> getByTutor(Long tutorId) {
