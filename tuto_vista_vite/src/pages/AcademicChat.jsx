@@ -114,134 +114,94 @@ export default function AcademicChat() {
   );
 
   return (
-    <MainLayout>  
-    <div className="flex h-screen w-full overflow-hidden bg-background font-body text-on-surface antialiased">
+  <MainLayout>            
+    {/* CORREGIDO: 
+      - Eliminamos 'ml-72' porque MainLayout ya maneja el margen del Sidebar.
+      - Eliminamos 'w-full' para evitar que desborde el viewport.
+      - Añadimos 'h-[calc(100vh-64px)]' (o la altura de tu Footer/Header si aplica) 
+        para que el chat ocupe todo el alto disponible y sus barras de scroll internas funcionen.
+    */}
+    <main className="flex-1 flex h-screen overflow-hidden">
       
-      {/* SECCIÓN A: SIDEBAR DE NAVEGACIÓN GENERAL (Fijo a la izquierda) */}
-      <aside className="fixed left-0 top-0 h-screen w-72 bg-surface-container-low dark:bg-inverse-surface flex flex-col py-8 z-50">
-        <div className="px-8 mb-10">
-          <h1 className="font-headline font-bold text-lg text-primary">The Academic Editorial</h1>
-        </div>
-        
-        {/* Componente de Perfil Integrado */}
-        <div className="mb-10">
-          <ProfileBlock 
-            name={CURRENT_USER.name} 
-            role={CURRENT_USER.role} 
-            avatarUrl={CURRENT_USER.avatarUrl} 
-          />
-        </div>
-
-        {/* Links de navegación interna */}
-        <nav className="flex-1 space-y-1">
-          <a className="text-on-surface-variant px-6 py-3 flex items-center gap-4 hover:bg-surface-container-high transition-colors" href="#overview">
-            <span className="material-symbols-outlined">dashboard</span>
-            <span>Overview</span>
-          </a>
-          <a className="text-on-surface-variant px-6 py-3 flex items-center gap-4 hover:bg-surface-container-high transition-colors" href="#sessions">
-            <span className="material-symbols-outlined">event_upcoming</span>
-            <span>My Sessions</span>
-          </a>
-          <a className="bg-surface-container-lowest text-primary font-bold rounded-l-full ml-4 px-6 py-3 flex items-center gap-4" href="#chat">
-            <span className="material-symbols-outlined">forum</span>
-            <span>Faculty Chat</span>
-          </a>
-        </nav>
-
-        <div className="px-6 mb-8">
-          <button className="signature-gradient w-full py-3 px-4 rounded-md text-on-primary font-bold text-sm shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined text-sm">add</span>
-            Book New Session
-          </button>
-        </div>
-      </aside>
-
-      {/* DISEÑO CENTRAL ASIMÉTRICO (Margen izquierdo de 72 para respetar el Sidebar fijo) */}
-      <main className="ml-72 flex w-full h-full overflow-hidden">
-        
-        {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
-        <section className="w-80 lg:w-96 h-full bg-surface flex flex-col z-10">
-          <header className="p-8 pb-4">
-            <h2 className="font-headline font-extrabold text-2xl tracking-tight mb-6">Messages</h2>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
-              <input 
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-surface-container-low border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-container" 
-                placeholder="Search contacts..." 
-              />
-            </div>
-          </header>
-
-          {/* Menú de Contactos con cambio de Estado dinámico */}
-          <div className="flex-1 overflow-y-auto pb-8">
-            <ContactMenu 
-              contacts={filteredContacts} 
-              activeContactId={activeContactId} 
-              onContactSelect={(id) => setActiveContactId(id)} 
+      {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
+      <section className="w-80 lg:w-96 h-full bg-surface flex flex-col z-10 flex-shrink-0">
+        <header className="p-8 pb-4">
+          <h2 className="font-headline font-extrabold text-2xl tracking-tight mb-6">Messages</h2>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-surface-container-low border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-container" 
+              placeholder="Search contacts..." 
             />
           </div>
-        </section>
+        </header>
 
-        {/* SECCIÓN C: FLUJO Y CONTENEDOR DE CHAT EN VIVO */}
-        <section className="flex-1 h-full bg-surface-container-low flex flex-col relative">
-          
-          {/* Cabecera del Chat Activo */}
-          <ChatHeader 
-            name={activeContact.name}
-            specialty={activeContact.specialty}
-            avatarUrl={activeContact.avatarUrl}
-            isOnline={activeContact.isOnline}
-            onAction={handleHeaderAction}
+        {/* Menú de Contactos */}
+        <div className="flex-1 overflow-y-auto pb-8">
+          <ContactMenu 
+            contacts={filteredContacts} 
+            activeContactId={activeContactId} 
+            onContactSelect={(id) => setActiveContactId(id)} 
           />
+        </div>
+      </section>
 
-          {/* Caja de Flujo de Mensajes */}
-          <div className="flex-1 overflow-y-auto p-10 space-y-6">
-            {/* Separador de Fecha Estático */}
-            <div className="flex justify-center my-4">
-              <span className="px-4 py-1 rounded-full bg-surface-container-high text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">
-                Today
-              </span>
-            </div>
+      {/* SECCIÓN C: FLUJO Y CONTENEDOR DE CHAT EN VIVO */}
+      <section className="flex-1 h-full bg-surface-container-low flex flex-col relative">
+        
+        {/* Cabecera del Chat Activo */}
+        <ChatHeader 
+          name={activeContact.name}
+          specialty={activeContact.specialty}
+          avatarUrl={activeContact.avatarUrl}
+          isOnline={activeContact.isOnline}
+          onAction={handleHeaderAction}
+        />
 
-            {/* Mapeo Inteligente de Mensajes */}
-            {activeContact.messages.map((msg) => {
-              if (msg.type === 'file') {
-                return (
-                  <FileAttachment 
-                    key={msg.id}
-                    fileName={msg.fileName}
-                    fileSize={msg.fileSize}
-                    fileType={msg.fileType}
-                    onDownload={() => console.log(`Descargando ${msg.fileName}...`)}
-                  />
-                );
-              }
-
-              return (
-                <MessageBubble 
-                  key={msg.id}
-                  text={msg.text}
-                  timestamp={msg.timestamp}
-                  isSent={msg.isSent}
-                  isRead={msg.isRead}
-                  imageUrl={msg.imageUrl}
-                />
-              );
-            })}
-            
-            {/* Nodo de referencia invisible para forzar el auto-scroll */}
-            <div ref={messagesEndRef} />
+        {/* Caja de Flujo de Mensajes */}
+        <div className="flex-1 overflow-y-auto p-10 space-y-6">
+          <div className="flex justify-center my-4">
+            <span className="px-4 py-1 rounded-full bg-surface-container-high text-[10px] font-label font-bold text-on-surface-variant uppercase tracking-widest">
+              Today
+            </span>
           </div>
 
-          {/* Barra de Escribir Mensaje con Callback Funcional */}
-          <MessageInputBar onSendMessage={handleSendMessage} />
+          {activeContact.messages.map((msg) => {
+            if (msg.type === 'file') {
+              return (
+                <FileAttachment 
+                  key={msg.id}
+                  fileName={msg.fileName}
+                  fileSize={msg.fileSize}
+                  fileType={msg.fileType}
+                  onDownload={() => console.log(`Descargando ${msg.fileName}...`)}
+                />
+              );
+            }
 
-        </section>
-      </main>
-    </div>
-    </MainLayout>
-  );
+            return (
+              <MessageBubble 
+                key={msg.id}
+                text={msg.text}
+                timestamp={msg.timestamp}
+                isSent={msg.isSent}
+                isRead={msg.isRead}
+                imageUrl={msg.imageUrl}
+              />
+            );
+          })}
+          
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Barra de Escribir Mensaje */}
+        <MessageInputBar onSendMessage={handleSendMessage} />
+
+      </section>
+    </main>
+  </MainLayout>
+);
 };
