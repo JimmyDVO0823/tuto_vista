@@ -82,7 +82,9 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={`h-screen fixed left-0 top-0 bg-mini-gray flex flex-col py-8 z-50 transition-all duration-300 ease-in-out shadow-sm overflow-hidden ${
-        isCollapsed ? 'w-20' : 'w-64'
+        isCollapsed
+          ? '-translate-x-full md:translate-x-0 w-64 md:w-20'
+          : 'translate-x-0 w-64'
       }`}
     >
       {/* Brand & Toggle */}

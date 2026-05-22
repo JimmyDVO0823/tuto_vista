@@ -108,7 +108,7 @@ const GestionTutorias = () => {
         <div className="flex border-b border-outline-variant/10 mb-8 max-w-4xl">
           <button
             onClick={() => setActiveTab('solicitudes')}
-            className={`py-4 px-6 font-bold text-sm border-b-2 transition-all ${
+            className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${
               activeTab === 'solicitudes'
                 ? 'border-academic-gold text-academic-gold font-extrabold'
                 : 'border-transparent text-elegant-gray hover:text-primary'
@@ -118,7 +118,7 @@ const GestionTutorias = () => {
           </button>
           <button
             onClick={() => setActiveTab('sesiones')}
-            className={`py-4 px-6 font-bold text-sm border-b-2 transition-all ${
+            className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${
               activeTab === 'sesiones'
                 ? 'border-academic-gold text-academic-gold font-extrabold'
                 : 'border-transparent text-elegant-gray hover:text-primary'
@@ -151,7 +151,7 @@ const GestionTutorias = () => {
           {!loading && !error && activeTab === 'solicitudes' && (
             <>
               {solicitudes.length === 0 ? (
-                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-16 text-center shadow-sm">
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-8 md:p-16 text-center shadow-sm">
                   <span className="material-symbols-outlined text-gray-300 text-6xl mb-4">inbox</span>
                   <h3 className="text-xl font-bold text-primary mb-2 font-display">No hay solicitudes pendientes</h3>
                   <p className="text-gray-500 text-sm">Cuando un estudiante te envíe una propuesta de tutoría, la verás aquí.</p>
@@ -175,7 +175,7 @@ const GestionTutorias = () => {
           {!loading && !error && activeTab === 'sesiones' && (
             <>
               {sesiones.length === 0 ? (
-                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-16 text-center shadow-sm">
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-8 md:p-16 text-center shadow-sm">
                   <span className="material-symbols-outlined text-gray-300 text-6xl mb-4">calendar_today</span>
                   <h3 className="text-xl font-bold text-primary mb-2 font-display">No tienes tutorías agendadas</h3>
                   <p className="text-gray-500 text-sm">Tus próximas sesiones de tutoría confirmadas se listarán en esta pestaña.</p>

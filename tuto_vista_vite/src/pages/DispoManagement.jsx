@@ -76,37 +76,39 @@ const DispoManagement = () => {
    return (
       <MainLayout>
          <div className="flex flex-col flex-1">
-            <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-8 py-4 flex justify-between items-center">
+            <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                <span className="text-xl font-bold text-primary font-display">Configuración de Horarios</span>
                <div className="flex gap-4">
                   <p className="text-sm text-gray-500 my-auto">Tus cambios se guardan automáticamente</p>
                </div>
             </header>
 
-            <main className="flex-1 p-10">
+            <main className="flex-1 p-4 md:p-10">
                <div className="max-w-7xl mx-auto">
                   <header className="mb-12">
-                     <h1 className="text-4xl font-extrabold text-primary font-display mb-4">Gestión de Disponibilidad</h1>
+                     <h1 className="text-2xl md:text-4xl font-extrabold text-primary font-display mb-4">Gestión de Disponibilidad</h1>
                      <p className="text-gray-600 text-lg">Haz click y arrastra sobre las horas para definir tus bloques disponibles.</p>
                   </header>
 
                   {!loading && (
-                     <AcademicCalendar
-                        events={disponibilidad}
-                        initialView="dayGridMonth"
-                        headerToolbar={{
-                           left: 'prev,next today',
-                           center: 'title',
-                           right: 'dayGridMonth,timeGridWeek'
-                        }}
-                        selectable={true}
-                        editable={false}
-                        onSelect={handleSelect}
-                        onEventClick={handleEventClick}
-                        slotMinTime="06:00:00"
-                        slotMaxTime="22:00:00"
-                        allDaySlot={false}
-                     />
+                     <div className="overflow-x-auto">
+                        <AcademicCalendar
+                           events={disponibilidad}
+                           initialView="dayGridMonth"
+                           headerToolbar={{
+                              left: 'prev,next today',
+                              center: 'title',
+                              right: 'dayGridMonth,timeGridWeek'
+                           }}
+                           selectable={true}
+                           editable={false}
+                           onSelect={handleSelect}
+                           onEventClick={handleEventClick}
+                           slotMinTime="06:00:00"
+                           slotMaxTime="22:00:00"
+                           allDaySlot={false}
+                        />
+                     </div>
                   )}
                </div>
             </main>

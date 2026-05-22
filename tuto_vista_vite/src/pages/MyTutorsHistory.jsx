@@ -11,19 +11,19 @@ const MyTutorsHistory = () => {
 
   return (
     <MainLayout>
-      <main className="p-10">
+      <main className="p-4 md:p-10">
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold text-academic-gold uppercase tracking-widest mb-2 block">Académico</span>
-            <h1 className="text-5xl font-extrabold text-primary tracking-tight font-display">Mi Historial de Tutorías</h1>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight font-display">Mi Historial de Tutorías</h1>
           </div>
-          <div className="relative w-80">
+          <div className="relative w-full md:w-80">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
             <input className="w-full pl-12 pr-4 py-3 bg-white rounded-full border border-gray-100 shadow-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Buscar materia..." />
           </div>
         </header>
 
-        <section className="bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden">
+        <section className="bg-white rounded-xl shadow-sm border border-gray-50 overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-[#f2f4f6]">
               <tr>

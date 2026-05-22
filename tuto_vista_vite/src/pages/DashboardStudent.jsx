@@ -19,11 +19,11 @@ const DashboardStudent = () => {
 
   return (
     <MainLayout>
-      <main className="p-10">
-        <header className="flex justify-between items-end mb-16">
+      <main className="p-4 md:p-10">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8 md:mb-16">
           <div className="max-w-2xl">
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">Estudiante Pregrado</p>
-            <h1 className="text-6xl font-extrabold font-headline text-primary tracking-tight leading-tight">Mi Librería de Aprendizaje</h1>
+            <h1 className="text-3xl md:text-6xl font-extrabold font-headline text-primary tracking-tight leading-tight">Mi Librería de Aprendizaje</h1>
           </div>
           <div className="flex gap-4">
              <div className="bg-white px-5 py-3 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
@@ -33,13 +33,13 @@ const DashboardStudent = () => {
           </div>
         </header>
 
-        <section className="grid grid-cols-12 gap-10 mb-20">
-          <article className="col-span-8">
+        <section className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 mb-10 md:mb-20">
+          <article className="col-span-12 md:col-span-8">
             <NextSessions sessions={sessions} isTutor={false} />
             <PendingAssignments />
           </article>
 
-          <aside className="col-span-4 space-y-10">
+          <aside className="col-span-12 md:col-span-4 space-y-10">
              <div className="bg-[#f2f4f6] p-8 rounded-2xl space-y-6">
                 <h3 className="text-xl font-bold text-primary border-b border-gray-200 pb-4">Progreso Semestral</h3>
                 <div className="space-y-4">

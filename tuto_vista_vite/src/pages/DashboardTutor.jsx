@@ -17,13 +17,13 @@ const DashboardTutor = () => {
 
   return (
     <MainLayout>
-      <main className="p-10">
-        <header className="flex justify-between items-end mb-12">
+      <main className="p-4 md:p-10">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8 md:mb-12">
           <div className="max-w-2xl">
             <p className="text-xs font-medium uppercase tracking-[0.1em] text-academic-gold mb-2">
               Panel del Instructor
             </p>
-            <h1 className="text-5xl font-extrabold font-headline text-primary tracking-tight">
+            <h1 className="text-3xl md:text-5xl font-extrabold font-headline text-primary tracking-tight">
               Bienvenido, {user?.name || 'Tutor'}.
             </h1>
           </div>
@@ -40,13 +40,13 @@ const DashboardTutor = () => {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-12 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8 md:mb-12">
           {[
             { label: 'Horas dictadas este mes', value: '128.5', icon: 'history_edu', color: 'border-primary' },
             { label: 'Calificación promedio', value: '4.92', icon: 'star', color: 'border-academic-gold', highlight: 'TOP' },
             { label: 'Ingresos totales', value: '$4,850.00', icon: 'payments', gradient: true }
           ].map((stat, i) => (
-            <div key={i} className={`col-span-4 p-8 rounded-lg shadow-sm flex flex-col justify-between h-48 ${stat.gradient ? 'signature-gradient text-white' : `bg-white border-l-4 ${stat.color}`}`}>
+            <div key={i} className={`col-span-12 md:col-span-4 p-8 rounded-lg shadow-sm flex flex-col justify-between h-48 ${stat.gradient ? 'signature-gradient text-white' : `bg-white border-l-4 ${stat.color}`}`}>
               <span className={`material-symbols-outlined text-4xl self-end ${stat.gradient ? 'text-white/30' : 'text-gray-200'}`}>
                 {stat.icon}
               </span>
@@ -70,8 +70,8 @@ const DashboardTutor = () => {
         </div>
 
         {/* Session List */}
-        <div className="grid grid-cols-12 gap-8">
-          <div className="col-span-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="col-span-12 md:col-span-8 space-y-6">
             <h2 className="text-2xl font-bold font-headline text-primary tracking-tight">Próximas Sesiones</h2>
             <div className="space-y-4">
               {sessions.length > 0 ? sessions.map((s, i) => (
@@ -101,7 +101,7 @@ const DashboardTutor = () => {
             </div>
           </div>
 
-          <aside className="col-span-4 space-y-8">
+          <aside className="col-span-12 md:col-span-4 space-y-8">
             <div className="bg-academic-gold/10 text-primary p-8 rounded-lg relative overflow-hidden">
                <h3 className="font-headline font-bold text-xl mb-3">Sugerencia Editorial</h3>
                <p className="text-sm leading-relaxed mb-6 opacity-90">Mejora tus materiales para el próximo trimestre.</p>

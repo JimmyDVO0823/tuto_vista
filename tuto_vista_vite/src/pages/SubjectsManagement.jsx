@@ -90,13 +90,13 @@ const SubjectsManagement = () => {
 
   return (
     <MainLayout>
-      <main className="p-12">
+      <main className="p-4 md:p-12">
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">
               {role === 'tutor' ? 'Catálogo del Tutor' : 'Administración del Sistema'}
             </p>
-            <h2 className="text-5xl font-extrabold font-headline text-primary tracking-tight leading-tight">
+            <h2 className="text-3xl md:text-5xl font-extrabold font-headline text-primary tracking-tight leading-tight">
               {role === 'tutor' ? 'Mis Materias Dictadas' : 'Gestión de Materias Académicas'}
             </h2>
           </div>

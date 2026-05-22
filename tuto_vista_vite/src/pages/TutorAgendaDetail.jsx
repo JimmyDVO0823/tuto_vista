@@ -207,7 +207,7 @@ const TutorAgendaDetail = () => {
   if (loading) {
     return (
       <MainLayout>
-        <main className="flex-1 p-12 min-h-screen flex items-center justify-center">
+        <main className="flex-1 p-4 md:p-12 min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="text-elegant-gray font-medium">Cargando perfil del tutor...</p>
@@ -220,7 +220,7 @@ const TutorAgendaDetail = () => {
   if (error || !tutor) {
     return (
       <MainLayout>
-        <main className="flex-1 p-12 min-h-screen flex items-center justify-center">
+        <main className="flex-1 p-4 md:p-12 min-h-screen flex items-center justify-center">
           <div className="text-center max-w-md bg-red-50 p-8 rounded-2xl border border-red-100">
             <span className="material-symbols-outlined text-red-500 text-5xl mb-4">error</span>
             <p className="text-red-700 font-bold mb-4">{error || 'Tutor no encontrado'}</p>
@@ -237,11 +237,11 @@ const TutorAgendaDetail = () => {
 
   return (
     <MainLayout>
-      <main className="flex-1 p-12 min-h-screen">
+      <main className="flex-1 p-4 md:p-12 min-h-screen">
         <header className="mb-16 flex flex-col md:flex-row items-start justify-between gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold text-academic-gold uppercase tracking-[0.2em] mb-4 block">Perfil del Tutor</span>
-            <h1 className="text-5xl font-extrabold text-primary tracking-tight font-display mb-6 leading-tight">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight font-display mb-6 leading-tight">
               {tutor.nombre_completo}
             </h1>
             {tutor.frase_personal && (
@@ -340,7 +340,7 @@ const TutorAgendaDetail = () => {
             </div>
 
             {/* Cuadro de Agenda y Reserva */}
-            <div className="bg-surface-container-lowest rounded-3xl p-10 shadow-ambient border border-outline-variant/10">
+            <div className="bg-surface-container-lowest rounded-3xl p-6 md:p-10 shadow-ambient border border-outline-variant/10">
               <div className="mb-8">
                 <h4 className="font-headline font-bold text-xl text-primary mb-2">Espacios de Disponibilidad Semanal</h4>
                 <p className="text-sm text-elegant-gray">Selecciona un bloque de horario para agendar tu tutoría.</p>

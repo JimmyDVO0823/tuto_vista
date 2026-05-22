@@ -12,27 +12,27 @@ const UsersManagement = () => {
   return (
     <MainLayout>
       <main className="min-h-screen">
-        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-8 py-4 flex justify-between items-center w-full">
+        <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-3 w-full">
           <div className="flex items-center gap-8">
             <span className="text-xl font-bold tracking-tight text-primary font-display">Administración de Usuarios</span>
           </div>
           <div className="flex items-center gap-4">
              <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
-                <input className="pl-10 pr-4 py-2 bg-[#f2f4f6] rounded-full border-none text-sm w-64" placeholder="Buscar..." />
+                <input className="pl-10 pr-4 py-2 bg-[#f2f4f6] rounded-full border-none text-sm w-full md:w-64" placeholder="Buscar..." />
              </div>
           </div>
         </header>
 
-        <section className="p-8 space-y-8">
+        <section className="p-4 md:p-8 space-y-8">
            <div className="flex justify-between items-end">
               <div className="max-w-2xl">
                  <p className="text-xs font-bold text-academic-gold uppercase tracking-widest mb-2 font-body">Panel de Control</p>
-                 <h2 className="text-4xl font-extrabold text-primary leading-tight font-display">Gestión de Usuarios</h2>
+                 <h2 className="text-2xl md:text-4xl font-extrabold text-primary leading-tight font-display">Gestión de Usuarios</h2>
               </div>
            </div>
 
-           <div className="grid grid-cols-4 gap-6">
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[
                 { label: 'Total Usuarios', value: '2,842' },
                 { label: 'Tutores Activos', value: '158' },
@@ -46,7 +46,7 @@ const UsersManagement = () => {
               ))}
            </div>
 
-           <div className="bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden">
+           <div className="bg-white rounded-xl shadow-sm border border-gray-50 overflow-x-auto">
              <table className="w-full text-left">
                 <thead className="bg-[#f2f4f6]">
                    <tr>

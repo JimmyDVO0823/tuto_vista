@@ -34,7 +34,7 @@ const SubjectTable = ({ subjects, showTutorColumn = true }) => {
   ].filter(h => h.visible);
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+    <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-x-auto">
       <table className="w-full text-left">
         <thead className="bg-[#f2f4f6]">
           <tr>
