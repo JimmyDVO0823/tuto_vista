@@ -40,6 +40,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       { label: 'Mis Materias', path: '/subjects', icon: 'menu_book' },
       { label: 'Mensajes', path: '#', icon: 'mail' },
       { label: 'Ajustes', path: '#', icon: 'settings' },
+      { label: 'Chat', path: '/chat', icon: 'chat' },
     ],
     tutor: [
       { label: 'Panel Instructor', path: '/dashboard', icon: 'dashboard' },
@@ -48,6 +49,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       { label: 'Mis Cursos', path: '/subjects', icon: 'school' },
       { label: 'Ingresos', path: '#', icon: 'payments' },
       { label: 'Ajustes', path: '#', icon: 'settings' },
+      { label: 'Chat', path: '/chat', icon: 'chat' },
     ]
   };
 

@@ -10,6 +10,7 @@ import DispoManagement from './pages/DispoManagement'
 import ProtectedRoute from './components/features/auth/ProtectedRoute/ProtectedRoute'
 import TutorAgendaDetail from './pages/TutorAgendaDetail'
 import GestionTutorias from './pages/GestionTutorias'
+import AcademicChat from './pages/AcademicChat'
 
 import { AuthProvider } from './context/AuthContext'
 
@@ -84,6 +85,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <GestionTutorias />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <AcademicChat />
               </ProtectedRoute>
             }
           />
