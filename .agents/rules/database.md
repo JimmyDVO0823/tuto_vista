@@ -2,243 +2,240 @@
 trigger: always_on
 ---
 
-en este archivo esta la primera parte de el ddl de la base de datos del proyecto, debes tener esto en cuenta siempre que trabajas en el proyecto.
-
- ================================================================
--- 1. PERFILES
---    Entidad raíz. Todo usuario del sistema tiene un perfil.
---    La contraseña se guarda hasheada desde el backend (bcrypt).
--- ================================================================
-CREATE TABLE perfiles (
-  id              SERIAL      PRIMARY KEY,
-  nombre_completo TEXT        NOT NULL,
-  correo          TEXT        NOT NULL UNIQUE,
-  contrasena_hash TEXT        NOT NULL,
-  url_avatar      TEXT,
-  rol             TEXT        NOT NULL CHECK (rol IN ('estudiante', 'tutor', 'administrador')),
-  esta_activo     BOOLEAN     NOT NULL DEFAULT TRUE,
-  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+aquí está el schema de la base de datos del proyecto, la segunda parte está en database2.md
+CREATE SCHEMA "public";
+CREATE TABLE "actividad_estudiante" (
+	"id" bigserial PRIMARY KEY,
+	"recurso_id" bigint,
+	"estudiante_id" bigint NOT NULL,
+	"sesion_id" bigint NOT NULL,
+	"estado" text DEFAULT 'pendiente' NOT NULL,
+	"comentario_tutor" text,
+	CONSTRAINT "actividad_estudiante_estado_check" CHECK ((estado = ANY (ARRAY['pendiente'::text, 'completado'::text])))
 );
- 
- 
--- ================================================================
--- 2. DEPARTAMENTO
---    Agrupa las materias por área académica.
--- ================================================================
-CREATE TABLE departamento (
-  id        SERIAL      PRIMARY KEY,
-  nombre    TEXT        NOT NULL UNIQUE,
+CREATE TABLE "conversacion" (
+	"id" bigserial PRIMARY KEY,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL
 );
- 
- 
--- ================================================================
--- 3. MATERIA
---    Cada materia pertenece a un departamento.
---    ON DELETE RESTRICT: no se puede borrar un departamento
---    si tiene materias asociadas.
--- ================================================================
-CREATE TABLE materia (
-  id              SERIAL      PRIMARY KEY,
-  nombre          TEXT        NOT NULL,
-  departamento_id INT         NOT NULL REFERENCES departamento(id) ON DELETE RESTRICT,
- );
- 
- 
--- ================================================================
--- 4. CONVERSACION
---    Contenedor del chat entre dos perfiles.
---    Los participantes se guardan en conversacion_participantes.
--- ================================================================
-CREATE TABLE conversacion (
-  id        SERIAL      PRIMARY KEY,
-  creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE "conversacion_participantes" (
+	"conversacion_id" bigint,
+	"perfil_id" bigint,
+	"unido_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "conversacion_participantes_pkey" PRIMARY KEY("conversacion_id","perfil_id")
 );
- 
- 
--- ================================================================
--- 5. TUTOR
---    Especialización de perfiles (herencia 1:1).
---    La PK es la misma que perfiles.id.
---    calificacion_promedio y total_sesiones se actualizan
---    desde el backend cada vez que se completa una sesión
---    o se recibe una reseña.
--- ================================================================
-CREATE TABLE tutor (
-  id                    INT           PRIMARY KEY REFERENCES perfiles(id) ON DELETE RESTRICT,
-  biografia             TEXT,
-  frase_personal        TEXT,
-  anios_experiencia     INT           NOT NULL DEFAULT 0   CHECK (anios_experiencia >= 0),
-  precio_por_hora       NUMERIC(10,2) NOT NULL DEFAULT 0   CHECK (precio_por_hora >= 0),
-  duracion_sesion_min   INT           NOT NULL DEFAULT 90  CHECK (duracion_sesion_min > 0),
-  esta_disponible       BOOLEAN       NOT NULL DEFAULT TRUE,
-  calificacion_promedio NUMERIC(3,2)  NOT NULL DEFAULT 0
-                          CHECK (calificacion_promedio BETWEEN 0 AND 5),
-  total_sesiones        INT           NOT NULL DEFAULT 0   CHECK (total_sesiones >= 0),
-  titulos               TEXT[],
-  logros                TEXT[],
-  creado_en             TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+CREATE TABLE "departamento" (
+	"id" bigserial PRIMARY KEY,
+	"nombre" varchar(255) NOT NULL CONSTRAINT "departamento_nombre_key" UNIQUE
 );
- 
- 
--- ================================================================
--- 6. ESTUDIANTE
---    Especialización de perfiles (herencia 1:1).
---    La PK es la misma que perfiles.id.
--- ================================================================
-CREATE TABLE estudiante (
-  id        INT         PRIMARY KEY REFERENCES perfiles(id) ON DELETE RESTRICT,
-  creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE "disponibilidad" (
+	"id" bigserial PRIMARY KEY,
+	"tutor_id" bigint NOT NULL,
+	"dia_semana" integer NOT NULL,
+	"hora_inicio" time NOT NULL,
+	"hora_fin" time NOT NULL,
+	"esta_activo" boolean DEFAULT true NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "chk_orden_horas" CHECK ((hora_inicio < hora_fin)),
+	CONSTRAINT "disponibilidad_dia_semana_check" CHECK (((dia_semana >= 0) AND (dia_semana <= 6)))
 );
- 
- 
--- ================================================================
--- 7. NOTIFICACIONES
---    Entidad débil de perfiles.
---    perfiles (1,N) ——recibe—— (0,N) notificaciones
--- ================================================================
-CREATE TABLE notificaciones (
-  id            SERIAL      PRIMARY KEY,
-  perfil_id     INT         NOT NULL REFERENCES perfiles(id) ON DELETE CASCADE,
-  tipo          TEXT        NOT NULL,
-  titulo        TEXT        NOT NULL,
-  cuerpo        TEXT        NOT NULL,
-  leida         BOOLEAN     NOT NULL DEFAULT FALSE,
-  creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE "disponibilidad_especifica" (
+	"id" bigserial PRIMARY KEY,
+	"tutor_id" bigint NOT NULL,
+	"fecha" date NOT NULL,
+	"hora_inicio" time NOT NULL,
+	"hora_fin" time NOT NULL,
+	"esta_disponible" boolean DEFAULT true NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "chk_horas_especificas" CHECK ((hora_inicio < hora_fin))
 );
- 
- 
--- ================================================================
--- 8. DISPONIBILIDAD
---    Entidad débil de tutor.
---    Bloques de horario semanal recurrente del tutor.
---    tutor (1,1) ——define—— (0,N) disponibilidad
--- ================================================================
-CREATE TABLE disponibilidad (
-  id          SERIAL      PRIMARY KEY,
-  tutor_id    INT         NOT NULL REFERENCES tutor(id) ON DELETE CASCADE,
-  dia_semana  INT         NOT NULL CHECK (dia_semana BETWEEN 0 AND 6),
-                            -- 0=Domingo 1=Lunes 2=Martes 3=Miércoles
-                            -- 4=Jueves  5=Viernes 6=Sábado
-  hora_inicio TIME        NOT NULL,
-  hora_fin    TIME        NOT NULL,
-  esta_activo BOOLEAN     NOT NULL DEFAULT TRUE,
-  creado_en   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT chk_orden_horas CHECK (hora_inicio < hora_fin)
+CREATE TABLE "estudiante" (
+	"id" bigint PRIMARY KEY,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL
 );
- 
- 
--- ================================================================
--- 9. SOLICITUD
---    Entidad débil de estudiante + tutor + materia.
---    El estudiante solicita una tutoría antes de que
---    el tutor la confirme y se cree la sesión.
--- ================================================================
-CREATE TABLE solicitud (
-  id              SERIAL      PRIMARY KEY,
-  estudiante_id   INT         NOT NULL REFERENCES estudiante(id) ON DELETE CASCADE,
-  tutor_id        INT         NOT NULL REFERENCES tutor(id)      ON DELETE CASCADE,
-  materia_id      INT         NOT NULL REFERENCES materia(id)    ON DELETE RESTRICT,
-  fecha_preferida DATE        NOT NULL,
-  hora_preferida  TIME        NOT NULL,
-  duracion_min    INT         NOT NULL DEFAULT 90 CHECK (duracion_min > 0),
-  mensaje         TEXT,
-  estado          TEXT        NOT NULL DEFAULT 'pendiente'
-                                CHECK (estado IN ('pendiente','aceptada','rechazada','cancelada')),
-  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE "estudiante_plan" (
+	"id" bigserial PRIMARY KEY,
+	"estudiante_id" bigint NOT NULL,
+	"plan_id" bigint NOT NULL,
+	"sesiones_disponibles" integer NOT NULL,
+	"fecha_vencimiento" date NOT NULL,
+	"estado" varchar(255) DEFAULT 'activo' NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "estudiante_plan_estado_check" CHECK (((estado)::text = ANY (ARRAY['activo'::text, 'vencido'::text, 'agotado'::text, 'cancelado'::text]))),
+	CONSTRAINT "estudiante_plan_sesiones_disponibles_check" CHECK ((sesiones_disponibles >= 0))
 );
- 
- 
--- ================================================================
--- 10. PLAN_TUTORIA
---     Paquetes de N sesiones a precio reducido que ofrece
---     un tutor. El estudiante compra el plan y paga una sola
---     vez por adelantado.
--- ================================================================
-CREATE TABLE plan_tutoria (
-  id                 SERIAL        PRIMARY KEY,
-  tutor_id           INT           NOT NULL REFERENCES tutor(id) ON DELETE CASCADE,
-  nombre             TEXT          NOT NULL,
-  descripcion        TEXT,
-  total_sesiones     INT           NOT NULL CHECK (total_sesiones > 0),
-  duracion_sesion    INT           NOT NULL DEFAULT 90 CHECK (duracion_sesion > 0),
-  precio_total       NUMERIC(10,2) NOT NULL CHECK (precio_total > 0),
-  duracion_plan_dias INT           NOT NULL CHECK (duracion_plan_dias > 0),
-    -- Días desde la compra para usar las sesiones. Ej: 90 = 3 meses
-  esta_activo        BOOLEAN       NOT NULL DEFAULT TRUE,
-  creado_en          TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+CREATE TABLE "factura" (
+	"id" bigserial PRIMARY KEY,
+	"pago_id" integer NOT NULL CONSTRAINT "factura_pago_id_key" UNIQUE,
+	"subtotal" numeric(10, 2) NOT NULL,
+	"impuesto" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"total" numeric(10, 2) GENERATED ALWAYS AS ((subtotal + impuesto)) STORED,
+	"moneda" varchar(255) DEFAULT 'COP' NOT NULL,
+	"emitida_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "factura_impuesto_check" CHECK ((impuesto >= (0)::numeric)),
+	CONSTRAINT "factura_subtotal_check" CHECK ((subtotal >= (0)::numeric))
 );
- 
- 
--- ================================================================
--- 11. ESTUDIANTE_PLAN
---     Registro de compra de un plan por parte de un estudiante.
---     Lleva el conteo de sesiones disponibles y el vencimiento.
---     Se crea desde el backend cuando el pago del plan
---     queda en estado 'completado'.
--- ================================================================
-CREATE TABLE estudiante_plan (
-  id                   SERIAL      PRIMARY KEY,
-  estudiante_id        INT         NOT NULL REFERENCES estudiante(id)   ON DELETE RESTRICT,
-  plan_id              INT         NOT NULL REFERENCES plan_tutoria(id) ON DELETE RESTRICT,
-  sesiones_disponibles INT         NOT NULL CHECK (sesiones_disponibles >= 0),
-  fecha_vencimiento    DATE        NOT NULL,
-  estado               TEXT        NOT NULL DEFAULT 'activo'
-                         CHECK (estado IN ('activo','vencido','agotado','cancelado')),
-  creado_en            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE "insignia" (
+	"id" bigserial PRIMARY KEY,
+	"nombre" varchar(255) NOT NULL CONSTRAINT "insignia_nombre_key" UNIQUE,
+	"descripcion" text NOT NULL,
+	"url_icono" varchar(255),
+	"condicion_tipo" varchar(255) NOT NULL,
+	"condicion_valor" integer NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "insignia_condicion_tipo_check" CHECK (((condicion_tipo)::text = ANY (ARRAY['total_sesiones'::text, 'sesiones_5_estrellas'::text, 'calificacion_promedio'::text]))),
+	CONSTRAINT "insignia_condicion_valor_check" CHECK ((condicion_valor > 0))
 );
- 
- 
--- ================================================================
--- 12. SESION_TUTORIA
---     Entidad débil de solicitud + tutor + materia.
---     Se crea cuando el tutor acepta una solicitud.
---     estudiante_plan_id: indica si la sesión se agendó
---     usando un plan comprado (nullable = sesión individual).
--- ================================================================
-CREATE TABLE sesion_tutoria (
-  id                 SERIAL        PRIMARY KEY,
-  solicitud_id       INT           UNIQUE REFERENCES solicitud(id)      ON DELETE SET NULL,
-  tutor_id           INT           NOT NULL REFERENCES tutor(id)        ON DELETE CASCADE,
-  estudiante_id      INT           NOT NULL REFERENCES estudiante(id)   ON DELETE CASCADE,
-  materia_id         INT           NOT NULL REFERENCES materia(id)      ON DELETE RESTRICT,
-  estudiante_plan_id INT           REFERENCES estudiante_plan(id)       ON DELETE SET NULL,
-  programada_para    TIMESTAMPTZ   NOT NULL,
-  duracion_min       INT           NOT NULL DEFAULT 90 CHECK (duracion_min > 0),
-  precio             NUMERIC(10,2) NOT NULL DEFAULT 0  CHECK (precio >= 0),
-  enlace_reunion     TEXT,
-  estado             TEXT          NOT NULL DEFAULT 'programada'
-                                     CHECK (estado IN (
-                                       'programada','en_progreso','completada',
-                                       'cancelada','no_asistio'
-                                     )),
-  cancelada_por      INT           REFERENCES perfiles(id) ON DELETE SET NULL,
-  motivo_cancelacion TEXT,
-  creado_en          TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+CREATE TABLE "materia" (
+	"id" bigserial PRIMARY KEY,
+	"nombre" varchar(255) NOT NULL,
+	"departamento_id" bigint NOT NULL
 );
- 
- 
--- ================================================================
--- 13. PAGO
---     Registra la transacción económica.
---     tipo 'sesion' → sesion_id NOT NULL, estudiante_plan_id NULL
---     tipo 'plan'   → estudiante_plan_id NOT NULL, sesion_id NULL
---     pago_tutor se calcula automáticamente (columna generada).
--- ================================================================
-CREATE TABLE pago (
-  id                  SERIAL        PRIMARY KEY,
-  sesion_id           INT           UNIQUE REFERENCES sesion_tutoria(id) ON DELETE RESTRICT,
-  estudiante_plan_id  INT           REFERENCES estudiante_plan(id)       ON DELETE RESTRICT,
-  estudiante_id       INT           NOT NULL REFERENCES estudiante(id)   ON DELETE RESTRICT,
-  tutor_id            INT           NOT NULL REFERENCES tutor(id)        ON DELETE RESTRICT,
-  tipo                TEXT          NOT NULL DEFAULT 'sesion'
-                        CHECK (tipo IN ('sesion', 'plan')),
-  monto               NUMERIC(10,2) NOT NULL CHECK (monto >= 0),
-  comision_plataforma NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (comision_plataforma >= 0),
-  pago_tutor          NUMERIC(10,2) GENERATED ALWAYS AS (monto - comision_plataforma) STORED,
-  moneda              TEXT          NOT NULL DEFAULT 'COP',
-  estado              TEXT          NOT NULL DEFAULT 'pendiente'
-                        CHECK (estado IN ('pendiente','completado','reembolsado','fallido')),
-  pagado_en           TIMESTAMPTZ,
-  creado_en           TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+CREATE TABLE "mensajes" (
+	"id" bigserial PRIMARY KEY,
+	"conversacion_id" bigint NOT NULL,
+	"remitente_id" bigint NOT NULL,
+	"contenido" text NOT NULL,
+	"leido" boolean DEFAULT false NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL
 );
- 
+CREATE TABLE "notificaciones" (
+	"id" bigserial PRIMARY KEY,
+	"perfil_id" bigint NOT NULL,
+	"tipo" varchar(255) NOT NULL,
+	"titulo" varchar(255) NOT NULL,
+	"cuerpo" text NOT NULL,
+	"leida" boolean DEFAULT false NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL
+);
+CREATE TABLE "pago" (
+	"id" bigserial PRIMARY KEY,
+	"sesion_id" bigint CONSTRAINT "pago_sesion_id_key" UNIQUE,
+	"estudiante_id" bigint NOT NULL,
+	"tutor_id" bigint NOT NULL,
+	"monto" numeric(10, 2) NOT NULL,
+	"comision_plataforma" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"pago_tutor" numeric(10, 2) GENERATED ALWAYS AS ((monto - comision_plataforma)) STORED,
+	"moneda" varchar(255) DEFAULT 'COP' NOT NULL,
+	"estado" varchar(255) DEFAULT 'pendiente' NOT NULL,
+	"pagado_en" timestamp with time zone,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	"tipo" varchar(255) DEFAULT 'sesion' NOT NULL,
+	"estudiante_plan_id" bigint,
+	CONSTRAINT "pago_comision_plataforma_check" CHECK ((comision_plataforma >= (0)::numeric)),
+	CONSTRAINT "pago_estado_check" CHECK (((estado)::text = ANY (ARRAY['pendiente'::text, 'completado'::text, 'reembolsado'::text, 'fallido'::text]))),
+	CONSTRAINT "pago_monto_check" CHECK ((monto >= (0)::numeric)),
+	CONSTRAINT "pago_tipo_check" CHECK (((tipo)::text = ANY (ARRAY['sesion'::text, 'plan'::text])))
+);
+CREATE TABLE "perfiles" (
+	"id" bigserial PRIMARY KEY,
+	"nombre_completo" varchar(255) NOT NULL,
+	"correo" varchar(255) NOT NULL CONSTRAINT "perfiles_correo_key" UNIQUE,
+	"contrasena_hash" varchar(255) NOT NULL,
+	"url_avatar" varchar(255),
+	"rol" varchar(255) NOT NULL,
+	"esta_activo" boolean DEFAULT true NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "perfiles_rol_check" CHECK (((rol)::text = ANY (ARRAY['estudiante'::text, 'tutor'::text, 'administrador'::text])))
+);
+CREATE TABLE "plan_tutoria" (
+	"id" bigserial PRIMARY KEY,
+	"tutor_id" bigint NOT NULL,
+	"nombre" varchar(255) NOT NULL,
+	"descripcion" text,
+	"total_sesiones" integer NOT NULL,
+	"duracion_sesion" integer DEFAULT 90 NOT NULL,
+	"precio_total" numeric(10, 2) NOT NULL,
+	"duracion_plan_dias" integer NOT NULL,
+	"esta_activo" boolean DEFAULT true NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "plan_tutoria_duracion_plan_dias_check" CHECK ((duracion_plan_dias > 0)),
+	CONSTRAINT "plan_tutoria_duracion_sesion_check" CHECK ((duracion_sesion > 0)),
+	CONSTRAINT "plan_tutoria_precio_total_check" CHECK ((precio_total > (0)::numeric)),
+	CONSTRAINT "plan_tutoria_total_sesiones_check" CHECK ((total_sesiones > 0))
+);
+CREATE TABLE "recursos" (
+	"id" bigserial PRIMARY KEY,
+	"tutor_id" bigint NOT NULL,
+	"materia_id" bigint NOT NULL,
+	"titulo" varchar(255) NOT NULL,
+	"descripcion" text,
+	"url_archivo" varchar(255),
+	"tipo" varchar(255),
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "recursos_tipo_check" CHECK (((tipo)::text = ANY (ARRAY['documento'::text, 'video'::text, 'enlace'::text, 'imagen'::text, 'otro'::text])))
+);
+CREATE TABLE "reporte" (
+	"id" bigserial PRIMARY KEY,
+	"reportado_por" bigint NOT NULL,
+	"reportado_a" bigint NOT NULL,
+	"sesion_id" bigint,
+	"motivo" varchar(255) NOT NULL,
+	"descripcion" text,
+	"estado" varchar(255) DEFAULT 'pendiente' NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "chk_reporte_diferente" CHECK ((reportado_por <> reportado_a)),
+	CONSTRAINT "reporte_estado_check" CHECK (((estado)::text = ANY (ARRAY['pendiente'::text, 'revisando'::text, 'resuelto'::text, 'descartado'::text]))),
+	CONSTRAINT "reporte_motivo_check" CHECK (((motivo)::text = ANY (ARRAY['no_asistio'::text, 'comportamiento_inapropiado'::text, 'contenido_inadecuado'::text, 'fraude'::text, 'otro'::text])))
+);
+CREATE TABLE "resena" (
+	"id" bigserial PRIMARY KEY,
+	"sesion_id" bigint NOT NULL CONSTRAINT "resena_sesion_id_key" UNIQUE,
+	"estudiante_id" bigint NOT NULL,
+	"tutor_id" bigint NOT NULL,
+	"puntuacion" numeric(2, 1) NOT NULL,
+	"comentario" text,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "resena_puntuacion_check" CHECK (((puntuacion >= 1.0) AND (puntuacion <= 5.0)))
+);
+CREATE TABLE "sesion_tutoria" (
+	"id" bigserial PRIMARY KEY,
+	"solicitud_id" bigint CONSTRAINT "sesion_tutoria_solicitud_id_key" UNIQUE,
+	"tutor_id" bigint NOT NULL,
+	"estudiante_id" bigint NOT NULL,
+	"materia_id" bigint NOT NULL,
+	"programada_para" timestamp with time zone NOT NULL,
+	"duracion_min" integer DEFAULT 90 NOT NULL,
+	"precio" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"enlace_reunion" varchar(255),
+	"estado" varchar(255) DEFAULT 'programada' NOT NULL,
+	"cancelada_por" bigint,
+	"motivo_cancelacion" text,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	"estudiante_plan_id" bigint,
+	CONSTRAINT "sesion_tutoria_duracion_min_check" CHECK ((duracion_min > 0)),
+	CONSTRAINT "sesion_tutoria_estado_check" CHECK (((estado)::text = ANY (ARRAY['programada'::text, 'en_progreso'::text, 'completada'::text, 'cancelada'::text, 'no_asistio'::text]))),
+	CONSTRAINT "sesion_tutoria_precio_check" CHECK ((precio >= (0)::numeric))
+);
+CREATE TABLE "solicitud" (
+	"id" bigserial PRIMARY KEY,
+	"estudiante_id" bigint NOT NULL,
+	"tutor_id" bigint NOT NULL,
+	"materia_id" bigint NOT NULL,
+	"fecha_preferida" date NOT NULL,
+	"hora_preferida" time NOT NULL,
+	"duracion_min" integer DEFAULT 90 NOT NULL,
+	"mensaje" text,
+	"estado" varchar(255) DEFAULT 'pendiente' NOT NULL,
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "solicitud_duracion_min_check" CHECK ((duracion_min > 0)),
+	CONSTRAINT "solicitud_estado_check" CHECK (((estado)::text = ANY (ARRAY['pendiente'::text, 'aceptada'::text, 'rechazada'::text, 'cancelada'::text])))
+);
+CREATE TABLE "tutor" (
+	"id" bigint PRIMARY KEY,
+	"biografia" varchar(255),
+	"frase_personal" varchar(255),
+	"anios_experiencia" integer DEFAULT 0 NOT NULL,
+	"precio_por_hora" numeric(10, 2) DEFAULT '0' NOT NULL,
+	"duracion_sesion_min" integer DEFAULT 90 NOT NULL,
+	"esta_disponible" boolean DEFAULT true NOT NULL,
+	"calificacion_promedio" numeric(3, 2) DEFAULT '0' NOT NULL,
+	"total_sesiones" integer DEFAULT 0 NOT NULL,
+	"titulos" text[],
+	"logros" text[],
+	"creado_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "tutor_anios_experiencia_check" CHECK ((anios_experiencia >= 0)),
+	CONSTRAINT "tutor_calificacion_promedio_check" CHECK (((calificacion_promedio >= (0)::numeric) AND (calificacion_promedio <= (5)::numeric))),
+	CONSTRAINT "tutor_duracion_sesion_min_check" CHECK ((duracion_sesion_min > 0)),
+	CONSTRAINT "tutor_precio_por_hora_check" CHECK ((precio_por_hora >= (0)::numeric)),
+	CONSTRAINT "tutor_total_sesiones_check" CHECK ((total_sesiones >= 0))
+);

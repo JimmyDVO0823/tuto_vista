@@ -5,6 +5,7 @@ import PendingAssignments from '../components/features/dashboard/PendingAssignme
 import AcademicCalendar from '../components/features/dashboard/AcademicCalendar/AcademicCalendar';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import NotificationsWidget from '../components/features/dashboard/NotificationWidget/NotificationWidget';
 
 const DashboardStudent = () => {
   const { user } = useAuth();
@@ -108,23 +109,7 @@ const DashboardStudent = () => {
                 </div>
              </div>
 
-             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Notificaciones</h3>
-                <div className="space-y-5">
-                   {[
-                     { user: 'Elena Martínez', msg: 'Subió nuevos recursos para Cálculo.', time: '2h' },
-                     { user: 'Dr. Smith', msg: 'Confirmó tu sesión de mañana.', time: '5h' }
-                   ].map((notif, i) => (
-                     <div key={i} className="flex gap-4 items-start">
-                        <div className="w-8 h-8 rounded-full bg-mini-gray shrink-0"></div>
-                        <div className="flex-1">
-                           <p className="text-xs leading-relaxed"><span className="font-bold text-primary">{notif.user}</span> {notif.msg}</p>
-                           <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase">{notif.time} ago</p>
-                        </div>
-                     </div>
-                   ))}
-                </div>
-             </div>
+             <NotificationsWidget />
           </aside>
         </section>
       </main>
