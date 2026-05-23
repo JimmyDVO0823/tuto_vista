@@ -1,45 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { api } from '../../../../lib/api';
 
-// MOCK DATA: Historial simulado de ingresos del tutor
-const INCOME_DATA_SOURCE = {
-  semana: [
-    { label: 'Lun', ingresos: 120 },
-    { label: 'Mar', ingresos: 240 },
-    { label: 'Mié', ingresos: 180 },
-    { label: 'Jue', ingresos: 320 },
-    { label: 'Vie', ingresos: 450 },
-    { label: 'Sáb', ingresos: 150 },
-    { label: 'Dom', ingresos: 90 },
-  ],
-  mes: [
-    { label: 'Sem 1', ingresos: 850 },
-    { label: 'Sem 2', ingresos: 1200 },
-    { label: 'Sem 3', ingresos: 950 },
-    { label: 'Sem 4', ingresos: 1400 },
-  ],
-  anio: [
-    { label: 'Ene', ingresos: 3200 },
-    { label: 'Feb', ingresos: 2800 },
-    { label: 'Mar', ingresos: 4100 },
-    { label: 'Abr', ingresos: 3900 },
-    { label: 'May', ingresos: 5200 },
-    { label: 'Jun', ingresos: 4800 },
-  ],
-  todo: [
-    { label: '2023', ingresos: 35000 },
-    { label: '2024', ingresos: 48000 },
-    { label: '2025', ingresos: 59000 },
-    { label: '2026', ingresos: 24500 }, // Año en curso
-  ]
-};
-
-export default function IncomeChart() {
+export default function IncomeChart({ tutorId }) {
   // Estado para controlar qué filtro está activo
   const [timeframe, setTimeframe] = useState('mes');
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (tutorId) {
+      setLoading(true);
+      api.get(`/tutores/${tutorId}/income-report`)
+        .then(res => {
+          setData(res);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Error fetching income report:', err);
+          setLoading(false);
+        });
+    }
+  }, [tutorId]);
+
+  if (loading || !data) {
+    return (
+      <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border-none w-full h-[400px] flex items-center justify-center">
+        <p className="text-primary font-medium animate-pulse">Cargando reporte de ingresos...</p>
+      </div>
+    );
+  }
 
   // Calcular el ingreso total mostrado según el filtro
-  const totalIncome = INCOME_DATA_SOURCE[timeframe].reduce((acc, curr) => acc + curr.ingresos, 0);
+  const totalIncome = data[timeframe]?.reduce((acc, curr) => acc + curr.ingresos, 0) || 0;
 
   return (
     <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border-none w-full">
@@ -78,7 +71,7 @@ export default function IncomeChart() {
       <div className="w-full h-72">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={INCOME_DATA_SOURCE[timeframe]}
+            data={data[timeframe]}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             {/* Cuadrícula sutil de fondo */}

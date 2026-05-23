@@ -73,4 +73,13 @@ public class TutorController {
     public ResponseEntity<com.tutorias.tutorias_backend.dto.TutorStatsDTO> getTutorStats(@PathVariable Long id) {
         return ResponseEntity.ok(tutorService.getTutorStats(id));
     }
+
+    /**
+     * GET /tutores/{id}/income-report
+     * Obtiene el reporte detallado de ingresos (semana, mes, año, historial).
+     */
+    @GetMapping("/{id}/income-report")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.TutorIncomeReportDto> getIncomeReport(@PathVariable Long id) {
+        return ResponseEntity.ok(tutorService.getIncomeReport(id));
+    }
 }

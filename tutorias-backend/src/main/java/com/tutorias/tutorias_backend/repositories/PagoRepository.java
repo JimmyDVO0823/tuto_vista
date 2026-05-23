@@ -20,4 +20,6 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
             @org.springframework.data.repository.query.Param("startOfLastMonth") java.time.OffsetDateTime startOfLastMonth,
             @org.springframework.data.repository.query.Param("startOfCurrentMonth") java.time.OffsetDateTime startOfCurrentMonth
     );
+
+    List<Pago> findByTutorIdAndEstadoOrderByCreadoEnAsc(Long tutorId, EstadoPago estado);
 }

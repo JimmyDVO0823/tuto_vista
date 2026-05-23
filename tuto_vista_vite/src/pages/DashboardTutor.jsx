@@ -97,7 +97,7 @@ const DashboardTutor = () => {
             </div>
           ))}
         </div>
-        <IncomeChart />
+        <IncomeChart tutorId={user?.id} />
         {/* Session List */}
         <div className="grid grid-cols-12 gap-8">
           <div className="col-span-8 space-y-6">
