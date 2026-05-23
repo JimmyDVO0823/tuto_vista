@@ -1,30 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from "../../../../context/AuthContext";
+import { api } from "../../../../lib/api";
 
 /**
  * NotificationsWidget Component.
  * Ofrece un historial de notificaciones con scroll dinámico y carga progresiva.
  */
 const NotificationsWidget = () => {
-  // 1. Dataset de prueba (Puedes migrarlo a props o consumirlo desde un useEffect)
-  const allNotifications = [
-    { user: 'Elena Martínez', msg: 'Subió nuevos recursos para Cálculo.', time: '2h' },
-    { user: 'Dr. Smith', msg: 'Confirmó tu sesión de mañana.', time: '5h' },
-    { user: 'Carlos Mendoza', msg: 'Te dejó una reseña de 5 estrellas.', time: '1d' },
-    { user: 'Sistema', msg: 'Tu pago de la sesión #102 ha sido procesado.', time: '2d' },
-    { user: 'Lucía Fernández', msg: 'Envió un mensaje nuevo al chat.', time: '3d' },
-    { user: 'Soporte Técnico', msg: 'Tu solicitud de asistencia fue resuelta.', time: '5d' },
-  ];
-
-  // 2. Estado para controlar cuántos elementos renderizar
+  const { user: authUser } = useAuth();
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(2);
 
-  // Filtramos la lista según el número visible actual
-  const displayedNotifications = allNotifications.slice(0, visibleCount);
-
-  // Manejador para cargar más elementos de forma progresiva
-  const handleLoadMore = () => {
-    setVisibleCount((prevCount) => Math.min(prevCount + 3, allNotifications.length));
+  // Mapeo de configuración por tipo de notificación
+  const typeConfig = {
+    TUTORIA_PROXIMA: { icon: 'schedule', color: 'text-blue-500', bg: 'bg-blue-50' },
+    SOLICITUD_TUTORIA: { icon: 'person_add', color: 'text-academic-gold', bg: 'bg-amber-50' },
+    CANCELACION_RECHAZO: { icon: 'cancel', color: 'text-red-500', bg: 'bg-red-50' },
+    NUEVA_ACTIVIDAD: { icon: 'assignment', color: 'text-green-500', bg: 'bg-green-50' },
+    MENSAJE_RECIBIDO: { icon: 'chat', color: 'text-purple-500', bg: 'bg-purple-50' },
+    DEFAULT: { icon: 'notifications', color: 'text-gray-500', bg: 'bg-gray-50' }
   };
+
+  useEffect(() => {
+    if (authUser?.id) {
+      api.get(`/users/${authUser.id}/notifications`)
+        .then(data => {
+          setNotifications(data || []);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Error cargando notificaciones:", err);
+          setLoading(false);
+        });
+    }
+  }, [authUser]);
+
+  const displayedNotifications = notifications.slice(0, visibleCount);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prevCount) => Math.min(prevCount + 3, notifications.length));
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center justify-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest">Cargando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-6 max-w-md w-full">
@@ -37,35 +62,43 @@ const NotificationsWidget = () => {
       <div 
         className={`space-y-5 overflow-y-auto pr-1 no-scrollbar transition-all duration-300`}
         style={{ 
-          // Si hay más de 3 notificaciones visibles, limita el alto para forzar el scrollbar
           maxHeight: visibleCount > 3 ? '240px' : 'auto' 
         }}
       >
-        {displayedNotifications.map((notif, i) => (
-          <div 
-            key={i} 
-            className="flex gap-4 items-start animate-in fade-in slide-in-from-bottom-2 duration-300"
-          >
-            {/* Avatar ficticio */}
-            <div className="w-8 h-8 rounded-full bg-mini-gray shrink-0 flex items-center justify-center text-xs font-bold text-gray-500 select-none">
-              {notif.user.charAt(0)}
-            </div>
-            
-            {/* Contenido */}
-            <div className="flex-1">
-              <p className="text-xs leading-relaxed text-gray-600">
-                <span className="font-bold text-primary">{notif.user}</span> {notif.msg}
-              </p>
-              <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">
-                {notif.time} ago
-              </p>
-            </div>
-          </div>
-        ))}
+        {notifications.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-4">No tienes notificaciones pendientes.</p>
+        ) : (
+          displayedNotifications.map((notif, i) => {
+            const config = typeConfig[notif.tipo] || typeConfig.DEFAULT;
+            return (
+              <div 
+                key={i} 
+                className="flex gap-4 items-start animate-in fade-in slide-in-from-bottom-2 duration-300"
+              >
+                {/* Icono dinámico según el tipo */}
+                <div className={`w-8 h-8 rounded-full ${config.bg} shrink-0 flex items-center justify-center`}>
+                  <span className={`material-symbols-outlined text-[18px] ${config.color} select-none`}>
+                    {config.icon}
+                  </span>
+                </div>
+                
+                {/* Contenido */}
+                <div className="flex-1">
+                  <p className="text-xs leading-relaxed text-gray-600">
+                    <span className="font-bold text-primary">{notif.user}</span> {notif.msg}
+                  </p>
+                  <p className="text-[10px] text-gray-400 font-bold mt-1 uppercase tracking-wider">
+                    {notif.time}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {/* Botón "Ver más" sutil estilo Academic Blue */}
-      {visibleCount < allNotifications.length && (
+      {/* Botón "Ver más" */}
+      {visibleCount < notifications.length && (
         <div className="pt-2 border-t border-gray-50 flex justify-start">
           <button
             type="button"

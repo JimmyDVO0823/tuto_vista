@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../../../context/AuthContext";
+import { api } from "../../../../lib/api";
 
 /**
  * SemesterProgressWidget Component.
@@ -6,34 +8,51 @@ import React, { useState } from "react";
  * expandible de actividades y scrollbar interno.
  */
 const SemesterProgressWidget = () => {
-  // 1. Dataset de prueba (Actividades con su estado 'completada' true/false)
-  const allActivities = [
-    { label: "Ensayo de Filosofía entregado", completed: true },
-    { label: "Revisión de Tesis pendiente", completed: false },
-    { label: "Taller de Álgebra Lineal enviado", completed: true },
-    { label: "Examen parcial de Programación", completed: false },
-    { label: "Lectura de Antropología Académica", completed: true },
-    { label: "Presentación de Proyecto Final", completed: false },
-  ];
-
-  // 2. Estado para manejar cuántas actividades se muestran en pantalla
+  const { user: authUser } = useAuth();
+  const [progressData, setProgressData] = useState({
+    completedCount: 0,
+    totalCount: 0,
+    activities: []
+  });
+  const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(2);
 
-  // 3. Cálculos automáticos para la fracción y la barra de progreso
-  const totalActivities = allActivities.length;
-  const completedCount = allActivities.filter((act) => act.completed).length;
+  useEffect(() => {
+    if (authUser?.id) {
+      api.get(`/students/${authUser.id}/semester-progress`)
+        .then(data => {
+          setProgressData(data || { completedCount: 0, totalCount: 0, activities: [] });
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Error cargando progreso semestral:", err);
+          setLoading(false);
+        });
+    }
+  }, [authUser]);
+
+  const { completedCount, totalCount, activities } = progressData;
 
   // Calculamos el porcentaje real para la propiedad 'width' de la barra
   const progressPercentage =
-    totalActivities > 0 ? (completedCount / totalActivities) * 100 : 0;
+    totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   // Filtramos la lista según el número visible actual
-  const displayedActivities = allActivities.slice(0, visibleCount);
+  const displayedActivities = activities.slice(0, visibleCount);
 
   // Manejador para cargar más actividades
   const handleLoadMore = () => {
-    setVisibleCount((prevCount) => Math.min(prevCount + 3, totalActivities));
+    setVisibleCount((prevCount) => Math.min(prevCount + 3, totalCount));
   };
+
+  if (loading) {
+    return (
+      <div className="bg-[#f2f4f6] p-8 rounded-2xl flex flex-col items-center justify-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest text-center">Calculando Progreso...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f2f4f6] p-8 rounded-2xl space-y-6 max-w-md w-full flex flex-col justify-between">
@@ -51,7 +70,7 @@ const SemesterProgressWidget = () => {
             </span>
             {/* Formato en Fracción */}
             <span className="text-2xl font-black text-primary">
-              {completedCount}/{totalActivities}
+              {completedCount}/{totalCount}
             </span>
           </div>
           {/* Barra de progreso de fondo blanco */}
@@ -68,41 +87,42 @@ const SemesterProgressWidget = () => {
         <div
           className="mt-6 space-y-3 overflow-y-auto pr-1 no-scrollbar transition-all duration-300"
           style={{
-            // Si hay más de 3 actividades visibles, limita la altura para activar el scroll
             maxHeight: visibleCount > 3 ? "160px" : "auto",
           }}
         >
-          {displayedActivities.map((activity, i) => (
-            <div
-              key={i}
-              className="flex items-center gap-3 text-sm font-bold animate-in fade-in slide-in-from-bottom-1 duration-200"
-            >
-              {activity.completed ? (
-                // Icono Verde si está completada
-                <span className="material-symbols-outlined text-green-500 select-none">
-                  check_circle
-                </span>
-              ) : (
-                // Icono Gris si está pendiente
-                <span className="material-symbols-outlined text-gray-400 select-none">
-                  pending
-                </span>
-              )}
-
-              <span
-                className={
-                  activity.completed ? "text-primary" : "text-gray-400"
-                }
+          {activities.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-4 italic">No hay actividades registradas en este semestre.</p>
+          ) : (
+            displayedActivities.map((activity, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 text-sm font-bold animate-in fade-in slide-in-from-bottom-1 duration-200"
               >
-                {activity.label}
-              </span>
-            </div>
-          ))}
+                {activity.completed ? (
+                  <span className="material-symbols-outlined text-green-500 select-none">
+                    check_circle
+                  </span>
+                ) : (
+                  <span className="material-symbols-outlined text-gray-400 select-none">
+                    pending
+                  </span>
+                )}
+
+                <span
+                  className={
+                    activity.completed ? "text-primary" : "text-gray-400"
+                  }
+                >
+                  {activity.label}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {/* Botón sutil "Ver más" estilo Academic Blue */}
-      {visibleCount < totalActivities && (
+      {/* Botón sutil "Ver más" */}
+      {visibleCount < totalCount && (
         <div className="pt-4 border-t border-gray-200/60 flex justify-start">
           <button
             type="button"

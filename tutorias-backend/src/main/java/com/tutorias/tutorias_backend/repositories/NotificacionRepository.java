@@ -8,5 +8,6 @@ import java.util.List;
 @Repository
 public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
     List<Notificacion> findByPerfilId(Long perfilId);
+    List<Notificacion> findByPerfilIdOrderByCreadoEnDesc(Long perfilId);
     List<Notificacion> findByPerfilIdAndLeidaFalse(Long perfilId);
 }

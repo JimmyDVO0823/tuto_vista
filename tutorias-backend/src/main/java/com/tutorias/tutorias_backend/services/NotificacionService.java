@@ -31,6 +31,20 @@ public class NotificacionService {
         return notificacionRepository.findByPerfilId(perfilId);
     }
 
+    public List<com.tutorias.tutorias_backend.dto.NotificationResponseDTO> getNotificationsByUserId(Long userId) {
+        List<Notificacion> notificaciones = notificacionRepository.findByPerfilIdOrderByCreadoEnDesc(userId);
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        
+        return notificaciones.stream()
+                .map(n -> com.tutorias.tutorias_backend.dto.NotificationResponseDTO.builder()
+                        .user(n.getTitulo())
+                        .msg(n.getCuerpo())
+                        .time(n.getCreadoEn().format(formatter))
+                        .tipo(n.getTipo())
+                        .build())
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     public void marcarComoLeida(Long id) {
         Notificacion n = notificacionRepository.findById(id).orElseThrow();
         n.setLeida(true);
