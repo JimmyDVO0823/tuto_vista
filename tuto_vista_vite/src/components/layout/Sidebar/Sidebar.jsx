@@ -38,7 +38,6 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       { label: 'Explorar Tutores', path: '/tutors', icon: 'search' },
       { label: 'Mis Sesiones', path: '/dispo', icon: 'calendar_today' },
       { label: 'Mis Materias', path: '/subjects', icon: 'menu_book' },
-      { label: 'Mensajes', path: '#', icon: 'mail' },
       { label: 'Ajustes', path: '#', icon: 'settings' },
       { label: 'Chat', path: '/chat', icon: 'chat' },
     ],
