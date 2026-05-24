@@ -3,13 +3,15 @@ import MainLayout from '../components/layout/MainLayout/MainLayout';
 import AcademicCalendar from '../features/dashboard/AcademicCalendar/AcademicCalendar';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import { HourlyRateCard } from '../features/tutors/HourlyRateCard/HourlyRateCard';
 
 const DispoManagement = () => {
    const { user } = useAuth();
    const [disponibilidad, setDisponibilidad] = useState([]);
+   const [hourlyRate, setHourlyRate] = useState(0); // Estado para el precio por hora
    const [loading, setLoading] = useState(true);
 
-   // Map 0=Sunday..6=Saturday to strings or standard dates for FullCalendar
+   // Mapeo de 0=Sunday..6=Saturday a estándar de FullCalendar
    const mapDispoToEvents = useCallback((dispoList) => {
       return dispoList.map(d => {
          const startFmt = d.horaInicio.substring(0, 5); // "06:00"
@@ -17,11 +19,11 @@ const DispoManagement = () => {
          return {
             id: d.id,
             title: `${startFmt} - ${endFmt}`,
-            daysOfWeek: [d.diaSemana], // 0=Sunday
+            daysOfWeek: [d.diaSemana], 
             startTime: d.horaInicio,
             endTime: d.horaFin,
             extendedProps: { type: 'Disponibilidad', status: 'Activo', time: `${startFmt} - ${endFmt}` },
-            color: '#aa3bff', // Accent color to differentiate
+            color: '#aa3bff', 
          };
       });
    }, []);
@@ -29,10 +31,16 @@ const DispoManagement = () => {
    const loadDisponibilidad = useCallback(async () => {
       if (!user?.id) return;
       try {
-         const data = await api.get(`/disponibilidad/tutor/${user.id}`);
-         setDisponibilidad(mapDispoToEvents(data));
+         // Paralelizar las peticiones de disponibilidad y tarifa del tutor para optimizar la carga
+         const [dispoData, tutorProfile] = await Promise.all([
+            api.get(`/disponibilidad/tutor/${user.id}`),
+            api.get(`/api/v1/tutors/profile`) // Ajusta este endpoint según tu backend real
+         ]);
+
+         setDisponibilidad(mapDispoToEvents(dispoData));
+         setHourlyRate(tutorProfile?.hourlyRate || 45); // Setea la tarifa inicial (ej: 45 por defecto)
       } catch (err) {
-         console.error('Error cargando disponibilidad:', err);
+         console.error('Error cargando los datos de configuración:', err);
       } finally {
          setLoading(false);
       }
@@ -42,9 +50,16 @@ const DispoManagement = () => {
       loadDisponibilidad();
    }, [loadDisponibilidad]);
 
+   // Manejador para actualizar los honorarios desde el backend
+   const handleSaveRate = async (newRate) => {
+      // Petición PATCH/PUT para guardar el nuevo precio
+      await api.patch('/api/v1/tutors/hourly-rate', { hourlyRate: newRate });
+      setHourlyRate(newRate); // Sincroniza el estado local tras una respuesta 2xx exitosa
+   };
+
    const handleSelect = async (info) => {
-      const diaSemana = info.start.getDay(); // 0=Sun, 1=Mon, etc.
-      const horaInicio = info.start.toTimeString().split(' ')[0]; // HH:mm:ss
+      const diaSemana = info.start.getDay(); 
+      const horaInicio = info.start.toTimeString().split(' ')[0]; 
       const horaFin = info.end.toTimeString().split(' ')[0];
 
       try {
@@ -55,7 +70,9 @@ const DispoManagement = () => {
             horaFin,
             estaActivo: true
          });
-         loadDisponibilidad(); // Reload from backend
+         // Refrescar únicamente los bloques del calendario
+         const data = await api.get(`/disponibilidad/tutor/${user.id}`);
+         setDisponibilidad(mapDispoToEvents(data));
       } catch (err) {
          console.error('Error guardando bloque:', err);
          alert('Error guardando bloque de disponibilidad.');
@@ -66,7 +83,8 @@ const DispoManagement = () => {
       if (window.confirm('¿Deseas eliminar este bloque de disponibilidad?')) {
          try {
             await api.delete(`/disponibilidad/${info.event.id}`);
-            loadDisponibilidad();
+            const data = await api.get(`/disponibilidad/tutor/${user.id}`);
+            setDisponibilidad(mapDispoToEvents(data));
          } catch (err) {
             console.error('Error eliminando bloque:', err);
          }
@@ -90,23 +108,41 @@ const DispoManagement = () => {
                      <p className="text-gray-600 text-lg">Haz click y arrastra sobre las horas para definir tus bloques disponibles.</p>
                   </header>
 
-                  {!loading && (
-                     <AcademicCalendar
-                        events={disponibilidad}
-                        initialView="dayGridMonth"
-                        headerToolbar={{
-                           left: 'prev,next today',
-                           center: 'title',
-                           right: 'dayGridMonth,timeGridWeek'
-                        }}
-                        selectable={true}
-                        editable={false}
-                        onSelect={handleSelect}
-                        onEventClick={handleEventClick}
-                        slotMinTime="06:00:00"
-                        slotMaxTime="22:00:00"
-                        allDaySlot={false}
-                     />
+                  {loading ? (
+                     <div className="text-center p-12 text-gray-500">Cargando configuraciones de tutoría...</div>
+                  ) : (
+                     /* Layout Grid en dos columnas: 12 columnas en total */
+                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        
+                        {/* Columna Izquierda: Calendario (8 de 12 columnas) */}
+                        <div className="lg:col-span-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                           <AcademicCalendar
+                              events={disponibilidad}
+                              initialView="timeGridWeek" // Cambiado a vista semanal por usabilidad al arrastrar horas
+                              headerToolbar={{
+                                 left: 'prev,next today',
+                                 center: 'title',
+                                 right: 'dayGridMonth,timeGridWeek'
+                              }}
+                              selectable={true}
+                              editable={false}
+                              onSelect={handleSelect}
+                              onEventClick={handleEventClick}
+                              slotMinTime="06:00:00"
+                              slotMaxTime="22:00:00"
+                              allDaySlot={false}
+                           />
+                        </div>
+
+                        {/* Columna Derecha: Configuración de Honorarios (4 de 12 columnas) */}
+                        <div className="lg:col-span-4 space-y-8">
+                           <HourlyRateCard 
+                              initialRate={hourlyRate} 
+                              onSaveRate={handleSaveRate} 
+                           />
+                        </div>
+
+                     </div>
                   )}
                </div>
             </main>
