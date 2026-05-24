@@ -107,7 +107,7 @@ const RegisterForm = () => {
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
 
-      window.location.href = '/tuto_vista/';
+      window.location.href = 'https://jimmydvo0823.github.io/tuto_vista/';
 
       setFormData({
         name: '',
