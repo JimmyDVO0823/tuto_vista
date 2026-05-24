@@ -177,6 +177,17 @@ public class TutorService {
     }
 
     /**
+     * Actualiza la tarifa por hora de un tutor.
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public void actualizarPrecio(Long tutorId, BigDecimal nuevoPrecio) {
+        Tutor tutor = tutorRepository.findById(tutorId)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+        tutor.setPrecioPorHora(nuevoPrecio);
+        tutorRepository.save(tutor);
+    }
+
+    /**
      * Obtiene un tutor por su ID.
      */
     public TutorDTO getTutorById(Long id) {

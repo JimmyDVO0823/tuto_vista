@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/MainLayout/MainLayout";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import IncomeChart from "../features/dashboard/IncomeChart/IncomeChart";
+import StatCard from "../components/ui/StatCard/StatCard"; // Importación del nuevo componente
 
 const DashboardTutor = () => {
   const { user } = useAuth();
@@ -28,6 +29,14 @@ const DashboardTutor = () => {
         .catch((err) => console.error("Error cargando estadísticas:", err));
     }
   }, [user]);
+
+  // Formateador de moneda colombiana integrado
+  const formattedIncome = new Intl.NumberFormat("es-CO", {
+	  A
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0 // Quita decimales innecesarios para pesos colombianos
+  }).format(stats.incomeLastMonth || 0);
 
   return (
     <MainLayout>
@@ -57,6 +66,7 @@ const DashboardTutor = () => {
           </div>
         </header>
 
+<<<<<<< HEAD
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8 md:mb-12">
           {[
@@ -110,11 +120,43 @@ const DashboardTutor = () => {
               </div>
             </div>
           ))}
+=======
+        {/* Grid de Estadísticas Limpio empleando el componente genérico */}
+        <div className="grid grid-cols-12 gap-6 mb-12">
+          <StatCard 
+            label="Horas dictadas este mes"
+            value={stats.hoursThisMonth?.toFixed(1) || "0.0"}
+            icon="history_edu"
+            color="border-primary"
+          />
+
+          <StatCard 
+            label="Calificación promedio"
+            value={stats.averageRating?.toFixed(2) || "0.00"}
+            icon="star"
+            color="border-academic-gold"
+            highlight={stats.averageRating >= 4.5 ? "TOP" : null}
+          />
+
+          <StatCard 
+            label="Ingresos el mes pasado"
+            value={formattedIncome}
+            icon="payments"
+            gradient={true}
+          />
+>>>>>>> main
         </div>
+
         <IncomeChart tutorId={user?.id} />
+
         {/* Session List */}
+<<<<<<< HEAD
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="col-span-12 md:col-span-8 space-y-6">
+=======
+        <div className="grid grid-cols-12 gap-8 mt-12">
+          <div className="col-span-12 lg:col-span-8 space-y-6">
+>>>>>>> main
             <h2 className="text-2xl font-bold font-headline text-primary tracking-tight">
               Próximas Sesiones
             </h2>
@@ -165,7 +207,11 @@ const DashboardTutor = () => {
             </div>
           </div>
 
+<<<<<<< HEAD
           <aside className="col-span-12 md:col-span-4 space-y-8">
+=======
+          <aside className="col-span-12 lg:col-span-4 space-y-8">
+>>>>>>> main
             <div className="bg-academic-gold/10 text-primary p-8 rounded-lg relative overflow-hidden">
               <h3 className="font-headline font-bold text-xl mb-3">
                 Sugerencia Editorial
