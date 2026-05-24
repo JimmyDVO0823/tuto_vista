@@ -16,7 +16,6 @@ const Home = () => {
         <HowItWorksSection />
         <TestimonialsSection />
         <CTASection />
-        <Footer />
       </div>
     </MainLayout>
   );
