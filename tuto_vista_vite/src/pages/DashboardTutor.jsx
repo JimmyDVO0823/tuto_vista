@@ -3,6 +3,7 @@ import MainLayout from "../components/layout/MainLayout/MainLayout";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import IncomeChart from "../features/dashboard/IncomeChart/IncomeChart";
+import StatCard from "../components/ui/StatCard/StatCard"; // Importación del nuevo componente
 
 const DashboardTutor = () => {
   const { user } = useAuth();
@@ -28,6 +29,13 @@ const DashboardTutor = () => {
         .catch((err) => console.error("Error cargando estadísticas:", err));
     }
   }, [user]);
+
+  // Formateador de moneda colombiana integrado
+  const formattedIncome = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0 // Quita decimales innecesarios para pesos colombianos
+  }).format(stats.incomeLastMonth || 0);
 
   return (
     <MainLayout>
@@ -57,67 +65,36 @@ const DashboardTutor = () => {
           </div>
         </header>
 
-        {/* Stats Grid */}
+        {/* Grid de Estadísticas Limpio empleando el componente genérico */}
         <div className="grid grid-cols-12 gap-6 mb-12">
-          {[
-            {
-              label: "Horas dictadas este mes",
-              value: stats.hoursThisMonth?.toFixed(1) || "0.0",
-              icon: "history_edu",
-              color: "border-primary",
-            },
-            {
-              label: "Calificación promedio",
-              value: stats.averageRating?.toFixed(2) || "0.00",
-              icon: "star",
-              color: "border-academic-gold",
-              highlight: stats.averageRating >= 4.5 ? "TOP" : null,
-            },
-            {
-              label: "Ingresos el mes pasado",
-              value: new Intl.NumberFormat("es-CO", {
-                style: "currency",
-                currency: "COP",
-              }).format(stats.incomeLastMonth || 0),
-              icon: "payments",
-              gradient: true,
-            },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className={`col-span-4 p-8 rounded-lg shadow-sm flex flex-col justify-between h-48 ${stat.gradient ? "signature-gradient text-white" : `bg-white border-l-4 ${stat.color}`}`}
-            >
-              <span
-                className={`material-symbols-outlined text-4xl self-end ${stat.gradient ? "text-white/30" : "text-gray-200"}`}
-              >
-                {stat.icon}
-              </span>
-              <div>
-                <h3
-                  className={`text-xs font-medium uppercase tracking-widest mb-1 ${stat.gradient ? "text-white/60" : "text-gray-400"}`}
-                >
-                  {stat.label}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <p
-                    className={`text-4xl font-bold font-headline ${stat.gradient ? "text-white" : "text-primary"}`}
-                  >
-                    {stat.value}
-                  </p>
-                  {stat.highlight && (
-                    <span className="text-academic-gold font-bold text-sm bg-academic-gold/10 px-2 py-0.5 rounded">
-                      {stat.highlight}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+          <StatCard 
+            label="Horas dictadas este mes"
+            value={stats.hoursThisMonth?.toFixed(1) || "0.0"}
+            icon="history_edu"
+            color="border-primary"
+          />
+
+          <StatCard 
+            label="Calificación promedio"
+            value={stats.averageRating?.toFixed(2) || "0.00"}
+            icon="star"
+            color="border-academic-gold"
+            highlight={stats.averageRating >= 4.5 ? "TOP" : null}
+          />
+
+          <StatCard 
+            label="Ingresos el mes pasado"
+            value={formattedIncome}
+            icon="payments"
+            gradient={true}
+          />
         </div>
+
         <IncomeChart tutorId={user?.id} />
+
         {/* Session List */}
-        <div className="grid grid-cols-12 gap-8">
-          <div className="col-span-8 space-y-6">
+        <div className="grid grid-cols-12 gap-8 mt-12">
+          <div className="col-span-12 lg:col-span-8 space-y-6">
             <h2 className="text-2xl font-bold font-headline text-primary tracking-tight">
               Próximas Sesiones
             </h2>
@@ -168,7 +145,7 @@ const DashboardTutor = () => {
             </div>
           </div>
 
-          <aside className="col-span-4 space-y-8">
+          <aside className="col-span-12 lg:col-span-4 space-y-8">
             <div className="bg-academic-gold/10 text-primary p-8 rounded-lg relative overflow-hidden">
               <h3 className="font-headline font-bold text-xl mb-3">
                 Sugerencia Editorial
