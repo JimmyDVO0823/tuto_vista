@@ -56,7 +56,7 @@ const DashboardStudent = () => {
       start: `${s.fechaPreferida}T${s.horaPreferida}`,
       end: new Date(
         new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
-          (s.duracionMin || 60) * 60000,
+        (s.duracionMin || 60) * 60000,
       ).toISOString(),
       extendedProps: {
         type: "Solicitud",
@@ -72,13 +72,13 @@ const DashboardStudent = () => {
 
   return (
     <MainLayout>
-      <main className="p-10">
-        <header className="flex justify-between items-end mb-16">
+      <main className="p-4 md:p-10">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8 md:mb-16">
           <div className="max-w-2xl">
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">
               Estudiante Pregrado
             </p>
-            <h1 className="text-6xl font-extrabold font-headline text-primary tracking-tight leading-tight">
+            <h1 className="text-3xl md:text-6xl font-extrabold font-headline text-primary tracking-tight leading-tight">
               Mi Librería de Aprendizaje
             </h1>
           </div>
@@ -94,8 +94,8 @@ const DashboardStudent = () => {
           </div>
         </header>
 
-        <section className="grid grid-cols-12 gap-10 mb-20">
-          <article className="col-span-8 space-y-10">
+        <section className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 mb-10 md:mb-20">
+          <article className="col-span-12 md:col-span-8">
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="text-2xl font-bold text-primary mb-6 font-headline">
                 Calendario Académico
@@ -106,7 +106,7 @@ const DashboardStudent = () => {
             <PendingAssignments />
           </article>
 
-          <aside className="col-span-4 space-y-10">
+          <aside className="col-span-12 md:col-span-4 space-y-10">
             <SemesterProgressWidget />
             <NotificationsWidget />
           </aside>

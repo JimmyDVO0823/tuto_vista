@@ -4,13 +4,13 @@ import MainLayout from '../components/layout/MainLayout/MainLayout';
 const DashboardAdmin = () => {
   return (
     <MainLayout>
-      <main className="p-8">
-        <header className="flex justify-between items-end mb-12">
+      <main className="p-4 md:p-8">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8 md:mb-12">
           <div className="max-w-2xl">
             <span className="text-[0.75rem] uppercase tracking-[0.15em] font-bold text-academic-gold mb-2 block">
               Panel de Administración
             </span>
-            <h1 className="text-5xl font-extrabold text-primary tracking-tight leading-none">
+            <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight leading-none">
               Visión General del Sistema
             </h1>
           </div>
@@ -25,8 +25,8 @@ const DashboardAdmin = () => {
         </header>
 
         {/* Top KPI Cards */}
-        <section className="grid grid-cols-12 gap-6 mb-12">
-          <div className="col-span-4 bg-white p-8 rounded-xl flex flex-col justify-between min-h-[180px] shadow-sm">
+        <section className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8 md:mb-12">
+          <div className="col-span-12 md:col-span-4 bg-white p-8 rounded-xl flex flex-col justify-between min-h-[180px] shadow-sm">
             <div className="flex justify-between items-start">
               <div className="w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary">group</span>
@@ -43,7 +43,7 @@ const DashboardAdmin = () => {
             </div>
           </div>
 
-          <div className="col-span-5 signature-gradient p-8 rounded-xl flex flex-col justify-between text-white min-h-[180px] shadow-xl shadow-primary/10">
+          <div className="col-span-12 md:col-span-5 signature-gradient p-8 rounded-xl flex flex-col justify-between text-white min-h-[180px] shadow-xl shadow-primary/10">
             <div className="flex justify-between items-start">
               <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center">
                 <span className="material-symbols-outlined text-white">payments</span>
@@ -79,8 +79,8 @@ const DashboardAdmin = () => {
         </section>
 
         {/* Charts Section */}
-        <section className="grid grid-cols-12 gap-8 mb-12">
-          <div className="col-span-8 bg-white p-8 rounded-xl shadow-sm">
+        <section className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8 md:mb-12">
+          <div className="col-span-12 md:col-span-8 bg-white p-8 rounded-xl shadow-sm">
             <div className="flex justify-between items-center mb-10">
               <h3 className="text-xl font-bold text-primary">
                 Tutorías Realizadas
@@ -95,7 +95,7 @@ const DashboardAdmin = () => {
               </div>
             </div>
             <div className="relative h-64 flex items-end justify-between gap-1 px-4">
-               <div className="absolute inset-0 flex flex-col justify-between py-2 border-l border-b border-gray-100">
+              <div className="absolute inset-0 flex flex-col justify-between py-2 border-l border-b border-gray-100">
                 {[0, 1, 2, 3].map((i) => (
                   <div key={i} className="w-full border-t border-dashed border-gray-50" />
                 ))}
@@ -111,7 +111,7 @@ const DashboardAdmin = () => {
             </div>
           </div>
 
-          <div className="col-span-4 bg-[#f2f4f6] p-8 rounded-xl flex flex-col justify-between shadow-sm">
+          <div className="col-span-12 md:col-span-4 bg-[#f2f4f6] p-8 rounded-xl flex flex-col justify-between shadow-sm">
             <div>
               <h3 className="text-xl font-bold text-primary mb-2">Materias</h3>
               <p className="text-xs text-gray-600 leading-relaxed">

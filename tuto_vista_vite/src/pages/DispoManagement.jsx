@@ -19,11 +19,11 @@ const DispoManagement = () => {
          return {
             id: d.id,
             title: `${startFmt} - ${endFmt}`,
-            daysOfWeek: [d.diaSemana], 
+            daysOfWeek: [d.diaSemana],
             startTime: d.horaInicio,
             endTime: d.horaFin,
             extendedProps: { type: 'Disponibilidad', status: 'Activo', time: `${startFmt} - ${endFmt}` },
-            color: '#aa3bff', 
+            color: '#aa3bff',
          };
       });
    }, []);
@@ -58,8 +58,8 @@ const DispoManagement = () => {
    };
 
    const handleSelect = async (info) => {
-      const diaSemana = info.start.getDay(); 
-      const horaInicio = info.start.toTimeString().split(' ')[0]; 
+      const diaSemana = info.start.getDay();
+      const horaInicio = info.start.toTimeString().split(' ')[0];
       const horaFin = info.end.toTimeString().split(' ')[0];
 
       try {
@@ -94,18 +94,18 @@ const DispoManagement = () => {
    return (
       <MainLayout>
          <div className="flex flex-col flex-1">
-            <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-8 py-4 flex justify-between items-center">
+            <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10 px-4 md:px-8 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                <span className="text-xl font-bold text-primary font-display">Configuración de Horarios</span>
                <div className="flex gap-4">
                   <p className="text-sm text-gray-500 my-auto">Tus cambios se guardan automáticamente</p>
                </div>
             </header>
 
-            <main className="flex-1 p-10">
+            <main className="flex-1 p-4 md:p-10">
                <div className="max-w-7xl mx-auto">
-                  <header className="mb-12">
-                     <h1 className="text-4xl font-extrabold text-primary font-display mb-4">Gestión de Disponibilidad</h1>
-                     <p className="text-gray-600 text-lg">Haz click y arrastra sobre las horas para definir tus bloques disponibles.</p>
+                  <header className="mb-8 md:mb-12">
+                     <h1 className="text-3xl md:text-4xl font-extrabold text-primary font-display mb-3 md:mb-4">Gestión de Disponibilidad</h1>
+                     <p className="text-gray-600 text-md md:text-lg">Haz click y arrastra sobre las horas para definir tus bloques disponibles.</p>
                   </header>
 
                   {loading ? (
@@ -113,7 +113,7 @@ const DispoManagement = () => {
                   ) : (
                      /* Layout Grid en dos columnas: 12 columnas en total */
                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                        
+
                         {/* Columna Izquierda: Calendario (8 de 12 columnas) */}
                         <div className="lg:col-span-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                            <AcademicCalendar
@@ -136,9 +136,9 @@ const DispoManagement = () => {
 
                         {/* Columna Derecha: Configuración de Honorarios (4 de 12 columnas) */}
                         <div className="lg:col-span-4 space-y-8">
-                           <HourlyRateCard 
-                              initialRate={hourlyRate} 
-                              onSaveRate={handleSaveRate} 
+                           <HourlyRateCard
+                              initialRate={hourlyRate}
+                              onSaveRate={handleSaveRate}
                            />
                         </div>
 

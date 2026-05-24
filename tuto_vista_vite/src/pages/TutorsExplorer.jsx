@@ -65,8 +65,8 @@ const TutorsExplorer = () => {
       // Filtrar por nombre en el cliente (búsqueda rápida)
       const filtered = searchQuery
         ? data.filter(t =>
-            t.nombre_completo?.toLowerCase().includes(searchQuery.toLowerCase())
-          )
+          t.nombre_completo?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
         : data;
 
       const mappedTutors = filtered.map(t => ({
@@ -96,14 +96,14 @@ const TutorsExplorer = () => {
 
   return (
     <MainLayout>
-      <main className="flex-1 p-10 min-h-screen">
+      <main className="flex-1 p-4 md:p-10 min-h-screen">
         <TutorSearchHeader
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
         />
 
-        <div className="grid grid-cols-12 gap-10 mt-12">
-          <aside className="col-span-3">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 mt-6 md:mt-12">
+          <aside className="col-span-12 md:col-span-3">
             <SearchFilters
               departments={departments}
               subjects={subjects}
@@ -112,9 +112,9 @@ const TutorsExplorer = () => {
             />
           </aside>
 
-          <section className="col-span-9 space-y-10">
+          <section className="col-span-12 md:col-span-9 space-y-10">
             {loading ? (
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {[1, 2, 3, 4].map((n) => (
                   <div key={n} className="bg-surface-container-lowest animate-pulse rounded-xl h-80"></div>
                 ))}
@@ -128,7 +128,7 @@ const TutorsExplorer = () => {
                 No se encontraron tutores disponibles en este momento.
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {tutors.map((tutor) => (
                   <TutorCard key={tutor.id} {...tutor} />
                 ))}
