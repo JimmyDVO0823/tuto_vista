@@ -110,7 +110,7 @@ const RegisterForm = () => {
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
       console.log('Navegando a /');
-      navigate('/');
+      navigate('/tuto_vista/');
 
       setFormData({
         name: '',
