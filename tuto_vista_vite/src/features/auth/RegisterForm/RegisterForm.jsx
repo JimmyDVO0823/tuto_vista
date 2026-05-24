@@ -111,6 +111,7 @@ const RegisterForm = () => {
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
 
       setTimeout(() => {
+        console.log('Navegando a /');
         navigate('/');
       }, 1000);
 
