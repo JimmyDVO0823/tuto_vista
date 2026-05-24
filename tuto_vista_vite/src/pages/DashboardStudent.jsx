@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "../components/layout/MainLayout/MainLayout";
-import NextSessions from "../components/features/dashboard/NextSessions/NextSessions";
-import PendingAssignments from "../components/features/dashboard/PendingAssignments/PendingAssignments";
-import AcademicCalendar from "../components/features/dashboard/AcademicCalendar/AcademicCalendar";
+import NextSessions from "../features/dashboard/NextSessions/NextSessions";
+import PendingAssignments from "../features/dashboard/PendingAssignments/PendingAssignments";
+import AcademicCalendar from "../features/dashboard/AcademicCalendar/AcademicCalendar";
 import { useAuth } from "../context/AuthContext";
-import { api } from "../lib/api";
-import NotificationsWidget from "../components/features/dashboard/NotificationWidget/NotificationWidget";
-import SemesterProgressWidget from "../components/features/dashboard/SemesterProgressWidget/SemesterProgressWidget";
+import { api } from "../services/api";
+import NotificationsWidget from "../features/dashboard/NotificationWidget/NotificationWidget";
+import SemesterProgressWidget from "../features/dashboard/SemesterProgressWidget/SemesterProgressWidget";
 
 const DashboardStudent = () => {
   const { user } = useAuth();

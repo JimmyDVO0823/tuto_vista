@@ -4,8 +4,8 @@ import SubjectTable from '../components/ui/SubjectTable/SubjectTable';
 import Button from '../components/ui/Button/Button';
 import Searcher from '../components/ui/Searcher/Searcher';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../lib/api';
-import AddSubjectModal from '../components/features/tutors/AddSubjectModal/AddSubjectModal';
+import { api } from '../services/api';
+import AddSubjectModal from '../features/tutors/AddSubjectModal/AddSubjectModal';
 
 /**
  * SubjectsManagement Page.

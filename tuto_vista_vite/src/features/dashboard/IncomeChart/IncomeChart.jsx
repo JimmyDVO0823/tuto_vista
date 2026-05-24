@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { api } from '../../../../lib/api';
+import { api } from '../../../services/api';
 
 export default function IncomeChart({ tutorId }) {
   // Estado para controlar qué filtro está activo

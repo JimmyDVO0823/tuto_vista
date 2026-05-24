@@ -1,18 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Login from './pages/Login'
-import Home from './pages/Home'
-import TutorsExplorer from './pages/TutorsExplorer'
-import DashboardSwitcher from './pages/DashboardSwitcher'
-import LoginForm from './components/features/auth/LoginForm/LoginForm'
-import RegisterForm from './components/features/auth/RegisterForm/RegisterForm'
-import SubjectsManagement from './pages/SubjectsManagement'
-import DispoManagement from './pages/DispoManagement'
-import ProtectedRoute from './components/features/auth/ProtectedRoute/ProtectedRoute'
-import TutorAgendaDetail from './pages/TutorAgendaDetail'
-import GestionTutorias from './pages/GestionTutorias'
-import AcademicChat from './pages/AcademicChat'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import TutorsExplorer from "./pages/TutorsExplorer";
+import DashboardSwitcher from "./pages/DashboardSwitcher";
+import LoginForm from "./features/auth/LoginForm/LoginForm";
+import RegisterForm from "./features/auth/RegisterForm/RegisterForm";
+import SubjectsManagement from "./pages/SubjectsManagement";
+import DispoManagement from "./pages/DispoManagement";
+import ProtectedRoute from "./features/auth/ProtectedRoute/ProtectedRoute";
+import TutorAgendaDetail from "./pages/TutorAgendaDetail";
+import GestionTutorias from "./pages/GestionTutorias";
+import AcademicChat from "./pages/AcademicChat";
 
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider } from "./context/AuthContext";
 
 /**
  * Root Application Component.
@@ -99,7 +98,7 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

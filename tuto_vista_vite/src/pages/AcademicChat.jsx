@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ProfileBlock } from '../components/chat/ProfileBlock';
-import { ContactMenu } from '../components/chat/ContactMenu';
-import { ChatHeader } from '../components/chat/ChatHeader';
-import { MessageBubble } from '../components/chat/MessageBubble';
-import { FileAttachment } from '../components/chat/FileAttachment';
-import { MessageInputBar } from '../components/chat/MessageInputBar';
+import { ProfileBlock } from '../features/chat/ProfileBlock/ProfileBlock';
+import { ContactMenu } from '../features/chat/ContactMenu/ContactMenu';
+import { ChatHeader } from '../features/chat/ChatHeader/ChatHeader';
+import { MessageBubble } from '../features/chat/MessageBubble/MessageBubble';
+import { FileAttachment } from '../features/chat/FileAttachment/FileAttachment';
+import { MessageInputBar } from '../features/chat/MessageInputBar/MessageInputBar';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 
 import { useAuth } from '../context/AuthContext';
-import { api } from '../lib/api';
+import { api } from '../services/api';
 
 export default function AcademicChat() {
   const { user } = useAuth();
