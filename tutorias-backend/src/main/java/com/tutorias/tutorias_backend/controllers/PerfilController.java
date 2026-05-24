@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class PerfilController {
 
     private final PerfilService perfilService;
+    private final com.tutorias.tutorias_backend.repositories.PerfilRepository perfilRepository;
 
     @PatchMapping("/{id}")
     public ResponseEntity<Perfil> actualizarBasico(
@@ -25,8 +26,17 @@ public class PerfilController {
     @PatchMapping("/tutor/{id}")
     public ResponseEntity<Tutor> actualizarTutor(
             @PathVariable Long id,
-            @RequestParam String biografia,
-            @RequestParam String frase) {
-        return ResponseEntity.ok(perfilService.actualizarTutor(id, biografia, frase));
+            @jakarta.validation.Valid @RequestBody com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
+        
+        // Verificación de seguridad: El ID solicitado debe coincidir con el ID del perfil autenticado
+        Perfil authPerfil = perfilRepository.findByCorreo(userDetails.getUsername())
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Usuario no encontrado"));
+        
+        if (!authPerfil.getId().equals(id)) {
+            throw new org.springframework.security.access.AccessDeniedException("No tienes permiso para actualizar este perfil");
+        }
+
+        return ResponseEntity.ok(perfilService.actualizarTutor(id, updateDto));
     }
 }

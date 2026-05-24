@@ -109,10 +109,10 @@ const DispoManagement = () => {
                </div>
             </header>
 
-            <main className="flex-1 p-10">
-               <div className="max-w-7xl mx-auto">
-                  <header className="mb-12">
-                     <h1 className="text-4xl font-extrabold text-primary font-display mb-4">Gestión de Disponibilidad</h1>
+            <main className="flex-1 p-6 lg:p-8">
+               <div className="max-w-[1600px] mx-auto">
+                  <header className="mb-8">
+                     <h1 className="text-4xl font-extrabold text-primary font-display mb-2">Gestión de Disponibilidad</h1>
                      <p className="text-gray-600 text-lg">Haz click y arrastra sobre las horas para definir tus bloques disponibles.</p>
                   </header>
 

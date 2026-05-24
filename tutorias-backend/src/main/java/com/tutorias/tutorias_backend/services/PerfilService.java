@@ -22,11 +22,12 @@ public class PerfilService {
         return perfilRepository.save(p);
     }
 
-    @Transactional
-    public Tutor actualizarTutor(Long id, String biografia, String frase) {
-        Tutor t = tutorRepository.findById(id).orElseThrow();
-        t.setBiografia(biografia);
-        t.setFrasePersonal(frase);
+    @org.springframework.transaction.annotation.Transactional
+    public Tutor actualizarTutor(Long id, com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto) {
+        Tutor t = tutorRepository.findById(id).orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+        t.setBiografia(updateDto.getBiografia());
+        t.setFrasePersonal(updateDto.getFrase_personal());
+        t.setPrecioPorHora(updateDto.getPrecio_por_hora());
         return tutorRepository.save(t);
     }
 }
