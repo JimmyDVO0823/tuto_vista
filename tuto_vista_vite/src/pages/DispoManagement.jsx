@@ -4,6 +4,7 @@ import AcademicCalendar from '../features/dashboard/AcademicCalendar/AcademicCal
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { HourlyRateCard } from '../features/tutors/HourlyRateCard/HourlyRateCard';
+import StatCard from '../components/ui/StatCard/StatCard'; // 1. Importación del componente genérico
 
 const DispoManagement = () => {
    const { user } = useAuth();
@@ -38,7 +39,7 @@ const DispoManagement = () => {
          ]);
 
          setDisponibilidad(mapDispoToEvents(dispoData));
-         setHourlyRate(tutorProfile?.hourlyRate || 45); // Setea la tarifa inicial (ej: 45 por defecto)
+         setHourlyRate(tutorProfile?.hourlyRate || 45000); // Setea la tarifa inicial por defecto
       } catch (err) {
          console.error('Error cargando los datos de configuración:', err);
       } finally {
@@ -91,6 +92,13 @@ const DispoManagement = () => {
       }
    };
 
+   // 2. Formateador de moneda integrado localmente para representar el valor de forma elegante
+   const formattedRate = new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0
+   }).format(hourlyRate || 0);
+
    return (
       <MainLayout>
          <div className="flex flex-col flex-1">
@@ -118,7 +126,7 @@ const DispoManagement = () => {
                         <div className="lg:col-span-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                            <AcademicCalendar
                               events={disponibilidad}
-                              initialView="timeGridWeek" // Cambiado a vista semanal por usabilidad al arrastrar horas
+                              initialView="timeGridWeek"
                               headerToolbar={{
                                  left: 'prev,next today',
                                  center: 'title',
@@ -134,8 +142,18 @@ const DispoManagement = () => {
                            />
                         </div>
 
-                        {/* Columna Derecha: Configuración de Honorarios (4 de 12 columnas) */}
+                        {/* Columna Derecha: Widgets de Tarifa y Modificación (4 de 12 columnas) */}
                         <div className="lg:col-span-4 space-y-8">
+                           
+                           {/* 3. Inyección del Widget Informativo Superior */}
+                           <StatCard 
+                              label="Tarifa Vigente Actual"
+                              value={formattedRate}
+                              icon="payments"
+                              gradient={true} // Aplica el gradiente característico de la marca
+                           />
+
+                           {/* Formulario de Modificación de Honorarios */}
                            <HourlyRateCard 
                               initialRate={hourlyRate} 
                               onSaveRate={handleSaveRate} 
