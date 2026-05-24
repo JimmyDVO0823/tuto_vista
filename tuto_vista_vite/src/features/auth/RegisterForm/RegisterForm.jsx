@@ -107,15 +107,11 @@ const RegisterForm = () => {
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
 
-      window.location.href = '/tuto_vista/';
+      // Redirigir a la página de login después de un breve retraso
+      setTimeout(() => {
+        window.location.href = '/loginform';
+      }, 1500);
 
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'estudiante'
-      });
     } catch (err) {
       setError(err.message || 'Error al registrar usuario.');
     } finally {
