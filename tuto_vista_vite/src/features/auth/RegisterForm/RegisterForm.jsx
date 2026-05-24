@@ -11,6 +11,9 @@ import React, { useState } from 'react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
+
+
 
 /**
  * RegisterForm Component.
@@ -44,7 +47,7 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const navigate = useNavigate();
   /**
    * Generic handler for input synchronization.
    * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e
@@ -101,17 +104,20 @@ const RegisterForm = () => {
         rol: formData.role
       });
 
-      // Guardar sesión en el contexto
-      login(response, response.token);
+    try {
+        const token = response?.token || response?.data?.token || response?.accessToken || null;
+        login(response, token);
+      } catch (loginErr) {
+        console.warn('Login post-registro falló silenciosamente:', loginErr);
+      }
 
-      setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'estudiante'
-      });
+      setSuccess('¡Registro exitoso! Redirigiendo...');
+      setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'estudiante' });
+
+      setTimeout(() => {
+        window.location.href = 'https://jimmydvo0823.github.io/tuto_vista/';
+      }, 1500);
+
     } catch (err) {
       setError(err.message || 'Error al registrar usuario.');
     } finally {
