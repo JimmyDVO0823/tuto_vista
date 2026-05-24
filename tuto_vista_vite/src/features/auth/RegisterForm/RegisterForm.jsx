@@ -11,6 +11,8 @@ import React, { useState } from 'react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
+
 
 
 /**
@@ -45,7 +47,7 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const navigate = useNavigate();
   /**
    * Generic handler for input synchronization.
    * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e
@@ -109,7 +111,7 @@ const RegisterForm = () => {
 
       // Redirigir a la página de login después de un breve retraso
       setTimeout(() => {
-        window.location.href = '/loginform';
+        navigate('/');
       }, 1500);
 
     } catch (err) {
