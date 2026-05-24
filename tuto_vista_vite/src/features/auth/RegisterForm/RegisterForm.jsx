@@ -109,11 +109,8 @@ const RegisterForm = () => {
       login(response, response.token);
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
-
-      setTimeout(() => {
-        console.log('Navegando a /');
-        navigate('/');
-      }, 1000);
+      console.log('Navegando a /');
+      navigate('/');
 
       setFormData({
         name: '',
