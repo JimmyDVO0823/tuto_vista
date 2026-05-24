@@ -12,6 +12,6 @@ import java.util.List;
 public class ConversacionDTO {
     private Long id;
     private OffsetDateTime creadoEn;
-    private List<Long> participantesIds;
+    private List<PerfilDTO> participantes;
     private MensajeDTO ultimoMensaje;
 }

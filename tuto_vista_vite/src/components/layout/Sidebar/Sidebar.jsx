@@ -9,24 +9,18 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import SidebarItem from './SidebarItem';
+import SidebarItem from './SidebarItem/SidebarItem';
 import SessionView from './SessionView';
 import { useAuth } from '../../../context/AuthContext';
 
 /**
  * Sidebar Component.
- * 
- * @param {Object} props - Component properties.
+ * * @param {Object} props - Component properties.
  * @param {boolean} props.isCollapsed - Controls the visual width and detail level of the sidebar.
  * @param {function} props.onMouseEnter - Handler for expanding the sidebar on hover (soft-expansion).
  * @param {function} props.onMouseLeave - Handler for collapsing on mouse exit.
  * @param {function} props.onToggle - Explicit toggle for manual expansion state management.
  * @component
- * 
- * @example
- * return (
- *   <Sidebar isCollapsed={false} onToggle={() => console.log('toggle')} />
- * )
  */
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const { user, logout } = useAuth();
@@ -38,8 +32,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       { label: 'Explorar Tutores', path: '/tutors', icon: 'search' },
       { label: 'Mis Sesiones', path: '/dispo', icon: 'calendar_today' },
       { label: 'Mis Materias', path: '/subjects', icon: 'menu_book' },
-      { label: 'Mensajes', path: '#', icon: 'mail' },
-      { label: 'Ajustes', path: '#', icon: 'settings' },
+      { label: 'Chat', path: '/chat', icon: 'chat' },
     ],
     tutor: [
       { label: 'Panel Instructor', path: '/dashboard', icon: 'dashboard' },
@@ -47,24 +40,19 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       { label: 'Disponibilidad', path: '/dispo', icon: 'schedule' },
       { label: 'Mis Cursos', path: '/subjects', icon: 'school' },
       { label: 'Ingresos', path: '#', icon: 'payments' },
-      { label: 'Ajustes', path: '#', icon: 'settings' },
+      { label: 'Chat', path: '/chat', icon: 'chat' },
     ]
   };
 
   /**
    * Selection Logic:
    * Dynamically filters the navigation registry based on the authenticated user's role.
-   * Defaults to 'estudiante' navigation if role is undefined or unrecognized, 
-   * ensuring system resilience.
-   * @type {Array<Object>}
    */
   const currentNav = navLinks[user?.role] || navLinks.estudiante;
 
   /**
    * User Domain Mapper:
    * Standardizes the raw 'User' state into a UI-friendly object.
-   * Adheres to the archival feel by mapping internal role codes to display labels.
-   * @type {Object|null}
    */
   const currentUser = user ? {
     name: user.name,
@@ -120,48 +108,61 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       </div>
 
       {/* Footer Actions */}
-      <div className={`px-5 mt-auto flex flex-col gap-4 ${isCollapsed ? 'items-center' : ''}`}>
-        <button 
-          className={`bg-academic-gold text-primary font-bold rounded-md flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-sm ${
-            isCollapsed ? 'w-10 h-10 p-0 rounded-full' : 'py-3 px-4 text-sm w-full'
-          }`}
-          title={isCollapsed ? 'Book New Session' : ''}
-        >
-          <span className="material-symbols-outlined !text-[20px]">add_circle</span>
-          {!isCollapsed && <span className="whitespace-nowrap">Book New Session</span>}
-        </button>
-        
-        <div className={`flex flex-col gap-1 border-t border-black/5 pt-4 ${isCollapsed ? 'items-center' : ''}`}>
-          <Link
-            to="#"
-            className={`text-xs text-gray-500 hover:text-primary flex items-center gap-2 px-2 py-1 transition-colors font-medium ${isCollapsed ? 'p-0' : ''}`}
-            title="Support"
-          >
-            <span className="material-symbols-outlined !text-[18px]">help</span>
-            {!isCollapsed && <span>Support</span>}
-          </Link>
-          
-          {currentUser ? (
-            <button
-              onClick={handleLogout}
-              className={`text-xs text-gray-500 hover:text-red-600 flex items-center gap-2 px-2 py-1 transition-colors font-medium text-left ${isCollapsed ? 'p-0' : ''}`}
-              title="Logout"
-            >
-              <span className="material-symbols-outlined !text-[18px]">logout</span>
-              {!isCollapsed && <span className="whitespace-nowrap">Logout</span>}
-            </button>
-          ) : (
-            <Link
-              to="/loginform"
-              className={`text-xs text-gray-500 hover:text-primary flex items-center gap-2 px-2 py-1 transition-colors font-medium ${isCollapsed ? 'p-0' : ''}`}
-              title="Login"
-            >
-              <span className="material-symbols-outlined !text-[18px]">login</span>
-              {!isCollapsed && <span className="whitespace-nowrap">Login</span>}
-            </Link>
-          )}
-        </div>
-      </div>
+      {/* Footer Actions */}
+<div className={`px-5 mt-auto flex flex-col gap-4 ${isCollapsed ? 'items-center' : ''}`}>
+  
+  {/* El botón de "Book New Session" se mantiene igual por ser un botón de acción principal (CTA) */}
+  <button 
+    className={`bg-academic-gold text-primary font-bold rounded-md flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-sm ${
+      isCollapsed ? 'w-10 h-10 p-0 rounded-full' : 'py-3 px-4 text-sm w-full'
+    }`}
+    title={isCollapsed ? 'Book New Session' : ''}
+  >
+    <span className="material-symbols-outlined !text-[20px]">add_circle</span>
+    {!isCollapsed && <span className="whitespace-nowrap">Book New Session</span>}
+  </button>
+  
+  {/* Bloque inferior usando la consistencia de SidebarItem */}
+  <div className={`flex flex-col gap-1 border-t border-black/5 pt-4 ${isCollapsed ? 'w-full items-center' : 'w-full'}`}>
+    
+    {/* Ajustes ahora es un SidebarItem */}
+    <SidebarItem
+      label="Ajustes"
+      path="/settings"
+      icon="settings"
+      isCollapsed={isCollapsed}
+      isActive={location.pathname === '/settings'}
+    />
+
+    {/* Support ahora es un SidebarItem */}
+    <SidebarItem
+      label="Support"
+      path="/support"
+      icon="help"
+      isCollapsed={isCollapsed}
+      isActive={location.pathname === '/support'}
+    />
+    
+    {/* Cerrar Sesión / Login usando SidebarItem */}
+    {currentUser ? (
+      <SidebarItem
+        label="Cerrar Sesión"
+        icon="logout"
+        isCollapsed={isCollapsed}
+        onClick={handleLogout} // <- Pasamos el comportamiento de botón
+        variant="danger"       // <- Pasamos una variante para pintarlo de rojo
+      />
+    ) : (
+      <SidebarItem
+        label="Login"
+        path="/loginform"
+        icon="login"
+        isCollapsed={isCollapsed}
+        isActive={location.pathname === '/loginform'}
+      />
+    )}
+  </div>
+</div>
     </nav>
   );
 };

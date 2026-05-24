@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import Pagination from '../../../ui/Pagination/Pagination';
+import Pagination from '../../../components/ui/Pagination/Pagination';
 import ActivityCard from '../ActivityCard/ActivityCard';
 
 /**

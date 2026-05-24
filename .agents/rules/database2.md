@@ -2,165 +2,87 @@
 trigger: always_on
 ---
 
-en este archivo esta la segunda parte de el ddl de la base de datos del proyecto, debes tener esto en cuenta siempre que trabajas en el proyecto.
-
--- ================================================================
--- 14. RESENA
---     Entidad débil de sesion_tutoria.
---     Solo el estudiante puede reseñar, y solo una vez
---     por sesión (UNIQUE en sesion_id).
---     El backend valida que la sesión esté en estado
---     'completada' antes de permitir la reseña.
--- ================================================================
-CREATE TABLE resena (
-  id            SERIAL        PRIMARY KEY,
-  sesion_id     INT           NOT NULL UNIQUE REFERENCES sesion_tutoria(id) ON DELETE CASCADE,
-  estudiante_id INT           NOT NULL REFERENCES estudiante(id)            ON DELETE CASCADE,
-  tutor_id      INT           NOT NULL REFERENCES tutor(id)                 ON DELETE CASCADE,
-  puntuacion    NUMERIC(2,1)  NOT NULL CHECK (puntuacion BETWEEN 1.0 AND 5.0),
-  comentario    TEXT,
-  creado_en     TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+CREATE TABLE "tutor_insignia" (
+	"tutor_id" bigint,
+	"insignia_id" bigint,
+	"obtenida_en" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "tutor_insignia_pkey" PRIMARY KEY("tutor_id","insignia_id")
 );
- 
- 
--- ================================================================
--- 15. RECURSOS
---     Entidad débil de tutor + materia.
---     Material de estudio que el tutor comparte en la plataforma.
--- ================================================================
-CREATE TABLE recursos (
-  id          SERIAL      PRIMARY KEY,
-  tutor_id    INT         NOT NULL REFERENCES tutor(id)   ON DELETE CASCADE,
-  materia_id  INT         NOT NULL REFERENCES materia(id) ON DELETE CASCADE,
-  titulo      TEXT        NOT NULL,
-  descripcion TEXT,
-  url_archivo TEXT,
-  tipo        TEXT        CHECK (tipo IN ('documento','video','enlace','imagen','otro')),
-  creado_en   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+CREATE TABLE "tutor_materias" (
+	"tutor_id" bigint,
+	"materia_id" bigint,
+	CONSTRAINT "tutor_materias_pkey" PRIMARY KEY("tutor_id","materia_id")
 );
- 
- 
--- ================================================================
--- 16. MENSAJES
---     Entidad débil de conversacion + perfiles.
---     El remitente debe ser participante de la conversación
---     (validado desde el backend).
--- ================================================================
-CREATE TABLE mensajes (
-  id              SERIAL      PRIMARY KEY,
-  conversacion_id INT         NOT NULL REFERENCES conversacion(id) ON DELETE CASCADE,
-  remitente_id    INT         NOT NULL REFERENCES perfiles(id)     ON DELETE CASCADE,
-  contenido       TEXT        NOT NULL,
-  leido           BOOLEAN     NOT NULL DEFAULT FALSE,
-  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
- 
- 
--- ================================================================
--- 17. CONVERSACION_PARTICIPANTES
---     Relación N:M entre perfiles y conversacion.
---     perfiles (1,N) ——participa—— (2,N) conversacion
---     La PK compuesta impide que un perfil esté dos veces
---     en la misma conversación.
--- ================================================================
-CREATE TABLE conversacion_participantes (
-  conversacion_id INT         NOT NULL REFERENCES conversacion(id) ON DELETE CASCADE,
-  perfil_id       INT         NOT NULL REFERENCES perfiles(id)     ON DELETE CASCADE,
-  unido_en        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (conversacion_id, perfil_id)
-);
- 
- 
--- ================================================================
--- 18. TUTOR_MATERIAS
---     Relación N:M entre tutor y materia.
---     Indica qué materias puede dictar un tutor.
---     Usado en el explorador para filtrar tutores por materia.
--- ================================================================
-CREATE TABLE tutor_materias (
-  tutor_id   INT NOT NULL REFERENCES tutor(id)   ON DELETE CASCADE,
-  materia_id INT NOT NULL REFERENCES materia(id) ON DELETE RESTRICT,
-  PRIMARY KEY (tutor_id, materia_id)
-);
- 
- 
--- 21. INSIGNIA
---     Catálogo de todas las insignias del sistema.
---     condicion_tipo y condicion_valor permiten al backend
---     evaluar automáticamente si un tutor ganó una insignia.
---     El CHECK en condicion_tipo garantiza que solo existan
---     tipos que el backend sabe manejar.
--- ================================================================
-CREATE TABLE insignia (
-  id              SERIAL      PRIMARY KEY,
-  nombre          TEXT        NOT NULL UNIQUE,
-  descripcion     TEXT        NOT NULL,
-  url_icono       TEXT,
-  condicion_tipo  TEXT        NOT NULL
-                    CHECK (condicion_tipo IN (
-                      'total_sesiones',
-                      'sesiones_5_estrellas',
-                      'calificacion_promedio'
-                    )),
-  condicion_valor INT         NOT NULL CHECK (condicion_valor > 0),
-  creado_en       TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-  
--- ================================================================
--- 22. TUTOR_INSIGNIA
---     Relación N:M entre tutor e insignia.
---     Registra qué insignias ha ganado cada tutor y cuándo.
---     La PK compuesta impide que un tutor tenga la misma
---     insignia dos veces.
--- ================================================================
-CREATE TABLE tutor_insignia (
-  tutor_id    INT         NOT NULL REFERENCES tutor(id)    ON DELETE CASCADE,
-  insignia_id INT         NOT NULL REFERENCES insignia(id) ON DELETE CASCADE,
-  obtenida_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (tutor_id, insignia_id)
-);
- 
- 
--- ================================================================
--- 23. REPORTE
---     Permite reportar problemas entre usuarios.
---     El administrador los gestiona desde su panel.
---     chk_reporte_diferente impide que alguien se reporte
---     a sí mismo.
--- ================================================================
-CREATE TABLE reporte (
-  id            SERIAL      PRIMARY KEY,
-  reportado_por INT         NOT NULL REFERENCES perfiles(id) ON DELETE CASCADE,
-  reportado_a   INT         NOT NULL REFERENCES perfiles(id) ON DELETE CASCADE,
-  sesion_id     INT         REFERENCES sesion_tutoria(id)    ON DELETE SET NULL,
-  motivo        TEXT        NOT NULL
-                  CHECK (motivo IN (
-                    'no_asistio',
-                    'comportamiento_inapropiado',
-                    'contenido_inadecuado',
-                    'fraude',
-                    'otro'
-                  )),
-  descripcion   TEXT,
-  estado        TEXT        NOT NULL DEFAULT 'pendiente'
-                  CHECK (estado IN ('pendiente','revisando','resuelto','descartado')),
-  creado_en     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT chk_reporte_diferente CHECK (reportado_por <> reportado_a)
-);
- 
- 
--- ================================================================
--- 24. FACTURA
---     Documento contable generado únicamente cuando un pago
---     queda en estado 'completado'.
---     El backend genera la factura y construye el número
---     visible usando el id: "FACT-2024-00001"
--- ================================================================
-CREATE TABLE factura (
-  id         SERIAL        PRIMARY KEY,
-  subtotal   NUMERIC(10,2) NOT NULL CHECK (subtotal >= 0),
-  impuesto   NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (impuesto >= 0),
-  total      NUMERIC(10,2) GENERATED ALWAYS AS (subtotal + impuesto) STORED,
-  moneda     TEXT          NOT NULL DEFAULT 'COP',
-  emitida_en TIMESTAMPTZ   NOT NULL DEFAULT NOW()
-);
+CREATE UNIQUE INDEX "actividad_estudiante_pkey" ON "actividad_estudiante" ("id");
+CREATE UNIQUE INDEX "conversacion_pkey" ON "conversacion" ("id");
+CREATE UNIQUE INDEX "conversacion_participantes_pkey" ON "conversacion_participantes" ("conversacion_id","perfil_id");
+CREATE UNIQUE INDEX "departamento_nombre_key" ON "departamento" ("nombre");
+CREATE UNIQUE INDEX "departamento_pkey" ON "departamento" ("id");
+CREATE UNIQUE INDEX "disponibilidad_pkey" ON "disponibilidad" ("id");
+CREATE UNIQUE INDEX "disponibilidad_especifica_pkey" ON "disponibilidad_especifica" ("id");
+CREATE UNIQUE INDEX "estudiante_pkey" ON "estudiante" ("id");
+CREATE UNIQUE INDEX "estudiante_plan_pkey" ON "estudiante_plan" ("id");
+CREATE UNIQUE INDEX "factura_pago_id_key" ON "factura" ("pago_id");
+CREATE UNIQUE INDEX "factura_pkey" ON "factura" ("id");
+CREATE UNIQUE INDEX "insignia_nombre_key" ON "insignia" ("nombre");
+CREATE UNIQUE INDEX "insignia_pkey" ON "insignia" ("id");
+CREATE UNIQUE INDEX "materia_pkey" ON "materia" ("id");
+CREATE UNIQUE INDEX "mensajes_pkey" ON "mensajes" ("id");
+CREATE UNIQUE INDEX "notificaciones_pkey" ON "notificaciones" ("id");
+CREATE UNIQUE INDEX "pago_pkey" ON "pago" ("id");
+CREATE UNIQUE INDEX "pago_sesion_id_key" ON "pago" ("sesion_id");
+CREATE UNIQUE INDEX "perfiles_correo_key" ON "perfiles" ("correo");
+CREATE UNIQUE INDEX "perfiles_pkey" ON "perfiles" ("id");
+CREATE UNIQUE INDEX "plan_tutoria_pkey" ON "plan_tutoria" ("id");
+CREATE UNIQUE INDEX "recursos_pkey" ON "recursos" ("id");
+CREATE UNIQUE INDEX "reporte_pkey" ON "reporte" ("id");
+CREATE UNIQUE INDEX "resena_pkey" ON "resena" ("id");
+CREATE UNIQUE INDEX "resena_sesion_id_key" ON "resena" ("sesion_id");
+CREATE UNIQUE INDEX "sesion_tutoria_pkey" ON "sesion_tutoria" ("id");
+CREATE UNIQUE INDEX "sesion_tutoria_solicitud_id_key" ON "sesion_tutoria" ("solicitud_id");
+CREATE UNIQUE INDEX "solicitud_pkey" ON "solicitud" ("id");
+CREATE UNIQUE INDEX "tutor_pkey" ON "tutor" ("id");
+CREATE UNIQUE INDEX "tutor_insignia_pkey" ON "tutor_insignia" ("tutor_id","insignia_id");
+CREATE UNIQUE INDEX "tutor_materias_pkey" ON "tutor_materias" ("tutor_id","materia_id");
+ALTER TABLE "actividad_estudiante" ADD CONSTRAINT "actividad_estudiante_estudiante_id_fkey" FOREIGN KEY ("estudiante_id") REFERENCES "perfiles"("id");
+ALTER TABLE "actividad_estudiante" ADD CONSTRAINT "actividad_estudiante_recurso_id_fkey" FOREIGN KEY ("recurso_id") REFERENCES "recursos"("id") ON DELETE CASCADE;
+ALTER TABLE "actividad_estudiante" ADD CONSTRAINT "actividad_estudiante_sesion_id_fkey" FOREIGN KEY ("sesion_id") REFERENCES "sesion_tutoria"("id");
+ALTER TABLE "conversacion_participantes" ADD CONSTRAINT "conversacion_participantes_conversacion_id_fkey" FOREIGN KEY ("conversacion_id") REFERENCES "conversacion"("id") ON DELETE CASCADE;
+ALTER TABLE "conversacion_participantes" ADD CONSTRAINT "conversacion_participantes_perfil_id_fkey" FOREIGN KEY ("perfil_id") REFERENCES "perfiles"("id") ON DELETE CASCADE;
+ALTER TABLE "disponibilidad" ADD CONSTRAINT "disponibilidad_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "disponibilidad_especifica" ADD CONSTRAINT "disponibilidad_especifica_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "estudiante" ADD CONSTRAINT "estudiante_id_fkey" FOREIGN KEY ("id") REFERENCES "perfiles"("id") ON DELETE RESTRICT;
+ALTER TABLE "estudiante_plan" ADD CONSTRAINT "estudiante_plan_estudiante_id_fkey" FOREIGN KEY ("estudiante_id") REFERENCES "estudiante"("id") ON DELETE RESTRICT;
+ALTER TABLE "estudiante_plan" ADD CONSTRAINT "estudiante_plan_plan_id_fkey" FOREIGN KEY ("plan_id") REFERENCES "plan_tutoria"("id") ON DELETE RESTRICT;
+ALTER TABLE "factura" ADD CONSTRAINT "factura_pago_id_fkey" FOREIGN KEY ("pago_id") REFERENCES "pago"("id") ON DELETE RESTRICT;
+ALTER TABLE "materia" ADD CONSTRAINT "materia_departamento_id_fkey" FOREIGN KEY ("departamento_id") REFERENCES "departamento"("id") ON DELETE RESTRICT;
+ALTER TABLE "mensajes" ADD CONSTRAINT "mensajes_conversacion_id_fkey" FOREIGN KEY ("conversacion_id") REFERENCES "conversacion"("id") ON DELETE CASCADE;
+ALTER TABLE "mensajes" ADD CONSTRAINT "mensajes_remitente_id_fkey" FOREIGN KEY ("remitente_id") REFERENCES "perfiles"("id") ON DELETE CASCADE;
+ALTER TABLE "notificaciones" ADD CONSTRAINT "notificaciones_perfil_id_fkey" FOREIGN KEY ("perfil_id") REFERENCES "perfiles"("id") ON DELETE CASCADE;
+ALTER TABLE "pago" ADD CONSTRAINT "pago_estudiante_id_fkey" FOREIGN KEY ("estudiante_id") REFERENCES "estudiante"("id") ON DELETE RESTRICT;
+ALTER TABLE "pago" ADD CONSTRAINT "pago_estudiante_plan_id_fkey" FOREIGN KEY ("estudiante_plan_id") REFERENCES "estudiante_plan"("id") ON DELETE RESTRICT;
+ALTER TABLE "pago" ADD CONSTRAINT "pago_sesion_id_fkey" FOREIGN KEY ("sesion_id") REFERENCES "sesion_tutoria"("id") ON DELETE RESTRICT;
+ALTER TABLE "pago" ADD CONSTRAINT "pago_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE RESTRICT;
+ALTER TABLE "plan_tutoria" ADD CONSTRAINT "plan_tutoria_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "recursos" ADD CONSTRAINT "recursos_materia_id_fkey" FOREIGN KEY ("materia_id") REFERENCES "materia"("id") ON DELETE CASCADE;
+ALTER TABLE "recursos" ADD CONSTRAINT "recursos_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "reporte" ADD CONSTRAINT "reporte_reportado_a_fkey" FOREIGN KEY ("reportado_a") REFERENCES "perfiles"("id") ON DELETE CASCADE;
+ALTER TABLE "reporte" ADD CONSTRAINT "reporte_reportado_por_fkey" FOREIGN KEY ("reportado_por") REFERENCES "perfiles"("id") ON DELETE CASCADE;
+ALTER TABLE "reporte" ADD CONSTRAINT "reporte_sesion_id_fkey" FOREIGN KEY ("sesion_id") REFERENCES "sesion_tutoria"("id") ON DELETE SET NULL;
+ALTER TABLE "resena" ADD CONSTRAINT "resena_estudiante_id_fkey" FOREIGN KEY ("estudiante_id") REFERENCES "estudiante"("id") ON DELETE CASCADE;
+ALTER TABLE "resena" ADD CONSTRAINT "resena_sesion_id_fkey" FOREIGN KEY ("sesion_id") REFERENCES "sesion_tutoria"("id") ON DELETE CASCADE;
+ALTER TABLE "resena" ADD CONSTRAINT "resena_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "sesion_tutoria" ADD CONSTRAINT "sesion_tutoria_cancelada_por_fkey" FOREIGN KEY ("cancelada_por") REFERENCES "perfiles"("id") ON DELETE SET NULL;
+ALTER TABLE "sesion_tutoria" ADD CONSTRAINT "sesion_tutoria_estudiante_id_fkey" FOREIGN KEY ("estudiante_id") REFERENCES "estudiante"("id") ON DELETE CASCADE;
+ALTER TABLE "sesion_tutoria" ADD CONSTRAINT "sesion_tutoria_estudiante_plan_id_fkey" FOREIGN KEY ("estudiante_plan_id") REFERENCES "estudiante_plan"("id") ON DELETE SET NULL;
+ALTER TABLE "sesion_tutoria" ADD CONSTRAINT "sesion_tutoria_materia_id_fkey" FOREIGN KEY ("materia_id") REFERENCES "materia"("id") ON DELETE RESTRICT;
+ALTER TABLE "sesion_tutoria" ADD CONSTRAINT "sesion_tutoria_solicitud_id_fkey" FOREIGN KEY ("solicitud_id") REFERENCES "solicitud"("id") ON DELETE SET NULL;
+ALTER TABLE "sesion_tutoria" ADD CONSTRAINT "sesion_tutoria_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "solicitud" ADD CONSTRAINT "solicitud_estudiante_id_fkey" FOREIGN KEY ("estudiante_id") REFERENCES "estudiante"("id") ON DELETE CASCADE;
+ALTER TABLE "solicitud" ADD CONSTRAINT "solicitud_materia_id_fkey" FOREIGN KEY ("materia_id") REFERENCES "materia"("id") ON DELETE RESTRICT;
+ALTER TABLE "solicitud" ADD CONSTRAINT "solicitud_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "tutor" ADD CONSTRAINT "tutor_id_fkey" FOREIGN KEY ("id") REFERENCES "perfiles"("id") ON DELETE RESTRICT;
+ALTER TABLE "tutor_insignia" ADD CONSTRAINT "tutor_insignia_insignia_id_fkey" FOREIGN KEY ("insignia_id") REFERENCES "insignia"("id") ON DELETE CASCADE;
+ALTER TABLE "tutor_insignia" ADD CONSTRAINT "tutor_insignia_tutor_id_fkey" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;
+ALTER TABLE "tutor_materias" ADD CONSTRAINT "fk_materia" FOREIGN KEY ("materia_id") REFERENCES "materia"("id") ON DELETE RESTRICT;
+ALTER TABLE "tutor_materias" ADD CONSTRAINT "fk_tutor" FOREIGN KEY ("tutor_id") REFERENCES "tutor"("id") ON DELETE CASCADE;

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
-import AcademicCalendar from '../components/features/dashboard/AcademicCalendar/AcademicCalendar';
+import AcademicCalendar from '../features/dashboard/AcademicCalendar/AcademicCalendar';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../lib/api';
+import { api } from '../services/api';
 
 const DispoManagement = () => {
    const { user } = useAuth();

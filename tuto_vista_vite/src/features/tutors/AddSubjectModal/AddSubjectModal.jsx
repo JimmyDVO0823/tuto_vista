@@ -8,8 +8,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import Button from '../../../../components/ui/Button/Button';
-import { api } from '../../../../lib/api';
+import Button from '../../../components/ui/Button/Button';
+import { api } from '../../../services/api';
 
 /**
  * AddSubjectModal Component.

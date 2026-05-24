@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
-import TutorSearchHeader from '../components/features/tutors/TutorSearchHeader/TutorSearchHeader';
-import SearchFilters from '../components/features/tutors/SearchFilters/SearchFilters';
-import TutorCard from '../components/features/tutors/TutorCard/TutorCard';
+import TutorSearchHeader from '../features/tutors/TutorSearchHeader/TutorSearchHeader';
+import SearchFilters from '../features/tutors/SearchFilters/SearchFilters';
+import TutorCard from '../features/tutors/TutorCard/TutorCard';
 import Pagination from '../components/ui/Pagination/Pagination';
-import { api } from '../lib/api';
+import { api } from '../services/api';
 
 const TutorsExplorer = () => {
   const [tutors, setTutors] = useState([]);

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
-import { api } from '../lib/api';
+import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import RequestCard from '../components/features/tutors/RequestCard/RequestCard';
-import SessionCard from '../components/features/tutors/SessionCard/SessionCard';
+import RequestCard from '../features/tutors/RequestCard/RequestCard';
+import SessionCard from '../features/tutors/SessionCard/SessionCard';
 
 const GestionTutorias = () => {
   const { user } = useAuth();

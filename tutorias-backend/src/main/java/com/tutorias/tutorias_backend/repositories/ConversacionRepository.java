@@ -11,4 +11,9 @@ import java.util.List;
 public interface ConversacionRepository extends JpaRepository<Conversacion, Long> {
     @Query("SELECT c FROM Conversacion c JOIN c.participantes p WHERE p.id = :perfilId")
     List<Conversacion> findByPerfilId(@Param("perfilId") Long perfilId);
+
+    @Query("SELECT c FROM Conversacion c " +
+           "WHERE (SELECT COUNT(p) FROM c.participantes p WHERE p.id IN (:p1, :p2)) = 2 " +
+           "AND SIZE(c.participantes) = 2")
+    List<Conversacion> findExactConversation(@Param("p1") Long p1, @Param("p2") Long p2);
 }
