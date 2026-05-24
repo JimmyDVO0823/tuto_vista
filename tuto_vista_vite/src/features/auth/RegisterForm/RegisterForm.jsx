@@ -105,6 +105,11 @@ const RegisterForm = () => {
       login(response, response.token);
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
+
+      setTimeout(() => {
+        navigate('/loginform');
+      }, 1500);
+
       setFormData({
         name: '',
         email: '',
