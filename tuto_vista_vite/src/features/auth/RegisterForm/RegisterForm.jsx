@@ -11,7 +11,6 @@ import React, { useState } from 'react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
 
 
 /**
@@ -46,8 +45,6 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const navigate = useNavigate();
 
   /**
    * Generic handler for input synchronization.
@@ -109,8 +106,8 @@ const RegisterForm = () => {
       login(response, response.token);
 
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
-      console.log('Navegando a /');
-      navigate('/tuto_vista/');
+
+      window.location.href = '/tuto_vista/';
 
       setFormData({
         name: '',
