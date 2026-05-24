@@ -152,9 +152,11 @@ const LoginForm = () => {
             type="email"
             value={formData.email}
             onChange={handleEmailChange}
+            aria-describedby={emailError ? "email-error" : undefined}
+            aria-invalid={emailError ? "true" : "false"}
           />
           {emailError && (
-            <p className="text-red-600 text-xs mt-1">
+            <p className="text-red-600 text-xs mt-1" id="email-error">
               {emailError}
             </p>
           )}
@@ -176,16 +178,19 @@ const LoginForm = () => {
               type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={handlePasswordChange}
+              aria-describedby={passwordError ? "password-error" : undefined}
+              aria-invalid={passwordError ? "true" : "false"}
             />
             <button
               type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
               onClick={() => setShowPassword(!showPassword)}
               tabIndex="-1"
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 {showPassword ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 01-1.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                 ) : (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 )}
@@ -193,14 +198,15 @@ const LoginForm = () => {
             </button>
           </div>
           {passwordError && (
-            <p className="text-red-600 text-xs mt-1">
+            <p className="text-red-600 text-xs mt-1" id="password-error">
               {passwordError}
             </p>
           )}
         </div>
         <div className="flex items-center justify-between py-2">
-          <label className="flex items-center gap-2 cursor-pointer group">
+          <label className="flex items-center gap-2 cursor-pointer group" htmlFor="remember-me">
             <input
+              id="remember-me"
               className="w-4 h-4 rounded border-outline-variant text-[#002045] focus:ring-[#002045]/20 cursor-pointer"
               type="checkbox"
             />
@@ -241,7 +247,10 @@ const LoginForm = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <button className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]">
+        <button
+          className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]"
+          aria-label="Iniciar sesión con Google"
+        >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -262,7 +271,10 @@ const LoginForm = () => {
           </svg>
           <span className="text-xs font-semibold">Google</span>
         </button>
-        <button className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]">
+        <button
+          className="flex items-center justify-center gap-2 py-3 bg-white border border-gray-200 rounded-md hover:bg-gray-50 transition-colors active:scale-[0.98]"
+          aria-label="Iniciar sesión con Facebook"
+        >
           <svg className="w-5 h-5 text-[#1877F2]" viewBox="0 0 24 24">
             <path
               d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
