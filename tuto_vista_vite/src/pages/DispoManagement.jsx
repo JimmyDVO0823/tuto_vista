@@ -4,7 +4,7 @@ import AcademicCalendar from '../features/dashboard/AcademicCalendar/AcademicCal
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { HourlyRateCard } from '../features/tutors/HourlyRateCard/HourlyRateCard';
-import StatCard from '../components/ui/StatCard/StatCard'; // 1. Importación del componente genérico
+import StatCard from '../components/ui/StatCard/StatCard';
 
 const DispoManagement = () => {
    const { user } = useAuth();
@@ -32,14 +32,15 @@ const DispoManagement = () => {
    const loadDisponibilidad = useCallback(async () => {
       if (!user?.id) return;
       try {
-         // Paralelizar las peticiones de disponibilidad y tarifa del tutor para optimizar la carga
+         // Paralelizar las peticiones de disponibilidad y el perfil según tu API_TUTO.json
          const [dispoData, tutorProfile] = await Promise.all([
             api.get(`/disponibilidad/tutor/${user.id}`),
-            api.get(`/api/v1/tutors/profile`) // Ajusta este endpoint según tu backend real
+            api.get(`/tutores/${user.id}`) // <- CORREGIDO: Endpoint correcto para obtener los datos del tutor
          ]);
 
          setDisponibilidad(mapDispoToEvents(dispoData));
-         setHourlyRate(tutorProfile?.hourlyRate || 45000); // Setea la tarifa inicial por defecto
+         // <- CORREGIDO: Mapeamos con el campo real de tu DTO/Esquema 'precio_por_hora'
+         setHourlyRate(tutorProfile?.precio_por_hora || 0); 
       } catch (err) {
          console.error('Error cargando los datos de configuración:', err);
       } finally {
@@ -53,9 +54,19 @@ const DispoManagement = () => {
 
    // Manejador para actualizar los honorarios desde el backend
    const handleSaveRate = async (newRate) => {
-      // Petición PATCH/PUT para guardar el nuevo precio
-      await api.patch('/api/v1/tutors/hourly-rate', { hourlyRate: newRate });
-      setHourlyRate(newRate); // Sincroniza el estado local tras una respuesta 2xx exitosa
+      try {
+         // <- CORREGIDO: Apunta de forma exacta al @PatchMapping("/tutor/{id}") de tu PerfilController
+         // e incluye en el cuerpo el campo estructurado de tu TutorUpdateDTO: precio_por_hora
+         await api.patch(`/perfiles/tutor/${user.id}`, { 
+            precio_por_hora: newRate 
+         });
+         
+         setHourlyRate(newRate); // Sincroniza el estado local de forma reactiva
+      } catch (err) {
+         console.error('Error actualizando la tarifa:', err);
+         alert('No se pudo guardar la nueva tarifa.');
+         throw err; // Lanza el error para que HourlyRateCard muestre su feedback visual de error
+      }
    };
 
    const handleSelect = async (info) => {
@@ -71,7 +82,6 @@ const DispoManagement = () => {
             horaFin,
             estaActivo: true
          });
-         // Refrescar únicamente los bloques del calendario
          const data = await api.get(`/disponibilidad/tutor/${user.id}`);
          setDisponibilidad(mapDispoToEvents(data));
       } catch (err) {
@@ -92,7 +102,7 @@ const DispoManagement = () => {
       }
    };
 
-   // 2. Formateador de moneda integrado localmente para representar el valor de forma elegante
+   // Formateador de moneda integrado localmente para representar el valor de forma elegante
    const formattedRate = new Intl.NumberFormat("es-CO", {
       style: "currency",
       currency: "COP",
@@ -119,7 +129,6 @@ const DispoManagement = () => {
                   {loading ? (
                      <div className="text-center p-12 text-gray-500">Cargando configuraciones de tutoría...</div>
                   ) : (
-                     /* Layout Grid en dos columnas: 12 columnas en total */
                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                         
                         {/* Columna Izquierda: Calendario (8 de 12 columnas) */}
@@ -145,12 +154,12 @@ const DispoManagement = () => {
                         {/* Columna Derecha: Widgets de Tarifa y Modificación (4 de 12 columnas) */}
                         <div className="lg:col-span-4 space-y-8">
                            
-                           {/* 3. Inyección del Widget Informativo Superior */}
+                           {/* Widget Informativo Superior */}
                            <StatCard 
                               label="Tarifa Vigente Actual"
                               value={formattedRate}
                               icon="payments"
-                              gradient={true} // Aplica el gradiente característico de la marca
+                              gradient={true}
                            />
 
                            {/* Formulario de Modificación de Honorarios */}
