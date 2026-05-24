@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
+
 
 const RegisterForm = () => {
   const { login } = useAuth();
@@ -19,7 +21,11 @@ const RegisterForm = () => {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const navigate = useNavigate();
+  /**
+   * Generic handler for input synchronization.
+   * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e
+   */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -63,7 +69,7 @@ const RegisterForm = () => {
       setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'estudiante' });
 
       setTimeout(() => {
-        window.location.href = 'https://jimmydvo0823.github.io/tuto_vista/';
+        navigate('/');
       }, 1500);
 
     } catch (err) {
