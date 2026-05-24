@@ -11,6 +11,8 @@ import React, { useState } from 'react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
+
 
 /**
  * RegisterForm Component.
@@ -32,6 +34,9 @@ const RegisterForm = () => {
     confirmPassword: '',
     role: 'estudiante'
   });
+
+  const navigate = useNavigate();
+
 
   /** @state {boolean} loading - Submission lock */
   const [loading, setLoading] = useState(false);
