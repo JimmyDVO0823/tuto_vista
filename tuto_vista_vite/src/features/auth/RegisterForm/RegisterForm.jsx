@@ -35,9 +35,6 @@ const RegisterForm = () => {
     role: 'estudiante'
   });
 
-  const navigate = useNavigate();
-
-
   /** @state {boolean} loading - Submission lock */
   const [loading, setLoading] = useState(false);
   /** @state {string|null} error - Validation or network error persistence */
@@ -49,6 +46,8 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   /** @state {boolean} showConfirmPassword - Visibility toggle for confirmation */
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const navigate = useNavigate();
 
   /**
    * Generic handler for input synchronization.
@@ -112,8 +111,8 @@ const RegisterForm = () => {
       setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
 
       setTimeout(() => {
-        navigate('/loginform');
-      }, 1500);
+        navigate('/');
+      }, 1000);
 
       setFormData({
         name: '',
