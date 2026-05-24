@@ -34,16 +34,15 @@ const SubjectTable = ({ subjects, showTutorColumn = true }) => {
   ].filter(h => h.visible);
 
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-hidden">
+    <section className="bg-white rounded-2xl shadow-sm border border-gray-50 overflow-x-auto">
       <table className="w-full text-left">
         <thead className="bg-[#f2f4f6]">
           <tr>
             {headers.map((h, i, arr) => (
               <th
                 key={h.label}
-                className={`px-8 py-6 text-[0.7rem] uppercase tracking-widest font-bold text-gray-400 ${
-                  h.center ? 'text-center' : ''
-                }`}
+                className={`px-8 py-6 text-[0.7rem] uppercase tracking-widest font-bold text-gray-400 ${h.center ? 'text-center' : ''
+                  }`}
               >
                 {h.label}
               </th>
@@ -63,7 +62,7 @@ const SubjectTable = ({ subjects, showTutorColumn = true }) => {
                   <div className="text-xs text-gray-400 mt-1">{s.sem}</div>
                 </td>
                 <td className="px-8 py-6 text-sm text-gray-500">{s.dept}</td>
-                
+
                 {showTutorColumn && (
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-3">
@@ -94,11 +93,10 @@ const SubjectTable = ({ subjects, showTutorColumn = true }) => {
                 </td>
                 <td className="px-8 py-6">
                   <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold ${
-                      s.status === 'ACTIVO'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-500'
-                    }`}
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold ${s.status === 'ACTIVO'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-500'
+                      }`}
                   >
                     {s.status}
                   </span>

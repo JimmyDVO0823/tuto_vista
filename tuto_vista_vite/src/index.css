@@ -65,26 +65,26 @@
   }
 
   h1 {
-    font-size: 56px;
+    font-size: 3.5rem;
     font-weight: 900;
     line-height: 1.25;
-    letter-spacing: -1.68px;
-    margin: 32px 0;
+    letter-spacing: -0.105rem;
+    margin: 2rem 0;
 
     @media (max-width: 1024px) {
-      font-size: 36px;
-      margin: 20px 0;
+      font-size: 2.25rem;
+      margin: 1.25rem 0;
     }
   }
 
   h2 {
-    font-size: 24px;
+    font-size: 1.5rem;
     line-height: 118%;
-    letter-spacing: -0.24px;
-    margin: 0 0 8px;
+    letter-spacing: -0.015rem;
+    margin: 0 0 0.5rem;
 
     @media (max-width: 1024px) {
-      font-size: 20px;
+      font-size: 1.25rem;
     }
   }
 
@@ -101,9 +101,75 @@
   }
 
   code {
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 135%;
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
     background: var(--code-bg);
+  }
+}
+
+/* Touch Usability for Mobile Breakpoints (max-width: 768px) */
+@media (max-width: 768px) {
+
+  #login-form input[type="email"],
+  #login-form input[type="password"],
+  #login-form button[type="submit"],
+  #login-form .grid button,
+  form.space-y-6 input[type="email"],
+  form.space-y-6 input[type="password"],
+  form.space-y-6 button[type="submit"] {
+    min-height: 3.143rem;
+    min-width: 3.143rem;
+    box-sizing: border-box;
+  }
+
+  /* Links touch targets */
+  #login-form a,
+  form.space-y-6 a {
+    min-height: 3.143rem;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  /* Checkbox and its label touch target */
+  #login-form label[htmlFor="remember-me"],
+  #login-form label[for="remember-me"],
+  form.space-y-6 label {
+    min-height: 3.143rem;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  #login-form input[type="checkbox"],
+  form.space-y-6 input[type="checkbox"] {
+    position: relative;
+  }
+
+  #login-form input[type="checkbox"]::before,
+  form.space-y-6 input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3.143rem;
+    height: 3.143rem;
+    min-width: 3.143rem;
+    min-height: 3.143rem;
+  }
+
+  /* Password toggle button touch target */
+  #login-form .relative button {
+    min-width: 3.143rem;
+    min-height: 3.143rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    transform: none;
   }
 }

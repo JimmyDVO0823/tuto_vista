@@ -25,7 +25,7 @@ import { useAuth } from '../../../context/AuthContext';
 const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  
+
   const navLinks = {
     estudiante: [
       { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
@@ -66,12 +66,13 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   };
 
   return (
-    <nav 
+    <nav
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`h-screen fixed left-0 top-0 bg-mini-gray flex flex-col py-8 z-50 transition-all duration-300 ease-in-out shadow-sm overflow-hidden ${
-        isCollapsed ? 'w-20' : 'w-64'
-      }`}
+      className={`h-screen fixed left-0 top-0 bg-mini-gray flex flex-col py-8 z-50 transition-all duration-300 ease-in-out shadow-sm overflow-hidden ${isCollapsed
+        ? '-translate-x-full md:translate-x-0 w-64 md:w-20'
+        : 'translate-x-0 w-64'
+        }`}
     >
       {/* Brand & Toggle */}
       <div className={`px-6 mb-10 flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
@@ -80,7 +81,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
             THE ACADEMIC
           </span>
         )}
-        <button 
+        <button
           onClick={onToggle}
           className={`material-symbols-outlined text-primary hover:bg-[#e6e8ea] p-2 rounded-full transition-colors ${isCollapsed ? 'scale-110' : ''}`}
         >
@@ -107,60 +108,59 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
 
       {/* Footer Actions */}
       {/* Footer Actions */}
-<div className={`px-5 mt-auto flex flex-col gap-4 ${isCollapsed ? 'items-center' : ''}`}>
-  
-  {/* El botón de "Book New Session" se mantiene igual por ser un botón de acción principal (CTA) */}
-  <button 
-    className={`bg-academic-gold text-primary font-bold rounded-md flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-sm ${
-      isCollapsed ? 'w-10 h-10 p-0 rounded-full' : 'py-3 px-4 text-sm w-full'
-    }`}
-    title={isCollapsed ? 'Book New Session' : ''}
-  >
-    <span className="material-symbols-outlined !text-[20px]">add_circle</span>
-    {!isCollapsed && <span className="whitespace-nowrap">Book New Session</span>}
-  </button>
-  
-  {/* Bloque inferior usando la consistencia de SidebarItem */}
-  <div className={`flex flex-col gap-1 border-t border-black/5 pt-4 ${isCollapsed ? 'w-full items-center' : 'w-full'}`}>
-    
-    {/* Ajustes ahora es un SidebarItem */}
-    <SidebarItem
-      label="Ajustes"
-      path="/settings"
-      icon="settings"
-      isCollapsed={isCollapsed}
-      isActive={location.pathname === '/settings'}
-    />
+      <div className={`px-5 mt-auto flex flex-col gap-4 ${isCollapsed ? 'items-center' : ''}`}>
 
-    {/* Support ahora es un SidebarItem */}
-    <SidebarItem
-      label="Support"
-      path="/support"
-      icon="help"
-      isCollapsed={isCollapsed}
-      isActive={location.pathname === '/support'}
-    />
-    
-    {/* Cerrar Sesión / Login usando SidebarItem */}
-    {currentUser ? (
-      <SidebarItem
-        label="Cerrar Sesión"
-        icon="logout"
-        isCollapsed={isCollapsed}
-        onClick={handleLogout} // <- Pasamos el comportamiento de botón
-        variant="danger"       // <- Pasamos una variante para pintarlo de rojo
-      />
-    ) : (
-      <SidebarItem
-        label="Login"
-        path="/loginform"
-        icon="login"
-        isCollapsed={isCollapsed}
-        isActive={location.pathname === '/loginform'}
-      />
-    )}
-  </div>
-</div>
+        {/* El botón de "Book New Session" se mantiene igual por ser un botón de acción principal (CTA) */}
+        <button
+          className={`bg-academic-gold text-primary font-bold rounded-md flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-sm ${isCollapsed ? 'w-10 h-10 p-0 rounded-full' : 'py-3 px-4 text-sm w-full'
+            }`}
+          title={isCollapsed ? 'Book New Session' : ''}
+        >
+          <span className="material-symbols-outlined !text-[20px]">add_circle</span>
+          {!isCollapsed && <span className="whitespace-nowrap">Book New Session</span>}
+        </button>
+
+        {/* Bloque inferior usando la consistencia de SidebarItem */}
+        <div className={`flex flex-col gap-1 border-t border-black/5 pt-4 ${isCollapsed ? 'w-full items-center' : 'w-full'}`}>
+
+          {/* Ajustes ahora es un SidebarItem */}
+          <SidebarItem
+            label="Ajustes"
+            path="/settings"
+            icon="settings"
+            isCollapsed={isCollapsed}
+            isActive={location.pathname === '/settings'}
+          />
+
+          {/* Support ahora es un SidebarItem */}
+          <SidebarItem
+            label="Support"
+            path="/support"
+            icon="help"
+            isCollapsed={isCollapsed}
+            isActive={location.pathname === '/support'}
+          />
+
+          {/* Cerrar Sesión / Login usando SidebarItem */}
+          {currentUser ? (
+            <SidebarItem
+              label="Cerrar Sesión"
+              icon="logout"
+              isCollapsed={isCollapsed}
+              onClick={handleLogout} // <- Pasamos el comportamiento de botón
+              variant="danger"       // <- Pasamos una variante para pintarlo de rojo
+            />
+          ) : (
+            <SidebarItem
+              label="Login"
+              path="/loginform"
+              icon="login"
+              isCollapsed={isCollapsed}
+              isActive={location.pathname === '/loginform'}
+            />
+          )}
+        </div>
+      </div>
     </nav>
   );
 };

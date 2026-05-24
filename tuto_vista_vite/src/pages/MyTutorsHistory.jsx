@@ -11,19 +11,19 @@ const MyTutorsHistory = () => {
 
   return (
     <MainLayout>
-      <main className="p-10">
+      <main className="p-4 md:p-10">
         <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold text-academic-gold uppercase tracking-widest mb-2 block">Académico</span>
-            <h1 className="text-5xl font-extrabold text-primary tracking-tight font-display">Mi Historial de Tutorías</h1>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight font-display">Mi Historial de Tutorías</h1>
           </div>
-          <div className="relative w-80">
+          <div className="relative w-full md:w-80">
             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
             <input className="w-full pl-12 pr-4 py-3 bg-white rounded-full border border-gray-100 shadow-sm outline-none focus:ring-2 focus:ring-primary/10 transition-all" placeholder="Buscar materia..." />
           </div>
         </header>
 
-        <section className="bg-white rounded-xl shadow-sm border border-gray-50 overflow-hidden">
+        <section className="bg-white rounded-xl shadow-sm border border-gray-50 overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-[#f2f4f6]">
               <tr>
@@ -50,18 +50,17 @@ const MyTutorsHistory = () => {
                   <td className="px-8 py-6 text-sm">{row.date}</td>
                   <td className="px-8 py-6 text-sm">{row.time}</td>
                   <td className="px-8 py-6">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase ${
-                      row.color === 'green' ? 'bg-green-100 text-green-700' : 
-                      row.color === 'amber' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase ${row.color === 'green' ? 'bg-green-100 text-green-700' :
+                        row.color === 'amber' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'
+                      }`}>
                       {row.status}
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
                     {row.rating ? (
-                       <span className="text-xs font-bold text-academic-gold flex items-center justify-end gap-1">
-                         <span className="material-symbols-outlined text-[14px]">star</span> {row.rating}
-                       </span>
+                      <span className="text-xs font-bold text-academic-gold flex items-center justify-end gap-1">
+                        <span className="material-symbols-outlined text-[14px]">star</span> {row.rating}
+                      </span>
                     ) : (
                       <button className="text-xs font-bold text-primary hover:underline">Acción</button>
                     )}
@@ -73,10 +72,10 @@ const MyTutorsHistory = () => {
         </section>
 
         <footer className="mt-24 pt-10 border-t border-gray-100 flex justify-between items-center opacity-60">
-           <p className="text-[10px] font-bold uppercase tracking-widest">© 2024 THE ACADEMIC EDITORIAL</p>
-           <div className="flex gap-6">
-             {['Privacy', 'Legal', 'Contact'].map(l => <a key={l} href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-primary">{l}</a>)}
-           </div>
+          <p className="text-[10px] font-bold uppercase tracking-widest">© 2024 THE ACADEMIC EDITORIAL</p>
+          <div className="flex gap-6">
+            {['Privacy', 'Legal', 'Contact'].map(l => <a key={l} href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-primary">{l}</a>)}
+          </div>
         </footer>
       </main>
     </MainLayout>
