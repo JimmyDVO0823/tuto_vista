@@ -104,14 +104,18 @@ const RegisterForm = () => {
         rol: formData.role
       });
 
-      // Guardar sesión en el contexto
-      login(response, response.token);
+    try {
+        const token = response?.token || response?.data?.token || response?.accessToken || null;
+        login(response, token);
+      } catch (loginErr) {
+        console.warn('Login post-registro falló silenciosamente:', loginErr);
+      }
 
-      setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
+      setSuccess('¡Registro exitoso! Redirigiendo...');
+      setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'estudiante' });
 
-      // Redirigir a la página de login después de un breve retraso
       setTimeout(() => {
-        navigate('/');
+        window.location.href = 'https://jimmydvo0823.github.io/tuto_vista/';
       }, 1500);
 
     } catch (err) {
