@@ -3,14 +3,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 const handleApiError = async (response) => {
   const errorData = await response.json().catch(() => ({}));
   const errorMessage = errorData.message || 'Error en la petición';
-  
+
   if (response.status === 401 || errorMessage.includes('JWT expired')) {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     window.location.href = '/loginform';
     throw new Error('Tu sesión ha expirado por inactividad. Por favor, inicia sesión nuevamente.');
   }
-  
+
   throw new Error(errorMessage);
 };
 
