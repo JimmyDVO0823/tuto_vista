@@ -30,6 +30,11 @@ export const api = {
       await handleApiError(response);
     }
 
+    // Protección para POST que retornan vacíos (204 No Content)
+    if (response.status === 204) {
+      return {};
+    }
+
     return response.json();
   },
 
@@ -63,6 +68,12 @@ export const api = {
 
     if (!response.ok) {
       await handleApiError(response);
+    }
+
+    // SOLUCIÓN: Si el backend responde con 204 No Content, devolvemos un objeto vacío
+    // evitando que intente ejecutar .json() sobre el cuerpo vacío de Spring Boot.
+    if (response.status === 204) {
+      return {};
     }
 
     return response.json();

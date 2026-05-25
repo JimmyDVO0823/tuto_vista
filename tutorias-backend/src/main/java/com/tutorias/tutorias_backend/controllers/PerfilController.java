@@ -24,23 +24,25 @@ public class PerfilController {
     }
 
     @PatchMapping("/tutor/{id}")
-public ResponseEntity<Void> actualizarTutor( // 👈 1. Cambiado Tutor por Void
-        @PathVariable Long id,
-        @jakarta.validation.Valid @RequestBody com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto,
-        @org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
-    
-    // Verificación de seguridad
-    Perfil authPerfil = perfilRepository.findByCorreo(userDetails.getUsername())
-            .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException("Usuario no encontrado"));
-    
-    if (!authPerfil.getId().equals(id)) {
-        throw new org.springframework.security.access.AccessDeniedException("No tienes permiso para actualizar este perfil");
+    public ResponseEntity<Void> actualizarTutor( // 👈 1. Cambiado Tutor por Void
+            @PathVariable Long id,
+            @jakarta.validation.Valid @RequestBody com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
+
+        // Verificación de seguridad
+        Perfil authPerfil = perfilRepository.findByCorreo(userDetails.getUsername())
+                .orElseThrow(
+                        () -> new org.springframework.security.access.AccessDeniedException("Usuario no encontrado"));
+
+        if (!authPerfil.getId().equals(id)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "No tienes permiso para actualizar este perfil");
+        }
+
+        // 2. Ejecutamos la acción en el servicio normalmente sin retornar la entidad
+        perfilService.actualizarTutor(id, updateDto);
+
+        // 3. Cambiado: Retornamos un estado 204 No Content (Cuerpo 100% vacío)
+        return ResponseEntity.noContent().build();
     }
-
-    // 2. Ejecutamos la acción en el servicio normalmente sin retornar la entidad
-    perfilService.actualizarTutor(id, updateDto);
-
-    // 3. Cambiado: Retornamos un estado 204 No Content (Cuerpo 100% vacío)
-    return ResponseEntity.noContent().build(); 
-}
 }
