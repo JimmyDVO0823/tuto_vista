@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import TutorsExplorer from "./pages/TutorsExplorer";
 import DashboardSwitcher from "./pages/DashboardSwitcher";
@@ -14,20 +14,13 @@ import AcademicChat from "./pages/AcademicChat";
 import { AuthProvider } from "./context/AuthContext";
 
 /**
- * Root Application Component.
- *
- * Route Classification:
- *  PUBLIC  → Accessible without authentication (/,  /loginform, /registerform, /tutors)
- *  PRIVATE → Require valid session + JWT       (/dashboard, /subjects, /dispo)
- *
- * ProtectedRoute acts as the client-side auth middleware for all PRIVATE routes.
- * It verifies both the Supabase session (via AuthContext) and the custom JWT
- * stored in localStorage ('tuto_jwt') before rendering the protected content.
+ * Root Application Component with HashRouter configuration.
  */
 function App() {
   return (
     <AuthProvider>
-      <Router basename={import.meta.env.BASE_URL}>
+      {/* Usamos Router (HashRouter) sin la propiedad basename */}
+      <Router>
         <Routes>
           {/* ── PUBLIC ROUTES ───────────────────────────────────────────── */}
           <Route path="/" element={<Home />} />
