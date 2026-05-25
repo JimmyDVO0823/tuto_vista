@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 
 /**
  * Helper para dar formato de miles: 10000 -> "10.000"
  */
 const formatWithThousandsSeparator = (value) => {
-  if (value === null || value === undefined || value === '') return '';
+  if (value === null || value === undefined || value === "") return "";
   // Convertir a string, remover lo que no sea número y aplicar la máscara de miles
-  const stringValue = value.toString().replace(/\D/g, '');
-  return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const stringValue = value.toString().replace(/\D/g, "");
+  return stringValue.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
 /**
  * Helper para limpiar el formato y obtener el número puro: "10.000" -> 10000
  */
 const parseRawNumber = (formattedValue) => {
-  const cleanString = formattedValue.replace(/\D/g, '');
-  return cleanString === '' ? 0 : parseInt(cleanString, 10);
+  const cleanString = formattedValue.replace(/\D/g, "");
+  return cleanString === "" ? 0 : parseInt(cleanString, 10);
 };
 
 export const HourlyRateCard = ({ initialRate = 45, onSaveRate }) => {
   // Guardamos el valor visual en el estado (con puntos)
-  const [displayRate, setDisplayRate] = useState(formatWithThousandsSeparator(initialRate));
+  const [displayRate, setDisplayRate] = useState(
+    formatWithThousandsSeparator(initialRate),
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -47,10 +49,10 @@ export const HourlyRateCard = ({ initialRate = 45, onSaveRate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Convertimos la cadena formateada ("10.000") a un entero puro (10000)
     const numericRate = parseRawNumber(displayRate);
-    
+
     // Validaciones de negocio
     if (numericRate <= 0) {
       setError("La tarifa por hora debe ser un número mayor a 0.");
@@ -68,7 +70,9 @@ export const HourlyRateCard = ({ initialRate = 45, onSaveRate }) => {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError(err.message || "No se pudo actualizar la tarifa. Inténtalo de nuevo.");
+      setError(
+        err.message || "No se pudo actualizar la tarifa. Inténtalo de nuevo.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -81,12 +85,15 @@ export const HourlyRateCard = ({ initialRate = 45, onSaveRate }) => {
       {/* Encabezado */}
       <div className="flex items-center gap-3 mb-6">
         <span className="material-symbols-outlined text-primary">payments</span>
-        <h3 className="font-headline font-bold text-primary text-lg">Configuración de Honorarios</h3>
+        <h3 className="font-headline font-bold text-primary text-lg">
+          Configuración de Honorarios
+        </h3>
       </div>
 
       <div className="space-y-6">
         <p className="text-xs text-on-surface-variant leading-relaxed">
-          Define tu tarifa por hora para las sesiones editoriales. Este valor será visible para los estudiantes en tu perfil público.
+          Define tu tarifa por hora para las sesiones editoriales. Este valor
+          será visible para los estudiantes en tu perfil público.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -126,8 +133,8 @@ export const HourlyRateCard = ({ initialRate = 45, onSaveRate }) => {
                   disabled={isLoading}
                   className={`flex-1 py-2 rounded-md text-xs font-bold transition-colors border ${
                     isActive
-                      ? 'bg-primary text-white border-transparent'
-                      : 'bg-surface-container-low hover:bg-surface-container-high text-primary border-outline-variant/30'
+                      ? "bg-primary text-white border-transparent"
+                      : "bg-surface-container-low hover:bg-surface-container-high text-primary border-outline-variant/30"
                   }`}
                 >
                   ${formatWithThousandsSeparator(preset)}
@@ -155,9 +162,9 @@ export const HourlyRateCard = ({ initialRate = 45, onSaveRate }) => {
             className="w-full signature-gradient text-white px-4 py-3.5 rounded-md font-bold text-sm shadow-md hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-lg">
-              {isLoading ? 'sync' : 'update'}
+              {isLoading ? "sync" : "update"}
             </span>
-            {isLoading ? 'Actualizando...' : 'Actualizar Tarifa'}
+            {isLoading ? "Actualizando..." : "Actualizar Tarifa"}
           </button>
         </form>
       </div>

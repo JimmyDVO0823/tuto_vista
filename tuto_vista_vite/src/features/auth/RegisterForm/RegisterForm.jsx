@@ -4,7 +4,6 @@ import { useAuth } from '../../../context/AuthContext';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 
-
 const RegisterForm = () => {
   const { login } = useAuth();
 
@@ -21,30 +20,63 @@ const RegisterForm = () => {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // SOLUCIÓN AL ERROR: Declaramos el estado para el mensaje de la contraseña
+  const [passwordError, setPasswordError] = useState('');
+
   const navigate = useNavigate();
+
   /**
    * Generic handler for input synchronization.
    * @param {React.ChangeEvent<HTMLInputElement|HTMLSelectElement>} e
    */
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Validación interactiva en tiempo real para el mensaje inferior
+    if (name === 'password') {
+      if (!value) {
+        setPasswordError('');
+      } else if (value.length < 8) {
+        setPasswordError('La contraseña debe tener al menos 8 caracteres.');
+      } else if (!/[A-Z]/.test(value)) {
+        setPasswordError('Debe incluir al menos una letra mayúscula.');
+      } else if (!/[0-9]/.test(value)) {
+        setPasswordError('Debe incluir al menos un número.');
+      } else if (!/[^A-Za-z0-9]/.test(value)) {
+        setPasswordError('Debe incluir al menos un carácter especial (ej. !, @, #).');
+      } else {
+        setPasswordError('');
+      }
+    }
   };
 
-  const emailSchema = z.string().email('Por favor, ingresa un correo electrónico válido.');
+  const registerSchema = z.object({
+    name: z.string().min(1, 'El nombre completo es obligatorio.'),
+    email: z.string().email('Por favor, ingresa un correo electrónico válido.'),
+    password: z
+      .string()
+      .min(8, 'La contraseña debe tener al menos 8 caracteres.')
+      .regex(/[A-Z]/, 'La contraseña debe tener al menos una letra mayúscula.')
+      .regex(/[0-9]/, 'La contraseña debe tener al menos un número.')
+      .regex(/[^A-Za-z0-9]/, 'La contraseña debe tener al menos un carácter especial (ej. !, @, #, $, etc.).'),
+    confirmPassword: z.string()
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden.",
+    path: ["confirmPassword"],
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
-    const validation = emailSchema.safeParse(formData.email);
-    if (!validation.success) {
-      setError(validation.error.issues[0]?.message || 'Correo electrónico inválido');
-      return;
-    }
+    // Validamos TODO el objeto formData con el esquema de Zod
+    const validation = registerSchema.safeParse(formData);
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message);
       return;
     }
 
@@ -67,6 +99,7 @@ const RegisterForm = () => {
 
       setSuccess('¡Registro exitoso! Redirigiendo...');
       setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'estudiante' });
+      setPasswordError('');
 
       setTimeout(() => {
         navigate('/');
@@ -117,6 +150,7 @@ const RegisterForm = () => {
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
+          {/* Campo: Contraseña */}
           <div className="space-y-1">
             <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant" htmlFor="reg-password">
               Contraseña
@@ -139,7 +173,14 @@ const RegisterForm = () => {
                 </svg>
               </button>
             </div>
+            {passwordError && (
+              <p className="text-red-600 text-xs mt-1">
+                {passwordError}
+              </p>
+            )}
           </div>
+
+          {/* Campo: Confirmar Contraseña (CORREGIDO: name y type id correctos) */}
           <div className="space-y-1">
             <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant" htmlFor="reg-confirm-password">
               Confirmar Contraseña
@@ -164,6 +205,7 @@ const RegisterForm = () => {
             </div>
           </div>
         </div>
+
         <div className="space-y-1">
           <label className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">
             Rol Académico
@@ -186,7 +228,8 @@ const RegisterForm = () => {
         </div>
         <button
           className="w-full py-4 signature-gradient text-white font-bold rounded-md active:scale-[0.98] transition-transform shadow-lg shadow-[#002045]/10 disabled:opacity-70 disabled:cursor-not-allowed"
-          type="submit" disabled={loading}
+          type="submit"
+          disabled={loading || !!passwordError || !formData.password}
         >
           {loading ? 'Procesando...' : 'Crear mi Cuenta'}
         </button>
