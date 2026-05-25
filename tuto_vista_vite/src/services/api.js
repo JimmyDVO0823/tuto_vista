@@ -1,8 +1,21 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
+// Manejador de errores mejorado para soportar tanto JSON como respuestas de texto plano
 const handleApiError = async (response) => {
-  const errorData = await response.json().catch(() => ({}));
-  const errorMessage = errorData.message || 'Error en la petición';
+  let errorMessage = 'Error en la petición';
+
+  try {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    } else {
+      const textError = await response.text();
+      errorMessage = textError || errorMessage;
+    }
+  } catch (e) {
+    // Si falla el parseo del error, se queda con el mensaje por defecto
+  }
 
   if (response.status === 401 || errorMessage.includes('JWT expired')) {
     localStorage.removeItem('user');
@@ -12,6 +25,25 @@ const handleApiError = async (response) => {
   }
 
   throw new Error(errorMessage);
+};
+
+// Función auxiliar para procesar la respuesta de forma segura según su tipo
+const parseResponse = async (response) => {
+  // 1. Si es 204 No Content, retornamos objeto vacío de inmediato
+  if (response.status === 204) {
+    return {};
+  }
+
+  const contentType = response.headers.get("content-type");
+
+  // 2. Si es un JSON válido, lo parseamos normalmente
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  // 3. Si es texto plano (como "Materia asignada..."), lo devolvemos estructurado como objeto
+  const textData = await response.text();
+  return textData ? { message: textData } : {};
 };
 
 export const api = {
@@ -30,12 +62,7 @@ export const api = {
       await handleApiError(response);
     }
 
-    // Protección para POST que retornan vacíos (204 No Content)
-    if (response.status === 204) {
-      return {};
-    }
-
-    return response.json();
+    return parseResponse(response);
   },
 
   async get(endpoint, token) {
@@ -52,7 +79,7 @@ export const api = {
       await handleApiError(response);
     }
 
-    return response.json();
+    return parseResponse(response);
   },
 
   async patch(endpoint, data, token) {
@@ -70,13 +97,7 @@ export const api = {
       await handleApiError(response);
     }
 
-    // SOLUCIÓN: Si el backend responde con 204 No Content, devolvemos un objeto vacío
-    // evitando que intente ejecutar .json() sobre el cuerpo vacío de Spring Boot.
-    if (response.status === 204) {
-      return {};
-    }
-
-    return response.json();
+    return parseResponse(response);
   },
 
   async delete(endpoint, token) {
@@ -93,11 +114,6 @@ export const api = {
       await handleApiError(response);
     }
 
-    // Return empty object for 204 No Content
-    if (response.status === 204) {
-      return {};
-    }
-
-    return response.json().catch(() => ({}));
+    return parseResponse(response);
   },
 };
