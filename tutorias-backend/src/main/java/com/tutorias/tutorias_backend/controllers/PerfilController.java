@@ -1,7 +1,6 @@
 package com.tutorias.tutorias_backend.controllers;
 
 import com.tutorias.tutorias_backend.entities.Perfil;
-import com.tutorias.tutorias_backend.entities.Tutor;
 import com.tutorias.tutorias_backend.services.PerfilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +22,9 @@ public class PerfilController {
         return ResponseEntity.ok(perfilService.actualizarBasico(id, nombre, avatar));
     }
 
+    // 1. CAMBIADO: Cambiamos ResponseEntity<Tutor> por ResponseEntity<Void>
     @PatchMapping("/tutor/{id}")
-    public ResponseEntity<Tutor> actualizarTutor(
+    public ResponseEntity<Void> actualizarTutor(
             @PathVariable Long id,
             @jakarta.validation.Valid @RequestBody com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto,
             @org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails) {
@@ -37,6 +37,10 @@ public class PerfilController {
             throw new org.springframework.security.access.AccessDeniedException("No tienes permiso para actualizar este perfil");
         }
 
-        return ResponseEntity.ok(perfilService.actualizarTutor(id, updateDto));
+        // 2. MODIFICADO: Solo ejecutamos la actualización sin guardar el resultado de la entidad
+        perfilService.actualizarTutor(id, updateDto);
+
+        // 3. CAMBIADO: Retornamos un estado 204 No Content (un cuerpo completamente vacío)
+        return ResponseEntity.noContent().build();
     }
 }
