@@ -92,9 +92,9 @@ const GestionTutorias = () => {
   };
   const handleUpdateLink = async (id, nuevoEnlace) => {
     try {
-      // Pasamos el string limpio directamente en el body
-      await api.patch(`/sesiones/${id}/enlace`, nuevoEnlace, {
-        headers: { 'Content-Type': 'text/plain' }
+      // Enviamos un objeto JSON estándar en lugar de texto plano
+      await api.patch(`/sesiones/${id}/enlace`, {
+        enlaceReunion: nuevoEnlace
       });
 
       // Actualizamos el estado local de las sesiones con el nuevo link
@@ -103,6 +103,7 @@ const GestionTutorias = () => {
     } catch (err) {
       console.error('Error updating session link:', err);
       alert(err.message || 'Error al actualizar el enlace de la reunión.');
+      throw err; // Lanzamos el error para que la tarjeta detenga el estado de carga
     }
   };
 

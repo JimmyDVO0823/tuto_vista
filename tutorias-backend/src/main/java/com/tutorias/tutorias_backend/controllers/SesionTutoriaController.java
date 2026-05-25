@@ -40,7 +40,10 @@ public class SesionTutoriaController {
     @PatchMapping("/{id}/enlace")
     public ResponseEntity<SesionTutoriaDTO> actualizarEnlace(
             @PathVariable Long id,
-            @RequestBody String enlaceReunion) {
+            @RequestBody java.util.Map<String, String> body) {
+
+        // Extraemos el valor usando la llave "enlaceReunion"
+        String enlaceReunion = body.get("enlaceReunion");
         return ResponseEntity.ok(sesionTutoriaService.actualizarEnlace(id, enlaceReunion));
     }
 }

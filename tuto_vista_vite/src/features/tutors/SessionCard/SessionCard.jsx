@@ -39,12 +39,17 @@ const SessionCard = ({ session, onCancel, onUpdateLink, isLoading = false }) => 
   const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(estudianteNombre)}&background=f2f4f6&color=002045&size=100`;
 
   const handleSave = async () => {
+    if (!linkInput.trim()) {
+      alert("Por favor, ingresa un enlace válido.");
+      return;
+    }
+
     setIsSavingLink(true);
     try {
       await onUpdateLink(id, linkInput);
-      setIsEditing(false);
+      setIsEditing(false); // Solo cierra la edición si no hubo excepciones
     } catch (err) {
-      // El error ya es manejado por el padre
+      // El error ya lo reporta el alert de GestionTutorias, mantenemos el modo edición abierto
     } finally {
       setIsSavingLink(false);
     }
