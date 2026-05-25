@@ -31,42 +31,58 @@ const DashboardStudent = () => {
   }, [user]);
 
   useEffect(() => {
-    const formattedSessions = sessions.map((s) => ({
-      id: `session-${s.id}`,
-      title: `Tutoría: ${s.materiaNombre}`,
-      start: s.programadaPara,
-      end: new Date(
-        new Date(s.programadaPara).getTime() + (s.duracionMin || 60) * 60000,
-      ).toISOString(),
-      extendedProps: {
-        type: "Sesión",
-        category: s.materiaNombre,
-        time: new Date(s.programadaPara).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        status: s.estado,
-        colorType: "academic-blue",
-      },
-    }));
+    // 1. Formatear sesiones (se muestran siempre)
+    const formattedSessions = sessions.map((s) => {
+      // Si la fecha viene con zona horaria (ej: termina en 'Z' o '+00:00'), 
+      // le removemos el sufijo para que JavaScript lo procese en la hora local del navegador
+      const fechaLocalString = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, '') : '';
+      const fechaBase = new Date(fechaLocalString);
 
-    const formattedSolicitudes = solicitudes.map((s) => ({
-      id: `solicitud-${s.id}`,
-      title: `Solicitud: ${s.materiaNombre}`,
-      start: `${s.fechaPreferida}T${s.horaPreferida}`,
-      end: new Date(
-        new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
-        (s.duracionMin || 60) * 60000,
-      ).toISOString(),
-      extendedProps: {
-        type: "Solicitud",
-        category: s.materiaNombre,
-        time: s.horaPreferida,
-        status: s.estado,
-        colorType: "academic-gold",
-      },
-    }));
+      return {
+        id: `session-${s.id}`,
+        title: `Tutoría: ${s.materiaNombre}`,
+        start: fechaLocalString, // Pasamos la fecha limpia sin 'Z'
+        end: new Date(
+          fechaBase.getTime() + (s.duracionMin || 60) * 60000,
+        ).toISOString().replace(/Z$|\+00:00$/, ''), // Quitamos la Z también al final
+        extendedProps: {
+          type: "Sesión",
+          category: s.materiaNombre,
+          time: fechaBase.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          status: s.estado,
+          colorType: "academic-blue",
+        },
+      };
+    });
 
+    // 2. FILTRAR Y FORMATEAR SOLICITUDES: Solo dejamos pasar las que sigan 'PENDIENTE'
+    const formattedSolicitudes = solicitudes
+      .filter((s) => {
+        // Aseguramos la comparación transformando a mayúsculas por si el backend varía
+        const estadoLimpio = s.estado?.toUpperCase();
+        return estadoLimpio === "PENDIENTE" || estadoLimpio === "PENDING";
+      })
+      .map((s) => ({
+        id: `solicitud-${s.id}`,
+        title: `Solicitud: ${s.materiaNombre}`,
+        start: `${s.fechaPreferida}T${s.horaPreferida}`,
+        end: new Date(
+          new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
+          (s.duracionMin || 60) * 60000,
+        ).toISOString(),
+        extendedProps: {
+          type: "Solicitud",
+          category: s.materiaNombre,
+          time: s.horaPreferida,
+          status: s.estado,
+          colorType: "academic-gold",
+        },
+      }));
+
+    // 3. Fusionar ambos conjuntos en el estado de eventos
     setEvents([...formattedSessions, ...formattedSolicitudes]);
   }, [sessions, solicitudes]);
 
