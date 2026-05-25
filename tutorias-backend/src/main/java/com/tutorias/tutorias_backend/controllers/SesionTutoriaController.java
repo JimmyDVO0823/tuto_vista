@@ -33,8 +33,12 @@ public class SesionTutoriaController {
     @PatchMapping("/{id}/estado")
     public ResponseEntity<SesionTutoriaDTO> actualizarEstado(
             @PathVariable Long id,
-            @RequestParam EstadoSesion estado) {
-        return ResponseEntity.ok(sesionTutoriaService.actualizarEstado(id, estado));
+            @RequestBody java.util.Map<String, Object> body) {
+
+        EstadoSesion estado = EstadoSesion.valueOf(body.get("estado").toString());
+        String motivo = (String) body.get("motivoCancelacion");
+
+        return ResponseEntity.ok(sesionTutoriaService.actualizarEstado(id, estado, motivo));
     }
 
     @PatchMapping("/{id}/enlace")

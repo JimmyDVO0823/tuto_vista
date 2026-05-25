@@ -85,14 +85,7 @@ const TutorAgendaDetail = () => {
     loadTutorDetails();
   }, [loadTutorDetails]);
 
-  useEffect(() => {
-    if (!loading) {
-      console.log("=== DATOS BACKEND ===");
-      console.log("1. Recurrentes (disponibilidad):", disponibilidad);
-      console.log("2. Específicas (dispoEspecifica):", dispoEspecifica);
-      console.log("=====================");
-    }
-  }, [loading, disponibilidad, dispoEspecifica]);
+
 
   // 🌟 REGRESAMOS A LOS BLOQUES SEMANALES LIMPIOS E INTACTOS
   const groupedDispo = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 0: [] };
