@@ -32,8 +32,15 @@ public class SesionTutoriaController {
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<SesionTutoriaDTO> actualizarEstado(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestParam EstadoSesion estado) {
         return ResponseEntity.ok(sesionTutoriaService.actualizarEstado(id, estado));
+    }
+
+    @PatchMapping("/{id}/enlace")
+    public ResponseEntity<SesionTutoriaDTO> actualizarEnlace(
+            @PathVariable Long id,
+            @RequestBody String enlaceReunion) {
+        return ResponseEntity.ok(sesionTutoriaService.actualizarEnlace(id, enlaceReunion));
     }
 }

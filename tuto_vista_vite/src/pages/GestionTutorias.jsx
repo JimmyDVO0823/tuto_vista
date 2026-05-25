@@ -90,6 +90,21 @@ const GestionTutorias = () => {
       setProcessingId(null);
     }
   };
+  const handleUpdateLink = async (id, nuevoEnlace) => {
+    try {
+      // Pasamos el string limpio directamente en el body
+      await api.patch(`/sesiones/${id}/enlace`, nuevoEnlace, {
+        headers: { 'Content-Type': 'text/plain' }
+      });
+
+      // Actualizamos el estado local de las sesiones con el nuevo link
+      setSesiones(prev => prev.map(s => s.id === id ? { ...s, enlaceReunion: nuevoEnlace } : s));
+      alert("¡Enlace de reunión actualizado con éxito!");
+    } catch (err) {
+      console.error('Error updating session link:', err);
+      alert(err.message || 'Error al actualizar el enlace de la reunión.');
+    }
+  };
 
   return (
     <MainLayout>
@@ -185,6 +200,7 @@ const GestionTutorias = () => {
                       key={session.id}
                       session={session}
                       onCancel={handleCancelSession}
+                      onUpdateLink={handleUpdateLink}
                       isLoading={processingId === session.id}
                     />
                   ))}
