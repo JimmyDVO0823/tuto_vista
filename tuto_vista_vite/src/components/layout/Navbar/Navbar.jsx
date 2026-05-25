@@ -17,8 +17,8 @@ import { Link } from 'react-router-dom';
 export default function Navbar() {
   return (
     <nav className="bg-[#f7f9fb]/80 backdrop-blur-md top-0 sticky z-50 shadow-sm">
-      <div className="flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
-        <div className="flex items-center gap-12">
+      <div className="flex justify-between items-center w-full px-4 md:px-8 py-4 max-w-full mx-auto">
+        <div className="flex items-center gap-4 md:gap-12">
           <Link to="/" className="text-xl font-bold tracking-tight text-[#002045] font-headline">
             The Academic Editorial
           </Link>
@@ -29,10 +29,10 @@ export default function Navbar() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/login" className="px-5 py-2 text-[#002045] font-semibold hover:opacity-80 transition-all active:scale-95">
+          <Link to="/login" className="px-3 md:px-5 py-2 text-[#002045] font-semibold text-sm md:text-base hover:opacity-80 transition-all active:scale-95">
             Sign In
           </Link>
-          <button className="px-6 py-2 bg-tertiary-container text-[#4e3d00] font-bold rounded-md hover:brightness-105 transition-all active:scale-95">Apply to Tutor</button>
+          <button className="px-4 md:px-6 py-2 bg-tertiary-container text-[#4e3d00] font-bold text-sm md:text-base rounded-md hover:brightness-105 transition-all active:scale-95">Apply to Tutor</button>
         </div>
       </div>
     </nav>

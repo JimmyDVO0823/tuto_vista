@@ -90,8 +90,8 @@ const SubjectsManagement = () => {
 
   return (
     <MainLayout>
-      <main className="p-4 md:p-12">
-        <header className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+      <main className="p-3 md:p-8 lg:p-12">
+        <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-8 md:mb-16">
           <div className="max-w-2xl">
             <p className="text-[0.75rem] uppercase tracking-[0.15em] font-medium text-academic-gold mb-3">
               {role === 'tutor' ? 'Catálogo del Tutor' : 'Administración del Sistema'}
@@ -102,32 +102,38 @@ const SubjectsManagement = () => {
           </div>
 
           {role === 'tutor' && (
-            <Button
-              variant="primary"
-              className="shadow-xl"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <span className="material-symbols-outlined">add</span>
-              Añadir materias
-            </Button>
+            <div className="w-full md:w-auto">
+              <Button
+                variant="primary"
+                className="shadow-xl w-full md:w-auto"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <span className="material-symbols-outlined">add</span>
+                Añadir materias
+              </Button>
+            </div>
           )}
         </header>
 
-        <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
-          <Searcher
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Buscar materia o departamento..."
-          />
-          <div className="flex gap-2">
-            <Button variant="boring">Filtros</Button>
+        <div className="bg-[#f2f4f6] p-2 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-3 w-full overflow-hidden">
+          <div className="w-full md:flex-1">
+            <Searcher
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Buscar materia o departamento..."
+            />
+          </div>
+          <div className="w-full md:w-auto flex gap-2">
+            <Button variant="boring" className="w-full md:w-auto">Filtros</Button>
           </div>
         </div>
 
-        <SubjectTable
-          subjects={filteredSubjects}
-          showTutorColumn={role !== 'tutor'}
-        />
+        <div className="w-full overflow-x-auto rounded-xl">
+          <SubjectTable
+            subjects={filteredSubjects}
+            showTutorColumn={role !== 'tutor'}
+          />
+        </div>
 
         <AddSubjectModal
           isOpen={isModalOpen}

@@ -60,7 +60,7 @@ const MainLayout = ({ children }) => {
 
       {/* Dynamic Content Area */}
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out min-h-screen ${isCollapsed ? 'ml-0 md:ml-20' : 'ml-0 md:ml-64'
+        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out min-h-screen ${isCollapsed ? 'ml-0 md:ml-20' : 'ml-0 md:ml-64'
           }`}
       >
         <main className="flex-1">

@@ -97,7 +97,7 @@ export default function AcademicChat() {
     <main className="flex-1 flex h-screen overflow-hidden">
       
       {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
-      <section className="w-80 lg:w-96 h-full bg-surface flex flex-col z-10 flex-shrink-0">
+      <section className="hidden md:flex md:w-80 lg:w-96 h-full bg-surface flex-col z-10 flex-shrink-0">
         <header className="p-8 pb-4">
           <h2 className="font-headline font-extrabold text-2xl tracking-tight mb-6">Messages</h2>
           <div className="relative">
@@ -135,13 +135,13 @@ export default function AcademicChat() {
             onAction={handleHeaderAction}
           />
         ) : (
-          <div className="h-24 px-10 flex items-center bg-surface-container-lowest">
+          <div className="h-24 px-4 md:px-10 flex items-center bg-surface-container-lowest">
             <p className="text-gray-400 italic">Select a conversation</p>
           </div>
         )}
 
         {/* Caja de Flujo de Mensajes */}
-        <div className="flex-1 overflow-y-auto p-10 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6">
           {messages.map((msg) => (
             <MessageBubble 
               key={msg.id}

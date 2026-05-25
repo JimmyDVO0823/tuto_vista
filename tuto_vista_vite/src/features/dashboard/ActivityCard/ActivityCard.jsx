@@ -30,13 +30,13 @@ const ActivityCard = ({
   actionPath = "#" 
 }) => {
   return (
-    <div className="group bg-white p-8 rounded-2xl flex items-center justify-between border-l-4 border-primary shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-      <div className="flex items-center gap-8">
-        <div className="w-16 h-16 rounded-full bg-mini-gray flex items-center justify-center font-bold text-primary text-xl">
+    <div className="group bg-white p-5 md:p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between border-l-4 border-primary shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      <div className="flex items-center gap-4 md:gap-8">
+        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-mini-gray flex items-center justify-center font-bold text-primary text-xl">
           {initial}
         </div>
         <div>
-          <h4 className="text-xl font-bold text-primary mb-1">{title}</h4>
+          <h4 className="text-base md:text-xl font-bold text-primary mb-1">{title}</h4>
           <p className="text-sm font-medium text-gray-400 uppercase tracking-widest">{subtitle}</p>
         </div>
       </div>

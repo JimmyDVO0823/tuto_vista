@@ -238,7 +238,7 @@ const TutorAgendaDetail = () => {
   return (
     <MainLayout>
       <main className="flex-1 p-4 md:p-12 min-h-screen">
-        <header className="mb-16 flex flex-col md:flex-row items-start justify-between gap-6">
+        <header className="mb-8 md:mb-16 flex flex-col md:flex-row items-start justify-between gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold text-academic-gold uppercase tracking-[0.2em] mb-4 block">Perfil del Tutor</span>
             <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight font-display mb-6 leading-tight">
@@ -261,7 +261,7 @@ const TutorAgendaDetail = () => {
           </div>
         </header>
 
-        <section className="grid grid-cols-12 gap-16">
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Columna Izquierda: Foto y Metadata */}
           <aside className="col-span-12 lg:col-span-4 space-y-12">
             <div className="aspect-[4/5] bg-surface-container-low rounded-2xl overflow-hidden shadow-ambient relative group">
@@ -340,7 +340,7 @@ const TutorAgendaDetail = () => {
             </div>
 
             {/* Cuadro de Agenda y Reserva */}
-            <div className="bg-surface-container-lowest rounded-3xl p-10 shadow-ambient border border-outline-variant/10">
+            <div className="bg-surface-container-lowest rounded-3xl p-5 md:p-10 shadow-ambient border border-outline-variant/10">
               <div className="mb-8">
                 <h4 className="font-headline font-bold text-xl text-primary mb-2">Espacios de Disponibilidad Semanal</h4>
                 <p className="text-sm text-elegant-gray">Selecciona un bloque de horario para agendar tu tutoría.</p>
@@ -511,7 +511,7 @@ const TutorAgendaDetail = () => {
                   <div className="pt-6 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                       <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Inversión por hora</p>
-                      <p className="text-3xl font-black text-primary">
+                      <p className="text-2xl md:text-3xl font-black text-primary">
                         ${tutor.precio_por_hora?.toLocaleString('es-CO')} COP
                         <span className="text-sm font-medium text-gray-400"> / h</span>
                       </p>

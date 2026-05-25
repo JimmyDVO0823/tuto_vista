@@ -27,7 +27,7 @@ export const MessageInputBar = ({ onSendMessage }) => {
   };
 
   return (
-    <footer className="p-8 bg-surface-container-low">
+    <footer className="p-3 md:p-8 bg-surface-container-low">
       <div className="bg-surface-container-lowest rounded-xl p-2 shadow-[0_-8px_40px_rgba(25,28,30,0.02)] flex items-end gap-2 group focus-within:ring-2 ring-primary/5">
         <button 
           className="p-3 text-on-surface-variant hover:text-primary transition-colors"

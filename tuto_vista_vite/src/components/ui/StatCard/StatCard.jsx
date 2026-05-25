@@ -11,7 +11,7 @@ export const StatCard = ({
 }) => {
   return (
     <div
-      className={`col-span-12 md:col-span-4 p-8 rounded-lg shadow-sm flex flex-col justify-between h-48 transition-all ${
+      className={`col-span-12 md:col-span-4 p-5 md:p-8 rounded-lg shadow-sm flex flex-col justify-between h-48 transition-all ${
         gradient 
           ? "signature-gradient text-white" 
           : `bg-white border-l-4 ${color}`
@@ -37,7 +37,7 @@ export const StatCard = ({
         </h3>
         <div className="flex items-center gap-2">
           <p
-            className={`text-4xl font-bold font-headline ${
+            className={`text-2xl md:text-4xl font-bold font-headline ${
               gradient ? "text-white" : "text-primary"
             }`}
           >

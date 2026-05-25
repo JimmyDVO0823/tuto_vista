@@ -63,7 +63,7 @@ const DashboardAdmin = () => {
             </div>
           </div>
 
-          <div className="col-span-3 bg-white p-8 rounded-xl flex flex-col justify-between min-h-[180px] shadow-sm">
+          <div className="col-span-12 md:col-span-3 bg-white p-8 rounded-xl flex flex-col justify-between min-h-[180px] shadow-sm">
             <div className="flex justify-between items-start">
               <div className="w-12 h-12 rounded-lg bg-academic-gold/10 flex items-center justify-center">
                 <span className="material-symbols-outlined text-academic-gold">school</span>
@@ -80,8 +80,8 @@ const DashboardAdmin = () => {
 
         {/* Charts Section */}
         <section className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-8 md:mb-12">
-          <div className="col-span-12 md:col-span-8 bg-white p-8 rounded-xl shadow-sm">
-            <div className="flex justify-between items-center mb-10">
+          <div className="col-span-12 md:col-span-8 bg-white p-4 md:p-8 rounded-xl shadow-sm">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-10">
               <h3 className="text-xl font-bold text-primary">
                 Tutorías Realizadas
               </h3>
@@ -111,7 +111,7 @@ const DashboardAdmin = () => {
             </div>
           </div>
 
-          <div className="col-span-12 md:col-span-4 bg-[#f2f4f6] p-8 rounded-xl flex flex-col justify-between shadow-sm">
+          <div className="col-span-12 md:col-span-4 bg-[#f2f4f6] p-4 md:p-8 rounded-xl flex flex-col justify-between shadow-sm">
             <div>
               <h3 className="text-xl font-bold text-primary mb-2">Materias</h3>
               <p className="text-xs text-gray-600 leading-relaxed">
