@@ -34,7 +34,7 @@ public class PagoController {
     public ResponseEntity<Map<String, String>> crearPreferencia(@RequestBody Map<String, Object> payload) {
         try {
             // Configura tu token de acceso de PRUEBA (Copia el tuyo de Mercado Pago Developers)
-            MercadoPagoConfig.setAccessToken("TEST-1005658941468040-052519-ad0111f9f1607cf86de49133cdb2042b-3425252781");
+            MercadoPagoConfig.setAccessToken("APP_USR-1005658941468040-052519-ad0111f9f1607cf86de49133cdb2042b-3425252781");
 
             // Recibimos el monto desde React
             String montoStr = payload.get("monto").toString();
