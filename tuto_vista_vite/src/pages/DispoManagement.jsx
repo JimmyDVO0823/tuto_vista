@@ -216,9 +216,7 @@ const DispoManagement = () => {
           </div>
         </header>
 
-        {/* MEJORA 1: Cambiado p-4 md:p-10 a px-6 lg:px-12 py-8 para dar más aire en los bordes de la pantalla */}
-        <main className="flex-1 px-6 lg:px-12 py-8 w-full">
-          {/* MEJORA 2: Reemplazado max-w-7xl por max-w-[1800px] o w-full para obligar a los elementos a estirarse horizontalmente */}
+        <main className="flex-1 px-2 md:px-6 lg:px-12 py-8 w-full">
           <div className="w-full max-w-[1700px] mx-auto">
             <header className="mb-8">
               <h1 className="text-3xl md:text-4xl font-extrabold text-primary font-display mb-2">
@@ -235,24 +233,27 @@ const DispoManagement = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-12 gap-8 items-start w-full">
-                {/* Columna Izquierda: Calendario (Ampliado a lg:col-span-8 y xl:col-span-9) */}
-                <div className="lg:col-span-8 xl:col-span-9 bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full">
-                  <AcademicCalendar
-                    events={disponibilidad}
-                    initialView="timeGridWeek"
-                    headerToolbar={{
-                      left: "prev,next today",
-                      center: "title",
-                      right: "dayGridMonth,timeGridWeek",
-                    }}
-                    selectable={true}
-                    editable={false}
-                    onSelect={handleSelect}
-                    onEventClick={handleEventClick}
-                    slotMinTime="06:00:00"
-                    slotMaxTime="22:00:00"
-                    allDaySlot={false}
-                  />
+                <div className="lg:col-span-8 xl:col-span-9 bg-white p-2 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full overflow-hidden">
+                  <div className="w-full overflow-x-auto -mx-1 px-1">
+                    <div className="min-w-[600px]">
+                      <AcademicCalendar
+                        events={disponibilidad}
+                        initialView="timeGridWeek"
+                        headerToolbar={{
+                          left: "prev,next today",
+                          center: "title",
+                          right: "dayGridMonth,timeGridWeek",
+                        }}
+                        selectable={true}
+                        editable={false}
+                        onSelect={handleSelect}
+                        onEventClick={handleEventClick}
+                        slotMinTime="06:00:00"
+                        slotMaxTime="22:00:00"
+                        allDaySlot={false}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="lg:col-span-4 xl:col-span-3 space-y-6 w-full">
