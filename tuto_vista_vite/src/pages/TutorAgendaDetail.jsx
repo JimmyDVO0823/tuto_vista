@@ -22,12 +22,13 @@ const TutorAgendaDetail = () => {
 
   const [tutor, setTutor] = useState(null);
   const [disponibilidad, setDisponibilidad] = useState([]);
+  const [dispoEspecifica, setDispoEspecifica] = useState([]);
   const [sesionesOcupadas, setSesionesOcupadas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Booking states
-  const [selectedSlot, setSelectedSlot] = useState(null); // { id, diaSemana, horaInicio, horaFin }
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedSubjectId, setSelectedSubjectId] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -38,7 +39,7 @@ const TutorAgendaDetail = () => {
 
   const getNextDateForDayOfWeek = (dayOfWeek) => {
     const resultDate = new Date();
-    const currentDay = resultDate.getDay(); // 0 = Sun, 1 = Mon, etc.
+    const currentDay = resultDate.getDay();
     let distance = dayOfWeek - currentDay;
     if (distance <= 0) {
       distance += 7;
@@ -52,20 +53,20 @@ const TutorAgendaDetail = () => {
       setLoading(true);
       setError(null);
 
-      // Fetch tutor info and availability in parallel
-      const [tutorData, dispoData, sesionesData] = await Promise.all([
+      const [tutorData, dispoData, dispoEspecData, sesionesData] = await Promise.all([
         api.get(`/tutores/${id}`),
         api.get(`/disponibilidad/tutor/${id}`),
-        api.get(`/sesiones/tutor/${id}`).catch(() => []) // Catch error just in case
+        api.get(`/disponibilidad/especifica/tutor/${id}`).catch(() => []),
+        api.get(`/sesiones/tutor/${id}`).catch(() => [])
       ]);
 
       setTutor(tutorData);
       setDisponibilidad(dispoData || []);
+      setDispoEspecifica(dispoEspecData || []);
 
       const ocupadas = (sesionesData || []).filter(s => s.estado === 'programada' || s.estado === 'en_progreso');
       setSesionesOcupadas(ocupadas);
 
-      // Pre-select first subject if available
       if (tutorData?.materias?.length > 0) {
         setSelectedSubjectId(tutorData.materias[0].id.toString());
       }
@@ -84,17 +85,95 @@ const TutorAgendaDetail = () => {
     loadTutorDetails();
   }, [loadTutorDetails]);
 
-  // Group availability by day
+  useEffect(() => {
+    if (!loading) {
+      console.log("=== DATOS BACKEND ===");
+      console.log("1. Recurrentes (disponibilidad):", disponibilidad);
+      console.log("2. Específicas (dispoEspecifica):", dispoEspecifica);
+      console.log("=====================");
+    }
+  }, [loading, disponibilidad, dispoEspecifica]);
+
+  // 🌟 REGRESAMOS A LOS BLOQUES SEMANALES LIMPIOS E INTACTOS
   const groupedDispo = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 0: [] };
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // 1. Procesar las recurrentes normales tal cual vienen de la regla semanal
   disponibilidad.forEach(slot => {
     if (groupedDispo[slot.diaSemana] !== undefined) {
-      groupedDispo[slot.diaSemana].push(slot);
+      groupedDispo[slot.diaSemana].push({
+        ...slot,
+        isEspecifica: false,
+        fechaPorDefecto: getNextDateForDayOfWeek(slot.diaSemana)
+      });
     }
   });
 
+  // 2. Inyectar las específicas que sean Horas Extra (estaDisponible === true)
+  dispoEspecifica.forEach(espec => {
+    if (espec.estaDisponible) {
+      const [year, month, day] = espec.fecha.split('-').map(Number);
+      const specDate = new Date(year, month - 1, day);
+      const dayOfWeek = specDate.getDay();
+
+      if (espec.fecha >= todayStr && groupedDispo[dayOfWeek] !== undefined) {
+        const yaExiste = groupedDispo[dayOfWeek].some(s => s.isEspecifica && s.id === `spec-${espec.id}`);
+
+        if (!yaExiste) {
+          groupedDispo[dayOfWeek].push({
+            id: `spec-${espec.id}`,
+            diaSemana: dayOfWeek,
+            horaInicio: espec.horaInicio,
+            horaFin: espec.horaFin,
+            isEspecifica: true,
+            fechaPorDefecto: espec.fecha
+          });
+        }
+      }
+    }
+  });
+
+  // Ordenar por hora de inicio
+  Object.keys(groupedDispo).forEach(day => {
+    groupedDispo[day].sort((a, b) => a.horaInicio.substring(0, 5).localeCompare(b.horaInicio.substring(0, 5)));
+  });
+
+  // 🌟 FUNCIÓN EN CALIENTE PARA DETECTAR SI EL HORARIO PROCE_EDE A UN BLOQUEO DEL TUTOR
+  const comprobarSiEstaBloqueado = () => {
+    if (!selectedDate || !selectedTime) return null;
+
+    // Buscamos si el tutor guardó un bloqueo (estaDisponible === false) para la fecha seleccionada
+    const bloqueo = dispoEspecifica.find(e => e.fecha === selectedDate && !e.estaDisponible);
+    if (!bloqueo) return null;
+
+    const timeToMinutes = (t) => {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    };
+
+    const inicioSesion = timeToMinutes(selectedTime);
+    const finSesion = inicioSesion + parseInt(selectedDuration);
+    const inicioBloqueo = timeToMinutes(bloqueo.horaInicio.substring(0, 5));
+    const finBloqueo = timeToMinutes(bloqueo.horaFin.substring(0, 5));
+
+    // Verificamos si hay colisión de rangos
+    const seCruza = inicioSesion < finBloqueo && finSesion > inicioBloqueo;
+
+    if (seCruza) {
+      return {
+        inicio: bloqueo.horaInicio.substring(0, 5),
+        fin: bloqueo.horaFin.substring(0, 5)
+      };
+    }
+
+    return null;
+  };
+
+  const infoBloqueo = comprobarSiEstaBloqueado();
+
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
-    setSelectedDate(getNextDateForDayOfWeek(slot.diaSemana));
+    setSelectedDate(slot.isEspecifica ? slot.fechaPorDefecto : getNextDateForDayOfWeek(slot.diaSemana));
     setSelectedTime(slot.horaInicio.substring(0, 5));
     setSuccessMessage(null);
   };
@@ -102,45 +181,37 @@ const TutorAgendaDetail = () => {
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      // Prompt login or redirect
       alert('Debes iniciar sesión como estudiante para solicitar una tutoría.');
       navigate('/loginform');
       return;
     }
 
-    if (!selectedSlot) {
-      alert('Por favor selecciona un bloque de disponibilidad.');
-      return;
-    }
-    if (!selectedSubjectId) {
-      alert('Por favor selecciona la materia.');
-      return;
-    }
-    if (!selectedDate) {
-      alert('Por favor selecciona la fecha de la tutoría.');
-      return;
-    }
-    if (!selectedTime) {
-      alert('Por favor selecciona la hora de la tutoría.');
-      return;
-    }
+    if (!selectedSlot) { alert('Por favor selecciona un bloque de disponibilidad.'); return; }
+    if (!selectedSubjectId) { alert('Por favor selecciona la materia.'); return; }
+    if (!selectedDate) { alert('Por favor selecciona la fecha de la tutoría.'); return; }
+    if (!selectedTime) { alert('Por favor selecciona la hora de la tutoría.'); return; }
+    if (infoBloqueo) { alert('No puedes solicitar tutorías en un rango de horas bloqueado por el tutor.'); return; }
 
-    // Validate that selected date matches the slot day of the week
-    const dateObj = new Date(selectedDate + 'T00:00:00');
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
     if (dateObj.getDay() !== selectedSlot.diaSemana) {
       alert(`La fecha seleccionada no es un ${FULL_DAY_NAMES[selectedSlot.diaSemana]}. Por favor selecciona una fecha correspondiente.`);
       return;
     }
 
-    // Validate that selectedTime and duration fit within the selected slot
+    if (selectedSlot.isEspecifica && selectedDate !== selectedSlot.fechaPorDefecto) {
+      alert(`Este bloque corresponde a una fecha especial única: ${selectedSlot.fechaPorDefecto}. No se puede cambiar el día.`);
+      return;
+    }
+
     const timeToMinutes = (timeStr) => {
       const [h, m] = timeStr.split(':').map(Number);
       return h * 60 + m;
     };
 
-    const slotStartMin = timeToMinutes(selectedSlot.horaInicio);
-    const slotEndMin = timeToMinutes(selectedSlot.horaFin);
-    const selectedStartMin = timeToMinutes(selectedTime);
+    const slotStartMin = timeToMinutes(selectedSlot.horaInicio.substring(0, 5));
+    const slotEndMin = timeToMinutes(selectedSlot.horaFin.substring(0, 5));
+    const selectedStartMin = timeToMinutes(selectedTime.substring(0, 5));
     const sessionEndMin = selectedStartMin + parseInt(selectedDuration);
 
     if (selectedStartMin < slotStartMin || selectedStartMin > slotEndMin) {
@@ -149,12 +220,11 @@ const TutorAgendaDetail = () => {
     }
 
     if (sessionEndMin > slotEndMin) {
-      alert(`La sesión excede el horario de disponibilidad del tutor (finaliza a las ${Math.floor(sessionEndMin / 60).toString().padStart(2, '0')}:${(sessionEndMin % 60).toString().padStart(2, '0')} pero el tutor está disponible hasta las ${selectedSlot.horaFin.substring(0, 5)}).`);
+      alert(`La sesión excede el horario de disponibilidad del tutor.`);
       return;
     }
 
-    // Validate overlap with occupied sessions on this date (using UTC to prevent timezone shift)
-    const sessionStart = new Date(`${selectedDate}T${selectedTime}:00Z`);
+    const sessionStart = new Date(`${selectedDate}T${selectedTime.substring(0, 5)}:00Z`);
     const sessionEnd = new Date(sessionStart.getTime() + selectedDuration * 60000);
 
     const ocupadasDelDia = sesionesOcupadas.filter(s => {
@@ -162,8 +232,7 @@ const TutorAgendaDetail = () => {
       const utcYear = localDate.getUTCFullYear();
       const utcMonth = String(localDate.getUTCMonth() + 1).padStart(2, '0');
       const utcDay = String(localDate.getUTCDate()).padStart(2, '0');
-      const localDateStr = `${utcYear}-${utcMonth}-${utcDay}`;
-      return localDateStr === selectedDate;
+      return `${utcYear}-${utcMonth}-${utcDay}` === selectedDate;
     });
 
     const hasOverlap = ocupadasDelDia.some(s => {
@@ -173,18 +242,19 @@ const TutorAgendaDetail = () => {
     });
 
     if (hasOverlap) {
-      alert("El horario seleccionado se cruza con una sesión ya confirmada del tutor. Por favor revisa los horarios ocupados y elige otro espacio.");
+      alert("El horario seleccionado se cruza con una sesión ya confirmada del tutor. Por favor revisa los horarios ocupados.");
       return;
     }
 
     try {
       setSubmitting(true);
+      const horaFormateada = selectedTime.length === 5 ? `${selectedTime}:00` : selectedTime;
 
       const payload = {
         tutorId: parseInt(id),
         materiaId: parseInt(selectedSubjectId),
         fechaPreferida: selectedDate,
-        horaPreferida: selectedTime,
+        horaPreferida: horaFormateada,
         duracionMin: parseInt(selectedDuration),
         mensaje: message,
       };
@@ -192,13 +262,12 @@ const TutorAgendaDetail = () => {
       await api.post('/solicitudes', payload);
       setSuccessMessage('¡Solicitud de tutoría enviada exitosamente! El tutor revisará tu propuesta.');
 
-      // Reset form
       setSelectedSlot(null);
       setSelectedTime('');
       setMessage('');
     } catch (err) {
       console.error('Error enviando solicitud:', err);
-      alert(err.message || 'Error al enviar la solicitud de tutoría. Intenta de nuevo.');
+      alert(err.message || 'Error al enviar la solicitud de tutoría.');
     } finally {
       setSubmitting(false);
     }
@@ -262,14 +331,9 @@ const TutorAgendaDetail = () => {
         </header>
 
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Columna Izquierda: Foto y Metadata */}
           <aside className="col-span-12 lg:col-span-4 space-y-12">
             <div className="aspect-[4/5] bg-surface-container-low rounded-2xl overflow-hidden shadow-ambient relative group">
-              <img
-                src={tutor.url_avatar || defaultAvatar}
-                alt={tutor.nombre_completo}
-                className="w-full h-full object-cover"
-              />
+              <img src={tutor.url_avatar || defaultAvatar} alt={tutor.nombre_completo} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                 <span className="text-white text-xs uppercase font-bold tracking-widest">
                   {tutor.anios_experiencia} años de experiencia
@@ -283,54 +347,14 @@ const TutorAgendaDetail = () => {
               </h3>
               <div className="flex flex-wrap gap-2">
                 {tutor.materias?.map(m => (
-                  <span
-                    key={m.id}
-                    className="px-4 py-2 bg-surface-container-lowest text-primary text-xs font-bold rounded-full border border-outline-variant/20 shadow-sm"
-                  >
+                  <span key={m.id} className="px-4 py-2 bg-surface-container-lowest text-primary text-xs font-bold rounded-full border border-outline-variant/20 shadow-sm">
                     {m.nombre}
                   </span>
                 ))}
-                {(!tutor.materias || tutor.materias.length === 0) && (
-                  <span className="text-sm text-gray-400 italic">No tiene materias registradas</span>
-                )}
               </div>
             </div>
-
-            {/* Títulos y Logros */}
-            {((tutor.titulos && tutor.titulos.length > 0) || (tutor.logros && tutor.logros.length > 0)) && (
-              <div className="bg-surface-container-low p-8 rounded-2xl space-y-8">
-                {tutor.titulos && tutor.titulos.length > 0 && (
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-elegant-gray">Titulaciones</h4>
-                    <ul className="space-y-3">
-                      {tutor.titulos.map((t, idx) => (
-                        <li key={idx} className="flex gap-3 items-start text-sm text-primary">
-                          <span className="material-symbols-outlined text-academic-gold text-base mt-0.5">school</span>
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {tutor.logros && tutor.logros.length > 0 && (
-                  <div className="space-y-4">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-elegant-gray">Reconocimientos</h4>
-                    <ul className="space-y-3">
-                      {tutor.logros.map((l, idx) => (
-                        <li key={idx} className="flex gap-3 items-start text-sm text-primary">
-                          <span className="material-symbols-outlined text-academic-gold text-base mt-0.5">workspace_premium</span>
-                          <span>{l}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
           </aside>
 
-          {/* Columna Derecha: Bio y Agenda/Reserva */}
           <article className="col-span-12 lg:col-span-8 space-y-16">
             <div className="space-y-6">
               <h2 className="text-3xl font-bold text-primary tracking-tight">Sobre {tutor.nombre_completo.split(' ')[0]}</h2>
@@ -339,14 +363,12 @@ const TutorAgendaDetail = () => {
               </p>
             </div>
 
-            {/* Cuadro de Agenda y Reserva */}
             <div className="bg-surface-container-lowest rounded-3xl p-5 md:p-10 shadow-ambient border border-outline-variant/10">
               <div className="mb-8">
                 <h4 className="font-headline font-bold text-xl text-primary mb-2">Espacios de Disponibilidad Semanal</h4>
-                <p className="text-sm text-elegant-gray">Selecciona un bloque de horario para agendar tu tutoría.</p>
+                <p className="text-sm text-elegant-gray">Selecciona un bloque de horario para agendar tu tutoría. Los bloques azules (⭐) son horarios especiales añadidos por el tutor.</p>
               </div>
 
-              {/* Grid Semanal */}
               <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-10">
                 {[1, 2, 3, 4, 5, 6, 0].map(dayIdx => {
                   const daySlots = groupedDispo[dayIdx];
@@ -362,13 +384,17 @@ const TutorAgendaDetail = () => {
                           return (
                             <button
                               key={slot.id}
+                              type="button"
                               onClick={() => handleSlotSelect(slot)}
                               className={`w-full py-3 px-2 rounded-xl text-xs font-bold transition-all text-center border ${isSelected
                                 ? 'bg-academic-gold/10 border-academic-gold text-academic-gold shadow-sm scale-[1.02]'
-                                : 'bg-surface-container-low border-outline-variant/10 text-primary hover:border-academic-gold hover:text-academic-gold hover:bg-academic-gold/5'
+                                : slot.isEspecifica
+                                  ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+                                  : 'bg-surface-container-low border-outline-variant/10 text-primary hover:border-academic-gold hover:text-academic-gold hover:bg-academic-gold/5'
                                 }`}
                             >
                               {slot.horaInicio.substring(0, 5)} - {slot.horaFin.substring(0, 5)}
+                              {slot.isEspecifica && <span className="block text-[9px] text-blue-500 font-normal">Único</span>}
                             </button>
                           );
                         })
@@ -380,7 +406,6 @@ const TutorAgendaDetail = () => {
                 })}
               </div>
 
-              {/* Formulario de Reserva */}
               {selectedSlot && (
                 <form onSubmit={handleBookingSubmit} className="mt-8 pt-8 border-t border-outline-variant/10 space-y-6 animate-fadeIn">
                   <div className="bg-surface-container-low p-6 rounded-2xl mb-6">
@@ -393,48 +418,9 @@ const TutorAgendaDetail = () => {
                     </p>
                   </div>
 
-                  {(() => {
-                    const ocupadasDelDia = !selectedDate ? [] : sesionesOcupadas.filter(s => {
-                      const localDate = new Date(s.programadaPara);
-                      const utcYear = localDate.getUTCFullYear();
-                      const utcMonth = String(localDate.getUTCMonth() + 1).padStart(2, '0');
-                      const utcDay = String(localDate.getUTCDate()).padStart(2, '0');
-                      const localDateStr = `${utcYear}-${utcMonth}-${utcDay}`;
-                      return localDateStr === selectedDate;
-                    });
-
-                    return ocupadasDelDia.length > 0 && (
-                      <div className="bg-orange-50 border border-orange-200 p-4 rounded-xl mb-6 animate-fadeIn">
-                        <h6 className="text-orange-800 font-bold text-xs uppercase tracking-wider mb-2 flex items-center gap-1">
-                          <span className="material-symbols-outlined text-sm">warning</span>
-                          Horarios Ocupados Este Día
-                        </h6>
-                        <ul className="text-sm text-orange-700 space-y-1">
-                          {ocupadasDelDia.map(s => {
-                            const start = new Date(s.programadaPara);
-                            const end = new Date(start.getTime() + s.duracionMin * 60000);
-                            return (
-                              <li key={s.id} className="flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 bg-orange-400 rounded-full"></span>
-                                <span className="font-medium">
-                                  {start.toLocaleTimeString([], { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} - {end.toLocaleTimeString([], { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                        <p className="text-xs text-orange-600 mt-2 font-medium">
-                          Por favor elige una hora que no se cruce con estos horarios.
-                        </p>
-                      </div>
-                    );
-                  })()}
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">
-                        Materia de estudio *
-                      </label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">Materia de estudio *</label>
                       <select
                         value={selectedSubjectId}
                         onChange={(e) => setSelectedSubjectId(e.target.value)}
@@ -442,32 +428,27 @@ const TutorAgendaDetail = () => {
                         className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl text-sm font-medium focus:outline-none focus:border-academic-gold transition-colors"
                       >
                         {tutor.materias?.map(m => (
-                          <option key={m.id} value={m.id}>
-                            {m.nombre}
-                          </option>
+                          <option key={m.id} value={m.id}>{m.nombre}</option>
                         ))}
                       </select>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">
-                        Fecha deseada (debe ser {FULL_DAY_NAMES[selectedSlot.diaSemana]}) *
-                      </label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">Fecha deseada *</label>
                       <input
                         type="date"
                         value={selectedDate}
+                        disabled={selectedSlot.isEspecifica}
                         onChange={(e) => setSelectedDate(e.target.value)}
                         required
-                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl text-sm font-medium focus:outline-none focus:border-academic-gold transition-colors"
+                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl text-sm font-medium focus:outline-none focus:border-academic-gold transition-colors disabled:opacity-70 disabled:bg-gray-100"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">
-                        Hora de inicio deseada (de {selectedSlot.horaInicio.substring(0, 5)} a {selectedSlot.horaFin.substring(0, 5)}) *
-                      </label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">Hora de inicio deseada *</label>
                       <input
                         type="time"
                         value={selectedTime}
@@ -480,9 +461,7 @@ const TutorAgendaDetail = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">
-                        Duración (minutos) *
-                      </label>
+                      <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">Duración (minutos) *</label>
                       <input
                         type="number"
                         min="15"
@@ -496,19 +475,28 @@ const TutorAgendaDetail = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">
-                      Mensaje / Dudas o temas a tratar (Opcional)
-                    </label>
+                    <label className="text-xs font-bold uppercase tracking-wider text-elegant-gray block">Mensaje / Dudas o temas a tratar</label>
                     <textarea
                       rows="3"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Ej: Hola, me gustaría repasar los temas de límites de cara al parcial..."
+                      placeholder="Ej: Hola, me gustaría repasar los temas de límites..."
                       className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl text-sm font-medium focus:outline-none focus:border-academic-gold transition-colors resize-none"
                     ></textarea>
                   </div>
 
-                  <div className="pt-6 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  {/* 🚨 BANNER DINÁMICO DE ADVERTENCIA DE BLOQUEO PARCIAL EXCLUSIVO DE LA FECHA */}
+                  {infoBloqueo && (
+                    <div className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl flex items-start gap-3 my-4 animate-fadeIn">
+                      <span className="material-symbols-outlined text-amber-600">warning</span>
+                      <div className="text-xs font-medium">
+                        <p className="font-bold text-amber-900 mb-0.5">Horario no disponible para esta fecha</p>
+                        El tutor ha inhabilitado la franja de <span className="font-bold">{infoBloqueo.inicio} a {infoBloqueo.fin}</span> para el día elegido. Por favor, selecciona una hora diferente fuera de ese rango.
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-6 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                       <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Inversión por hora</p>
                       <p className="text-2xl md:text-3xl font-black text-primary">
@@ -516,10 +504,15 @@ const TutorAgendaDetail = () => {
                         <span className="text-sm font-medium text-gray-400"> / h</span>
                       </p>
                     </div>
+
+                    {/* 🌟 BOTÓN CONGELADO / DESHABILITADO SI ENTRA EN CONFLICTO CON EL BLOQUEO */}
                     <button
                       type="submit"
-                      disabled={submitting}
-                      className="signature-gradient text-white px-10 py-4 rounded-xl font-bold shadow-xl shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:transform-none"
+                      disabled={submitting || !!infoBloqueo}
+                      className={`px-10 py-4 rounded-xl font-bold shadow-xl transition-all w-full md:w-auto ${!!infoBloqueo
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none opacity-60'
+                        : 'signature-gradient text-white hover:-translate-y-0.5 shadow-primary/20'
+                        }`}
                     >
                       {submitting ? 'Enviando...' : 'Solicitar Tutoría'}
                     </button>

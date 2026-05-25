@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,9 @@ public class SolicitudService {
     private final DisponibilidadRepository disponibilidadRepository;
     private final SesionTutoriaRepository sesionTutoriaRepository;
 
+    // 🌟 INYECTAMOS EL REPOSITORIO DE ESPECÍFICAS
+    private final DispoEspecificaRepository dispoEspecificaRepository;
+
     @Transactional
     public SolicitudDTO crear(Long estudianteId, SolicitudRequest request) {
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
@@ -30,53 +34,76 @@ public class SolicitudService {
         Materia materia = materiaRepository.findById(request.getMateriaId())
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
 
-        // Validar disponibilidad
         if (request.getHoraPreferida() == null) {
             throw new RuntimeException("La hora preferida es obligatoria.");
         }
-        
-        java.util.List<Disponibilidad> disponibilidades = disponibilidadRepository.findByTutorIdAndEstaActivoTrue(request.getTutorId());
-        
-        int diaSemanaJava = request.getFechaPreferida().getDayOfWeek().getValue(); // 1 = Lunes, ..., 7 = Domingo
-        int diaSemanaDB = diaSemanaJava == 7 ? 0 : diaSemanaJava; // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
-        
+
         java.time.LocalTime horaInicioSesion = request.getHoraPreferida();
         int duracion = request.getDuracionMin() != null ? request.getDuracionMin() : 90;
         java.time.LocalTime horaFinSesion = horaInicioSesion.plusMinutes(duracion);
-        
+
         boolean horarioValido = false;
-        for (Disponibilidad d : disponibilidades) {
-            if (d.getDiaSemana() == diaSemanaDB) {
-                if (!horaInicioSesion.isBefore(d.getHoraInicio()) && !horaFinSesion.isAfter(d.getHoraFin())) {
+
+        // 🌟 1. VALIDACIÓN JERÁRQUICA INTELIGENTE
+        Optional<DispoEspecifica> especOpt = dispoEspecificaRepository
+                .findByTutorIdAndFecha(request.getTutorId(), request.getFechaPreferida());
+
+        if (especOpt.isPresent()) {
+            DispoEspecifica espec = especOpt.get();
+
+            if (espec.isEstaDisponible()) {
+                // CASO A: Es una HORA EXTRA (Bloque Azul). Solo es válido si entra
+                // completamente en este rango.
+                if (!horaInicioSesion.isBefore(espec.getHoraInicio()) && !horaFinSesion.isAfter(espec.getHoraFin())) {
                     horarioValido = true;
-                    break;
                 }
+            } else {
+                // CASO B: Es un BLOQUEO de horas (Gris/Rojo).
+                // Verificamos si la solicitud se cruza/solapa con el rango bloqueado.
+                boolean seCruzaConBloqueo = horaInicioSesion.isBefore(espec.getHoraFin())
+                        && horaFinSesion.isAfter(espec.getHoraInicio());
+
+                if (seCruzaConBloqueo) {
+                    throw new RuntimeException(
+                            "El horario seleccionado coincide con un bloque que el tutor ha deshabilitado para este día.");
+                }
+
+                // Si NO se cruza con las horas bloqueadas, verificamos si cae en el horario
+                // recurrente normal de ese día.
+                horarioValido = validarContraHorarioRecurrente(request.getTutorId(), request.getFechaPreferida(),
+                        horaInicioSesion, horaFinSesion);
             }
-        }
-        
-        if (!horarioValido) {
-            throw new RuntimeException("El horario seleccionado o la duración excede la disponibilidad configurada del tutor para este día.");
+        } else {
+            // CASO C: No hay excepciones específicas para esta fecha, validamos con el
+            // horario semanal regular.
+            horarioValido = validarContraHorarioRecurrente(request.getTutorId(), request.getFechaPreferida(),
+                    horaInicioSesion, horaFinSesion);
         }
 
-        // Validar solapamiento con sesiones existentes (programadas o en progreso) en esa fecha exacta
+        if (!horarioValido) {
+            throw new RuntimeException(
+                    "El horario seleccionado o la duración excede la disponibilidad configurada del tutor para este día.");
+        }
+
+        // Validar solapamiento con sesiones existentes (programadas o en progreso) en
+        // esa fecha exacta
         java.time.OffsetDateTime nuevaInicio = java.time.OffsetDateTime.of(
-            request.getFechaPreferida(), 
-            request.getHoraPreferida(), 
-            java.time.ZoneOffset.UTC
-        );
+                request.getFechaPreferida(),
+                request.getHoraPreferida(),
+                java.time.ZoneOffset.UTC);
         java.time.OffsetDateTime nuevaFin = nuevaInicio.plusMinutes(duracion);
 
         java.util.List<SesionTutoria> activeSessions = sesionTutoriaRepository.findByTutorIdAndEstadoIn(
-            request.getTutorId(),
-            java.util.List.of(com.tutorias.tutorias_backend.enums.EstadoSesion.programada, com.tutorias.tutorias_backend.enums.EstadoSesion.en_progreso)
-        );
+                request.getTutorId(),
+                java.util.List.of(com.tutorias.tutorias_backend.enums.EstadoSesion.programada,
+                        com.tutorias.tutorias_backend.enums.EstadoSesion.en_progreso));
 
         for (SesionTutoria s : activeSessions) {
             java.time.OffsetDateTime extInicio = s.getProgramadaPara();
             java.time.OffsetDateTime extFin = extInicio.plusMinutes(s.getDuracionMin());
 
             if (nuevaInicio.isBefore(extFin) && nuevaFin.isAfter(extInicio)) {
-                throw new RuntimeException("El tutor ya está ocupado en ese horario exacto (" + 
+                throw new RuntimeException("El tutor ya está ocupado en ese horario exacto (" +
                         extInicio.toLocalTime() + " - " + extFin.toLocalTime() + ") por otra tutoría confirmada.");
             }
         }
@@ -92,6 +119,25 @@ public class SolicitudService {
         solicitud.setEstado(EstadoSolicitud.pendiente);
 
         return toDTO(solicitudRepository.save(solicitud));
+    }
+
+    // 🌟 MÉTODO AUXILIAR ENCAPSULADO PARA VALIDAR EL HORARIO SEMANAL RECURRENTE
+    private boolean validarContraHorarioRecurrente(Long tutorId, java.time.LocalDate fecha, java.time.LocalTime inicio,
+            java.time.LocalTime fin) {
+        List<Disponibilidad> disponibilidades = disponibilidadRepository
+                .findByTutorIdAndEstaActivoTrue(tutorId);
+
+        int diaSemanaJava = fecha.getDayOfWeek().getValue(); // 1 = Lunes, ..., 7 = Domingo
+        int diaSemanaDB = diaSemanaJava == 7 ? 0 : diaSemanaJava; // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+
+        for (Disponibilidad d : disponibilidades) {
+            if (d.getDiaSemana() == diaSemanaDB) {
+                if (!inicio.isBefore(d.getHoraInicio()) && !fin.isAfter(d.getHoraFin())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Transactional
