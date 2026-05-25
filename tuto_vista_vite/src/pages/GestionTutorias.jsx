@@ -90,6 +90,22 @@ const GestionTutorias = () => {
       setProcessingId(null);
     }
   };
+  const handleUpdateLink = async (id, nuevoEnlace) => {
+    try {
+      // Enviamos un objeto JSON estándar en lugar de texto plano
+      await api.patch(`/sesiones/${id}/enlace`, {
+        enlaceReunion: nuevoEnlace
+      });
+
+      // Actualizamos el estado local de las sesiones con el nuevo link
+      setSesiones(prev => prev.map(s => s.id === id ? { ...s, enlaceReunion: nuevoEnlace } : s));
+      alert("¡Enlace de reunión actualizado con éxito!");
+    } catch (err) {
+      console.error('Error updating session link:', err);
+      alert(err.message || 'Error al actualizar el enlace de la reunión.');
+      throw err; // Lanzamos el error para que la tarjeta detenga el estado de carga
+    }
+  };
 
   return (
     <MainLayout>
@@ -185,6 +201,7 @@ const GestionTutorias = () => {
                       key={session.id}
                       session={session}
                       onCancel={handleCancelSession}
+                      onUpdateLink={handleUpdateLink}
                       isLoading={processingId === session.id}
                     />
                   ))}
