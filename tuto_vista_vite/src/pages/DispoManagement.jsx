@@ -94,10 +94,6 @@ const DispoManagement = () => {
         api.get(`/tutores/${user.id}`).catch(() => null),
       ]);
 
-      // Impresión de depuración en consola para auditar qué está llegando del backend
-      console.log("Recurrentes crudas:", dispoRecurrente);
-      console.log("Específicas crudas:", dispoEspecifica);
-
       const todasLasDisponibilidades = [
         ...(Array.isArray(dispoRecurrente) ? dispoRecurrente : []),
         ...(Array.isArray(dispoEspecifica) ? dispoEspecifica : [])
