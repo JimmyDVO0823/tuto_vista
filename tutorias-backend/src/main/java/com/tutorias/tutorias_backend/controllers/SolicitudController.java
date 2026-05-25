@@ -24,7 +24,7 @@ public class SolicitudController {
         String email = authentication.getName();
         com.tutorias.tutorias_backend.entities.Perfil perfil = perfilRepository.findByCorreo(email)
                 .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
-        Long estudianteId = perfil.getId(); 
+        Long estudianteId = perfil.getId();
         return ResponseEntity.ok(solicitudService.crear(estudianteId, request));
     }
 
@@ -40,7 +40,7 @@ public class SolicitudController {
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<SolicitudDTO> actualizarEstado(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestParam EstadoSolicitud estado) {
         return ResponseEntity.ok(solicitudService.actualizarEstado(id, estado));
     }
