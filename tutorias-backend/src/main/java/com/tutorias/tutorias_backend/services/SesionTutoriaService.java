@@ -115,10 +115,23 @@ public class SesionTutoriaService {
     }
 
     @Transactional
-    public SesionTutoriaDTO actualizarEstado(Long id, EstadoSesion estado) {
+    public SesionTutoriaDTO actualizarEstado(Long id, EstadoSesion estado, String motivo) {
         SesionTutoria sesion = sesionTutoriaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
         sesion.setEstado(estado);
+
+        // Si la sesión pasa a un estado de cierre negativo, acoplamos el motivo
+        if (estado == EstadoSesion.cancelada || estado == EstadoSesion.no_asistio) {
+            if (motivo != null && !motivo.trim().isEmpty()) {
+                sesion.setMotivoCancelacion(motivo);
+            }
+        } else {
+            // Flujo feliz (en_progreso, completada): nos aseguramos de limpiar el motivo si
+            // existía alguno
+            sesion.setMotivoCancelacion(null);
+        }
+
         return toDTO(sesionTutoriaRepository.save(sesion));
     }
 

@@ -49,7 +49,6 @@ const GestionTutorias = () => {
       await api.post(`/sesiones/desde-solicitud/${id}`);
       setSolicitudes(prev => prev.filter(s => s.id !== id));
       alert("¡Tutoría aceptada y agendada exitosamente!");
-      // Reload both lists so the session is added to the sessions list
       fetchData();
     } catch (err) {
       console.error('Error accepting solicitud:', err);
@@ -75,35 +74,53 @@ const GestionTutorias = () => {
     }
   };
 
-  const handleCancelSession = async (id) => {
-    if (!window.confirm("¿Estás seguro de que deseas cancelar esta tutoría ya programada?")) return;
-
+  const handleUpdateStatus = async (id, estadoNuevo, motivoCancelacion = null) => {
     try {
       setProcessingId(id);
-      await api.patch(`/sesiones/${id}/estado?estado=cancelada`);
-      setSesiones(prev => prev.filter(s => s.id !== id));
-      alert("¡Tutoría cancelada exitosamente!");
+
+      await api.patch(`/sesiones/${id}/estado`, {
+        estado: estadoNuevo,
+        motivoCancelacion: motivoCancelacion
+      });
+
+      setSesiones(prev =>
+        prev.map(s => {
+          if (s.id === id) {
+            return { ...s, estado: estadoNuevo, motivoCancelacion: motivoCancelacion };
+          }
+          return s;
+        })
+          .filter(s => s.estado === 'programada' || s.estado === 'en_progreso')
+      );
+
+      const mensajes = {
+        en_progreso: "¡La tutoría ha iniciado! Está ahora en progreso.",
+        completada: "¡Excelente! Tutoría marcada como completada.",
+        cancelada: "La tutoría ha sido cancelada.",
+        no_asistio: "Se registró la inasistencia del estudiante."
+      };
+
+      alert(mensajes[estadoNuevo] || "Estado de la tutoría actualizado.");
     } catch (err) {
-      console.error('Error canceling session:', err);
-      alert(err.message || 'Error al cancelar la tutoría.');
+      console.error('Error al actualizar el estado de la sesión:', err);
+      alert(err.message || 'Error al procesar el cambio de estado.');
     } finally {
       setProcessingId(null);
     }
   };
+
   const handleUpdateLink = async (id, nuevoEnlace) => {
     try {
-      // Enviamos un objeto JSON estándar en lugar de texto plano
       await api.patch(`/sesiones/${id}/enlace`, {
         enlaceReunion: nuevoEnlace
       });
 
-      // Actualizamos el estado local de las sesiones con el nuevo link
       setSesiones(prev => prev.map(s => s.id === id ? { ...s, enlaceReunion: nuevoEnlace } : s));
       alert("¡Enlace de reunión actualizado con éxito!");
     } catch (err) {
       console.error('Error updating session link:', err);
       alert(err.message || 'Error al actualizar el enlace de la reunión.');
-      throw err; // Lanzamos el error para que la tarjeta detenga el estado de carga
+      throw err;
     }
   };
 
@@ -200,7 +217,7 @@ const GestionTutorias = () => {
                     <SessionCard
                       key={session.id}
                       session={session}
-                      onCancel={handleCancelSession}
+                      onUpdateStatus={handleUpdateStatus} // 👈 Corregido de onCancel a onUpdateStatus
                       onUpdateLink={handleUpdateLink}
                       isLoading={processingId === session.id}
                     />
