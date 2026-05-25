@@ -1,9 +1,5 @@
 /**
- * @fileoverview Feature Component - Advanced Academic Calendar
- * @module components/features/dashboard/AcademicCalendar
- * @description A high-fidelity scheduling interface powered by FullCalendar. 
- * Orchestrates pedagogical sessions and academic commitments with a 
- * focus on visual hierarchy and immediate event previews.
+ * @fileoverview Feature Component - Advanced Academic Calendar (Soporte Multi-vista)
  */
 
 import React, { useState } from 'react';
@@ -13,8 +9,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventPreviewCard from './EventPreviewCard';
 
-export default function AcademicCalendar({ 
-  events = [], 
+export default function AcademicCalendar({
+  events = [],
   initialView = 'dayGridMonth',
   headerToolbar = { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
   selectable = false,
@@ -45,7 +41,17 @@ export default function AcademicCalendar({
     setHoveredEvent(null);
   };
 
-  const isViewSelectable = selectable && currentView !== 'dayGridMonth';
+  // 🛠️ CORRECCIÓN AQUÍ: En la vista de mes SÍ debe ser seleccionable para poder agendar días específicos
+  const isViewSelectable = selectable;
+
+  const filteredEvents = events.filter(event => {
+    const type = event.extendedProps?.type?.toLowerCase() || '';
+    const status = event.extendedProps?.status?.toLowerCase() || '';
+    if (type.includes('solicitud')) {
+      return status === 'pendiente' || status === 'pending';
+    }
+    return true;
+  });
 
   return (
     <div className={`relative bg-surface-container-lowest p-8 rounded-lg shadow-ambient font-body
@@ -60,7 +66,7 @@ export default function AcademicCalendar({
       [&_.fc-button]:font-body [&_.fc-button]:font-semibold [&_.fc-button]:capitalize [&_.fc-button]:rounded-xl
       [&_.fc-col-header-cell-cushion]:font-headline [&_.fc-col-header-cell-cushion]:font-semibold [&_.fc-col-header-cell-cushion]:text-elegant-gray [&_.fc-col-header-cell-cushion]:no-underline
       [&_.fc-daygrid-day-number]:font-body [&_.fc-daygrid-day-number]:text-elegant-gray [&_.fc-daygrid-day-number]:no-underline [&_.fc-daygrid-day-number]:p-2
-      ${isViewSelectable ? `
+      ${isViewSelectable && currentView !== 'dayGridMonth' ? `
         [&_.fc-timegrid]:cursor-cell
         [&_.fc-timegrid-slots_tr]:cursor-cell
         [&_.fc-timegrid-slots_td]:cursor-cell
@@ -71,14 +77,19 @@ export default function AcademicCalendar({
         [&_.fc-timegrid-col-bg]:cursor-cell
         [&_.fc-timegrid-col-bg:hover]:bg-gray-50/20
         [&_.fc-timegrid-cols_td]:cursor-cell
+      ` : ''}
+      ${isViewSelectable && currentView === 'dayGridMonth' ? `
+        [&_.fc-daygrid-day]:cursor-pointer
+        [&_.fc-daygrid-day:hover]:bg-gray-50/50
       ` : ''}`}>
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={initialView}
         aspectRatio={1.1}
         headerToolbar={headerToolbar}
-        events={events}
-        selectable={isViewSelectable}
+        events={filteredEvents}
+        selectable={isViewSelectable} // 👈 Ahora hereda directamente el true/false que le mandes
+        unselectAuto={true}
         editable={editable}
         select={onSelect}
         eventClick={onEventClick}
@@ -88,8 +99,11 @@ export default function AcademicCalendar({
         displayEventTime={false}
         datesSet={(arg) => setCurrentView(arg.view.type)}
         eventClassNames={(arg) => {
+          // Si el evento ya viene con un color quemado desde FullCalendar, respetarlo
+          if (arg.event.backgroundColor) return `rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer`;
+
           const colorType = arg.event.extendedProps.colorType;
-          let colorClass = 'bg-primary'; // Default blue
+          let colorClass = 'bg-primary';
           if (colorType === 'academic-gold') {
             colorClass = 'bg-academic-gold text-white';
           } else if (colorType === 'academic-blue') {
