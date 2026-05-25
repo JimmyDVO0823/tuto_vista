@@ -1,27 +1,5 @@
 <!doctype html>
 <html lang="en">
-  <script type="text/javascript">
-    // Revisa si venimos de una redirección por 404
-    (function (l) {
-      if (l.search[1] === "p") {
-        var pairs = l.search.slice(1).split("&");
-        var query = {};
-        pairs.forEach(function (pair) {
-          var keyVal = pair.split("=");
-          query[keyVal[0]] = decodeURIComponent(keyVal[1] || "");
-        });
-        if (query.p !== undefined) {
-          window.history.replaceState(
-            null,
-            null,
-            l.pathname.slice(0, l.pathname.length - (query.p || "").length) +
-              query.p.replace(/~and~/g, "&") +
-              l.hash,
-          );
-        }
-      }
-    })(window.location);
-  </script>
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/tuto_vista/favicon.svg" />
@@ -48,6 +26,28 @@
         background: linear-gradient(135deg, #002045 0%, #1a365d 100%);
       }
     </style>
+    <script type="text/javascript">
+      // 2. Decodifica la ruta redirigida por el archivo 404.html
+      (function (l) {
+        if (l.search[1] === "p") {
+          var pairs = l.search.slice(1).split("&");
+          var query = {};
+          pairs.forEach(function (pair) {
+            var keyVal = pair.split("=");
+            query[keyVal[0]] = decodeURIComponent(keyVal[1] || "");
+          });
+          if (query.p !== undefined) {
+            window.history.replaceState(
+              null,
+              null,
+              l.pathname.slice(0, l.pathname.length - (query.p || "").length) +
+                query.p.replace(/~and~/g, "&") +
+                l.hash,
+            );
+          }
+        }
+      })(window.location);
+    </script>
     <script type="module" crossorigin src="/tuto_vista/assets/index-Ca5hv9BC.js"></script>
     <link rel="stylesheet" crossorigin href="/tuto_vista/assets/index-APHOzQyq.css">
   </head>
