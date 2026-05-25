@@ -93,13 +93,13 @@ const GestionTutorias = () => {
 
   return (
     <MainLayout>
-      <main className="flex-1 p-8 lg:p-12 min-h-screen">
+      <main className="flex-1 p-4 md:p-8 lg:p-12 min-h-screen">
         <header className="mb-12 max-w-4xl">
           <span className="text-xs font-bold text-academic-gold uppercase tracking-[0.2em] mb-4 block">Panel de Control</span>
-          <h1 className="text-4xl font-extrabold text-primary tracking-tight font-display mb-4">
+          <h1 className="text-2xl md:text-4xl font-extrabold text-primary tracking-tight font-display mb-4">
             Gestionar Tutorías
           </h1>
-          <p className="text-lg text-gray-500 leading-relaxed border-l-4 border-academic-gold/50 pl-4">
+          <p className="text-base md:text-lg text-gray-500 leading-relaxed border-l-4 border-academic-gold/50 pl-4">
             Administra tus encuentros académicos. Responde a solicitudes entrantes y gestiona o cancela tus tutorías ya programadas.
           </p>
         </header>

@@ -96,7 +96,7 @@ const DashboardStudent = () => {
 
         <section className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 mb-10 md:mb-20">
           <article className="col-span-12 md:col-span-8">
-            <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+            <div className="bg-white p-4 md:p-8 rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="text-2xl font-bold text-primary mb-6 font-headline">
                 Calendario Académico
               </h3>

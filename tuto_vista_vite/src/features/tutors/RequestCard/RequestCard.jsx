@@ -44,7 +44,7 @@ const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
   const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(estudianteNombre)}&background=f2f4f6&color=002045&size=100`;
 
   return (
-    <div className="bg-surface-container-lowest p-8 rounded-2xl shadow-ambient hover:-translate-y-1 transition-all duration-300">
+    <div className="bg-surface-container-lowest p-5 md:p-8 rounded-2xl shadow-ambient hover:-translate-y-1 transition-all duration-300">
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Left column: User info (Asymmetrical layout 30/70) */}
         <div className="flex items-center gap-4 lg:w-1/3 border-b lg:border-b-0 lg:border-r border-outline-variant/10 pb-6 lg:pb-0 lg:pr-6">
@@ -69,7 +69,7 @@ const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
               <span className="text-xs font-bold text-primary uppercase tracking-widest">{materiaNombre}</span>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span className="text-[10px] font-bold text-elegant-gray uppercase tracking-widest block mb-1">Fecha Propuesta</span>
                 <p className="text-sm font-medium text-primary capitalize">{requestedDate}</p>

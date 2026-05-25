@@ -19,7 +19,7 @@ import React from 'react';
  * @component
  */
 const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-  const baseStyles = 'px-8 py-4 rounded-md font-bold text-lg transition-all active:scale-95 flex items-center justify-center gap-2';
+  const baseStyles = 'px-5 py-3 text-base md:px-8 md:py-4 md:text-lg rounded-md font-bold transition-all active:scale-95 flex items-center justify-center gap-2';
   
   const variants = {
     primary: 'signature-gradient text-white shadow-lg hover:shadow-xl',

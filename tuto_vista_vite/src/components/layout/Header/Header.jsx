@@ -14,7 +14,7 @@
 const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-[#f7f9fb]/80 backdrop-blur-md shadow-sm">
-      <div className="flex justify-between items-center w-full px-8 py-4 max-w-full mx-auto">
+      <div className="flex justify-between items-center w-full px-4 md:px-8 py-4 max-w-full mx-auto">
         <div className="text-xl font-bold tracking-tight text-[#002045]">
           The Academic Editorial
         </div>

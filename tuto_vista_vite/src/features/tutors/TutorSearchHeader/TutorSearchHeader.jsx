@@ -2,12 +2,12 @@ import React from 'react';
 
 const TutorSearchHeader = ({ searchQuery, onSearchChange }) => {
   return (
-    <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+    <header className="mb-6 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8">
       <div className="max-w-2xl">
         <span className="text-sm font-label font-bold uppercase tracking-[0.1em] text-tertiary mb-2 block">
           Explora Expertos
         </span>
-        <h1 className="text-5xl font-headline font-black text-primary leading-tight">
+        <h1 className="text-3xl md:text-5xl font-headline font-black text-primary leading-tight">
           Encuentra tu mentor académico ideal.
         </h1>
       </div>

@@ -23,7 +23,7 @@ const SearchFilters = ({ departments, subjects, filters, onFilterChange }) => {
   };
 
   return (
-    <aside className="w-80 bg-surface-container-low flex flex-col p-8 gap-10 sticky top-[72px] h-[calc(100vh-72px)] border-r border-outline-variant/10 overflow-y-auto">
+    <aside className="w-full md:w-80 bg-surface-container-low flex flex-col p-4 md:p-8 gap-10 md:sticky md:top-[72px] md:h-[calc(100vh-72px)] border-b md:border-b-0 md:border-r border-outline-variant/10 overflow-y-auto">
       <div>
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-outline-variant/10">
           <h3 className="text-sm font-label font-bold uppercase tracking-widest text-on-surface-variant">

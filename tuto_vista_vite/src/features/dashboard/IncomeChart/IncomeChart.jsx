@@ -25,7 +25,7 @@ export default function IncomeChart({ tutorId }) {
 
   if (loading || !data) {
     return (
-      <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border-none w-full h-[400px] flex items-center justify-center">
+      <div className="bg-surface-container-lowest p-4 md:p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border-none w-full h-[400px] flex items-center justify-center">
         <p className="text-primary font-medium animate-pulse">Cargando reporte de ingresos...</p>
       </div>
     );
@@ -35,7 +35,7 @@ export default function IncomeChart({ tutorId }) {
   const totalIncome = data[timeframe]?.reduce((acc, curr) => acc + curr.ingresos, 0) || 0;
 
   return (
-    <div className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border-none w-full">
+    <div className="bg-surface-container-lowest p-4 md:p-6 rounded-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] border-none w-full">
       
       {/* CABECERA: Título, monto y selectores asimétricos */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">

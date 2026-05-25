@@ -71,7 +71,7 @@ const MyTutorsHistory = () => {
           </table>
         </section>
 
-        <footer className="mt-24 pt-10 border-t border-gray-100 flex justify-between items-center opacity-60">
+        <footer className="mt-24 pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 opacity-60">
           <p className="text-[10px] font-bold uppercase tracking-widest">© 2024 THE ACADEMIC EDITORIAL</p>
           <div className="flex gap-6">
             {['Privacy', 'Legal', 'Contact'].map(l => <a key={l} href="#" className="text-[10px] font-bold uppercase tracking-widest hover:text-primary">{l}</a>)}

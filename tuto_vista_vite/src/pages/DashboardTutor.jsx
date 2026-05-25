@@ -93,7 +93,7 @@ const DashboardTutor = () => {
         <IncomeChart tutorId={user?.id} />
 
         {/* Session List */}
-        <div className="grid grid-cols-12 gap-8 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 mt-12">
           <div className="col-span-12 lg:col-span-8 space-y-6">
             <h2 className="text-2xl font-bold font-headline text-primary tracking-tight">
               Próximas Sesiones
@@ -103,7 +103,7 @@ const DashboardTutor = () => {
                 sessions.map((s, i) => (
                   <div
                     key={s.id || i}
-                    className="bg-white p-6 rounded-lg flex items-center justify-between group hover:translate-x-2 transition-transform duration-300 shadow-sm border border-gray-50"
+                    className="bg-white p-6 rounded-lg flex flex-col md:flex-row items-center justify-between group hover:translate-x-2 transition-transform duration-300 shadow-sm border border-gray-50 gap-4 md:gap-8"
                   >
                     <div className="flex items-center gap-6">
                       <div className="w-16 h-16 rounded-full bg-mini-gray overflow-hidden border-2 border-white flex items-center justify-center text-xl font-bold text-gray-500">

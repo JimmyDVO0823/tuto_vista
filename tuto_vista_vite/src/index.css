@@ -110,6 +110,20 @@
 
 /* Touch Usability for Mobile Breakpoints (max-width: 768px) */
 @media (max-width: 768px) {
+  button, a, input, select, textarea {
+    min-height: 2.75rem;
+  }
+  input, select, textarea {
+    font-size: 1rem;
+  }
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+  body {
+    overflow-x: hidden;
+  }
+
 
   #login-form input[type="email"],
   #login-form input[type="password"],
