@@ -130,8 +130,8 @@ const DashboardStudent = () => {
                 <AcademicCalendar events={events} />
               </div>
 
-              {/* Nueva sección modularizada */}
-              <PorPagarSessions solicitudes={solicitudes} />
+              {/* Nueva sección modularizada - Filtra dentro del componente */}
+              <PorPagarSessions sessions={sessions} />
               
               <NextSessions sessions={sessions} isTutor={false} />
               <PendingAssignments />

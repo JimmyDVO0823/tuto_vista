@@ -46,25 +46,10 @@ const GestionTutorias = () => {
   const handleAccept = async (id) => {
     try {
       setProcessingId(id);
-      // 1. Buscamos la solicitud que vamos a aceptar para moverla localmente
-      const solicitudAceptada = solicitudes.find(s => s.id === id);
-      
       await api.post(`/sesiones/desde-solicitud/${id}`);
-      
-      // 2. Actualizamos los estados LOCALES para que el cambio sea instantáneo
       setSolicitudes(prev => prev.filter(s => s.id !== id));
-      
-      if (solicitudAceptada) {
-        const nuevaSesion = {
-          ...solicitudAceptada,
-          estado: 'programada',
-          programadaPara: `${solicitudAceptada.fechaPreferida}T${solicitudAceptada.horaPreferida}`
-        };
-        setSesiones(prev => [nuevaSesion, ...prev]);
-      }
-
       alert("¡Tutoría aceptada y agendada exitosamente!");
-      // Opcional: fetchData() para asegurar sincronía total con BD
+      fetchData();
     } catch (err) {
       console.error('Error accepting solicitud:', err);
       alert(err.message || 'Error al aceptar la solicitud. Es posible que haya un cruce de horarios.');
