@@ -23,7 +23,8 @@ const TutorAgendaDetail = () => {
   const [tutor, setTutor] = useState(null);
   const [disponibilidad, setDisponibilidad] = useState([]);
   const [dispoEspecifica, setDispoEspecifica] = useState([]);
-  const [sesionesOcupadas, setSesionesOcupadas] = useState([]);
+  // 🛠️ Unificamos todas las fuentes que quitan tiempo al tutor (Sesiones y Solicitudes Aceptadas)
+  const [compromisosOcupados, setCompromisosOcupados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -53,19 +54,42 @@ const TutorAgendaDetail = () => {
       setLoading(true);
       setError(null);
 
-      const [tutorData, dispoData, dispoEspecData, sesionesData] = await Promise.all([
+      const [tutorData, dispoData, dispoEspecData, sesionesData, solicitudesData] = await Promise.all([
         api.get(`/tutores/${id}`),
         api.get(`/disponibilidad/tutor/${id}`),
         api.get(`/disponibilidad/especifica/tutor/${id}`).catch(() => []),
-        api.get(`/sesiones/tutor/${id}`).catch(() => [])
+        api.get(`/sesiones/tutor/${id}`).catch(() => []),
+        api.get(`/solicitudes/tutor/${id}`).catch(() => []) // 🛠️ Traemos solicitudes del tutor
       ]);
 
       setTutor(tutorData);
       setDisponibilidad(dispoData || []);
       setDispoEspecifica(dispoEspecData || []);
 
-      const ocupadas = (sesionesData || []).filter(s => s.estado === 'programada' || s.estado === 'en_progreso');
-      setSesionesOcupadas(ocupadas);
+      // 🛠️ Procesar sesiones firmes
+      const sesionesMapeadas = (sesionesData || [])
+        .filter(s => s.estado === 'programada' || s.estado === 'en_progreso')
+        .map(s => ({
+          tipo: 'SESION',
+          fecha: s.programadaPara ? s.programadaPara.split('T')[0] : '',
+          horaInicio: s.programadaPara ? s.programadaPara.split('T')[1].substring(0, 5) : '',
+          duracionMin: s.duracionMin || 60,
+          label: 'Sesión Programada'
+        }));
+
+      // 🛠️ Procesar solicitudes aceptadas esperando pago que ya guardan espacio
+      const solicitudesMapeadas = (solicitudesData || [])
+        .filter(s => s.estado?.toLowerCase() === 'aceptada' || s.estado?.toLowerCase() === 'accepted')
+        .map(s => ({
+          tipo: 'SOLICITUD_ACEPTADA',
+          fecha: s.fechaPreferida,
+          horaInicio: s.horaPreferida?.substring(0, 5),
+          duracionMin: s.duracionMin || 60,
+          label: 'Aceptada (Esperando Pago)'
+        }));
+
+      // Combinamos ambas fuentes de bloqueo en un único set de compromisos
+      setCompromisosOcupados([...sesionesMapeadas, ...solicitudesMapeadas]);
 
       if (tutorData?.materias?.length > 0) {
         setSelectedSubjectId(tutorData.materias[0].id.toString());
@@ -84,8 +108,6 @@ const TutorAgendaDetail = () => {
   useEffect(() => {
     loadTutorDetails();
   }, [loadTutorDetails]);
-
-
 
   // 🌟 REGRESAMOS A LOS BLOQUES SEMANALES LIMPIOS E INTACTOS
   const groupedDispo = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 0: [] };
@@ -131,25 +153,65 @@ const TutorAgendaDetail = () => {
     groupedDispo[day].sort((a, b) => a.horaInicio.substring(0, 5).localeCompare(b.horaInicio.substring(0, 5)));
   });
 
+  // Helper matemático de tiempo
+  const timeToMinutes = (t) => {
+    if (!t) return 0;
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  const minutesToTime = (totalMinutes) => {
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  };
+
+  // 🛠️ OBTENER TODOS LOS COMPROMISOS DEL DÍA SELECCIONADO PARA MOSTRAR AL ALUMNO
+  // 🛠️ OBTENER TODOS LOS COMPROMISOS DEL DÍA (SESIONES, SOLICITUDES Y BLOQUEOS MANUALES)
+  const obtenerCompromisosDelDia = () => {
+    if (!selectedDate) return [];
+
+    // 1. Obtener sesiones y solicitudes aceptadas
+    const compromisos = compromisosOcupados.filter(c => c.fecha === selectedDate).map(c => {
+      const inicioMin = timeToMinutes(c.horaInicio);
+      const finMin = inicioMin + c.duracionMin;
+      return {
+        ...c,
+        horaFin: minutesToTime(finMin)
+      };
+    });
+
+    // 2. 🌟 NUEVO: Capturar e inyectar los bloqueos manuales (estaDisponible === false) de este día
+    const bloqueosManuales = dispoEspecifica
+      .filter(e => e.fecha === selectedDate && !e.estaDisponible)
+      .map(b => ({
+        tipo: 'BLOQUEO_MANUAL',
+        fecha: b.fecha,
+        horaInicio: b.horaInicio.substring(0, 5),
+        horaFin: b.horaFin.substring(0, 5),
+        label: 'Bloqueado por el Tutor'
+      }));
+
+    // Combinamos todo y lo ordenamos cronológicamente para que se vea impecable
+    return [...compromisos, ...bloqueosManuales].sort((a, b) =>
+      a.horaInicio.localeCompare(b.horaInicio)
+    );
+  };
+
+  const compromisosDelDia = obtenerCompromisosDelDia();
+
   // 🌟 FUNCIÓN EN CALIENTE PARA DETECTAR SI EL HORARIO PROCE_EDE A UN BLOQUEO DEL TUTOR
   const comprobarSiEstaBloqueado = () => {
     if (!selectedDate || !selectedTime) return null;
 
-    // Buscamos si el tutor guardó un bloqueo (estaDisponible === false) para la fecha seleccionada
     const bloqueo = dispoEspecifica.find(e => e.fecha === selectedDate && !e.estaDisponible);
     if (!bloqueo) return null;
-
-    const timeToMinutes = (t) => {
-      const [h, m] = t.split(':').map(Number);
-      return h * 60 + m;
-    };
 
     const inicioSesion = timeToMinutes(selectedTime);
     const finSesion = inicioSesion + parseInt(selectedDuration);
     const inicioBloqueo = timeToMinutes(bloqueo.horaInicio.substring(0, 5));
     const finBloqueo = timeToMinutes(bloqueo.horaFin.substring(0, 5));
 
-    // Verificamos si hay colisión de rangos
     const seCruza = inicioSesion < finBloqueo && finSesion > inicioBloqueo;
 
     if (seCruza) {
@@ -163,6 +225,24 @@ const TutorAgendaDetail = () => {
   };
 
   const infoBloqueo = comprobarSiEstaBloqueado();
+
+  // 🛠️ DETECTAR COLISIÓN DEL INPUT ACTUAL CON SESIONES U OTRAS SOLICITUDES ACEPTADAS
+  const comprobarColisionCompromisos = () => {
+    if (!selectedDate || !selectedTime) return null;
+
+    const inicioSesion = timeToMinutes(selectedTime);
+    const finSesion = inicioSesion + parseInt(selectedDuration);
+
+    const conflicto = compromisosDelDia.find(c => {
+      const cInicio = timeToMinutes(c.horaInicio);
+      const cFin = cInicio + c.duracionMin;
+      return inicioSesion < cFin && finSesion > cInicio;
+    });
+
+    return conflicto || null;
+  };
+
+  const infoConflictoCompromiso = comprobarColisionCompromisos();
 
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
@@ -184,6 +264,7 @@ const TutorAgendaDetail = () => {
     if (!selectedDate) { alert('Por favor selecciona la fecha de la tutoría.'); return; }
     if (!selectedTime) { alert('Por favor selecciona la hora de la tutoría.'); return; }
     if (infoBloqueo) { alert('No puedes solicitar tutorías en un rango de horas bloqueado por el tutor.'); return; }
+    if (infoConflictoCompromiso) { alert(`El horario entra en conflicto con una agenda ya reservada: ${infoConflictoCompromiso.label}`); return; }
 
     const [year, month, day] = selectedDate.split('-').map(Number);
     const dateObj = new Date(year, month - 1, day);
@@ -193,14 +274,9 @@ const TutorAgendaDetail = () => {
     }
 
     if (selectedSlot.isEspecifica && selectedDate !== selectedSlot.fechaPorDefecto) {
-      alert(`Este bloque corresponde a una fecha especial única: ${selectedSlot.fechaPorDefecto}. No se puede cambiar el día.`);
+      alert(`Este bloque corresponds a una fecha especial única: ${selectedSlot.fechaPorDefecto}. No se puede cambiar el día.`);
       return;
     }
-
-    const timeToMinutes = (timeStr) => {
-      const [h, m] = timeStr.split(':').map(Number);
-      return h * 60 + m;
-    };
 
     const slotStartMin = timeToMinutes(selectedSlot.horaInicio.substring(0, 5));
     const slotEndMin = timeToMinutes(selectedSlot.horaFin.substring(0, 5));
@@ -214,28 +290,6 @@ const TutorAgendaDetail = () => {
 
     if (sessionEndMin > slotEndMin) {
       alert(`La sesión excede el horario de disponibilidad del tutor.`);
-      return;
-    }
-
-    const sessionStart = new Date(`${selectedDate}T${selectedTime.substring(0, 5)}:00Z`);
-    const sessionEnd = new Date(sessionStart.getTime() + selectedDuration * 60000);
-
-    const ocupadasDelDia = sesionesOcupadas.filter(s => {
-      const localDate = new Date(s.programadaPara);
-      const utcYear = localDate.getUTCFullYear();
-      const utcMonth = String(localDate.getUTCMonth() + 1).padStart(2, '0');
-      const utcDay = String(localDate.getUTCDate()).padStart(2, '0');
-      return `${utcYear}-${utcMonth}-${utcDay}` === selectedDate;
-    });
-
-    const hasOverlap = ocupadasDelDia.some(s => {
-      const occStart = new Date(s.programadaPara);
-      const occEnd = new Date(occStart.getTime() + s.duracionMin * 60000);
-      return sessionStart < occEnd && sessionEnd > occStart;
-    });
-
-    if (hasOverlap) {
-      alert("El horario seleccionado se cruza con una sesión ya confirmada del tutor. Por favor revisa los horarios ocupados.");
       return;
     }
 
@@ -258,6 +312,8 @@ const TutorAgendaDetail = () => {
       setSelectedSlot(null);
       setSelectedTime('');
       setMessage('');
+      // Recargar detalles para refrescar compromisos en caliente
+      loadTutorDetails();
     } catch (err) {
       console.error('Error enviando solicitud:', err);
       alert(err.message || 'Error al enviar la solicitud de tutoría.');
@@ -401,14 +457,48 @@ const TutorAgendaDetail = () => {
 
               {selectedSlot && (
                 <form onSubmit={handleBookingSubmit} className="mt-8 pt-8 border-t border-outline-variant/10 space-y-6 animate-fadeIn">
-                  <div className="bg-surface-container-low p-6 rounded-2xl mb-6">
-                    <h5 className="font-bold text-sm text-primary uppercase tracking-wider mb-4">Detalles del bloque seleccionado</h5>
-                    <p className="text-sm text-elegant-gray">
-                      Día: <span className="font-bold text-primary">{FULL_DAY_NAMES[selectedSlot.diaSemana]}</span>
-                    </p>
-                    <p className="text-sm text-elegant-gray">
-                      Horario: <span className="font-bold text-primary">{selectedSlot.horaInicio.substring(0, 5)} - {selectedSlot.horaFin.substring(0, 5)}</span>
-                    </p>
+
+                  {/* 🛠️ CONTENEDOR SPLIT: DETALLES DEL BLOQUE + AGENDA OCUPADA VISIBLE */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-container-low p-6 rounded-2xl mb-6">
+                    <div>
+                      <h5 className="font-bold text-xs text-primary uppercase tracking-wider mb-3">Tu Bloque Seleccionado</h5>
+                      <p className="text-sm text-elegant-gray">
+                        Día: <span className="font-bold text-primary">{FULL_DAY_NAMES[selectedSlot.diaSemana]}</span>
+                      </p>
+                      <p className="text-sm text-elegant-gray">
+                        Rango Permitido: <span className="font-bold text-primary">{selectedSlot.horaInicio.substring(0, 5)} - {selectedSlot.horaFin.substring(0, 5)}</span>
+                      </p>
+                    </div>
+
+                    {/* 🛠️ LISTADO EN TIEMPO REAL DE HORARIOS YA OCUPADOS EN ESE DÍA ESPECÍFICO */}
+                    <div className="border-t md:border-t-0 md:border-l border-outline-variant/20 pt-4 md:pt-0 md:pl-6">
+                      <h5 className="font-bold text-xs text-red-700 uppercase tracking-wider mb-3 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm">calendar_today</span>
+                        Compromisos del Tutor ({selectedDate})
+                      </h5>
+                      {compromisosDelDia.length > 0 ? (
+                        <div className="space-y-2 max-h-32 overflow-y-auto pr-1"> {/* Subimos un pelo el max-h por si hay varios */}
+                          {compromisosDelDia.map((comp, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-2xs">
+                              <span className="font-mono font-bold text-gray-700">{comp.horaInicio} - {comp.horaFin}</span>
+                              <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold ${comp.tipo === 'SESION'
+                                  ? 'bg-blue-50 text-blue-700 border border-blue-100'
+                                  : comp.tipo === 'BLOQUEO_MANUAL'
+                                    ? 'bg-red-50 text-red-600 border border-red-100' // 🌟 Estilo para el Bloqueo Manual
+                                    : 'bg-amber-50 text-amber-700 border border-amber-100'
+                                }`}>
+                                {comp.label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-green-600 italic font-medium flex items-center gap-1 mt-2">
+                          <span className="material-symbols-outlined text-sm">check_circle</span>
+                          ¡Tutor totalmente libre este día!
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -449,7 +539,8 @@ const TutorAgendaDetail = () => {
                         max={selectedSlot.horaFin.substring(0, 5)}
                         onChange={(e) => setSelectedTime(e.target.value)}
                         required
-                        className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/10 rounded-xl text-sm font-medium focus:outline-none focus:border-academic-gold transition-colors"
+                        className={`w-full px-4 py-3 bg-surface-container-low border rounded-xl text-sm font-medium focus:outline-none transition-colors ${infoConflictoCompromiso ? 'border-red-300 focus:border-red-500 bg-red-50/30' : 'border-outline-variant/10 focus:border-academic-gold'
+                          }`}
                       />
                     </div>
 
@@ -478,13 +569,24 @@ const TutorAgendaDetail = () => {
                     ></textarea>
                   </div>
 
-                  {/* 🚨 BANNER DINÁMICO DE ADVERTENCIA DE BLOQUEO PARCIAL EXCLUSIVO DE LA FECHA */}
+                  {/* 🚨 ADVERTENCIA 1: BLOQUEO EXPLÍCITO MANUAL DEL TUTOR */}
                   {infoBloqueo && (
                     <div className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl flex items-start gap-3 my-4 animate-fadeIn">
                       <span className="material-symbols-outlined text-amber-600">warning</span>
                       <div className="text-xs font-medium">
                         <p className="font-bold text-amber-900 mb-0.5">Horario no disponible para esta fecha</p>
                         El tutor ha inhabilitado la franja de <span className="font-bold">{infoBloqueo.inicio} a {infoBloqueo.fin}</span> para el día elegido. Por favor, selecciona una hora diferente fuera de ese rango.
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 🚨 ADVERTENCIA 2: CRUCE DINÁMICO DE AGENDA OCUPADA */}
+                  {infoConflictoCompromiso && (
+                    <div className="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl flex items-start gap-3 my-4 animate-fadeIn">
+                      <span className="material-symbols-outlined text-red-600">error</span>
+                      <div className="text-xs font-medium">
+                        <p className="font-bold text-red-900 mb-0.5">Conflicto de Horario Detectado</p>
+                        Tu tutoría propuesta se cruza con una <span className="font-bold text-red-900 uppercase">"{infoConflictoCompromiso.label}"</span> agendada de <span className="font-bold">{infoConflictoCompromiso.horaInicio} a {infoConflictoCompromiso.horaFin}</span>. Ajusta los minutos o la hora de inicio.
                       </div>
                     </div>
                   )}
@@ -498,11 +600,10 @@ const TutorAgendaDetail = () => {
                       </p>
                     </div>
 
-                    {/* 🌟 BOTÓN CONGELADO / DESHABILITADO SI ENTRA EN CONFLICTO CON EL BLOQUEO */}
                     <button
                       type="submit"
-                      disabled={submitting || !!infoBloqueo}
-                      className={`px-10 py-4 rounded-xl font-bold shadow-xl transition-all w-full md:w-auto ${!!infoBloqueo
+                      disabled={submitting || !!infoBloqueo || !!infoConflictoCompromiso}
+                      className={`px-10 py-4 rounded-xl font-bold shadow-xl transition-all w-full md:w-auto ${(!!infoBloqueo || !!infoConflictoCompromiso)
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none opacity-60'
                         : 'signature-gradient text-white hover:-translate-y-0.5 shadow-primary/20'
                         }`}
