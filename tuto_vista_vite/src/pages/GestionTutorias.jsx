@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -9,7 +9,12 @@ const GestionTutorias = () => {
   const { user } = useAuth();
   const [solicitudes, setSolicitudes] = useState([]);
   const [sesiones, setSesiones] = useState([]);
-  const [activeTab, setActiveTab] = useState('solicitudes'); // 'solicitudes' | 'sesiones'
+  const [historial, setHistorial] = useState([]); // 👈 Estado para guardar las tutorías terminadas
+  const [activeTab, setActiveTab] = useState('solicitudes'); // 'solicitudes' | 'sesiones' | 'historial'
+
+  // Estados para los filtros avanzados del Historial
+  const [filterDate, setFilterDate] = useState('');
+  const [filterMateria, setFilterMateria] = useState('');
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,11 +31,19 @@ const GestionTutorias = () => {
         api.get(`/sesiones/tutor/${user.id}`).catch(() => [])
       ]);
 
+      // 1. Filtrar solicitudes pendientes
       const pendientes = solicitudesData.filter(s => s.estado === 'pendiente');
       setSolicitudes(pendientes);
 
+      // 2. Filtrar tutorías activas (programadas o en progreso)
       const agendadas = sesionesData.filter(s => s.estado === 'programada' || s.estado === 'en_progreso');
       setSesiones(agendadas);
+
+      // 3. Filtrar historial (completadas, canceladas o inasistencias)
+      const terminadas = sesionesData.filter(s =>
+        s.estado === 'completada' || s.estado === 'cancelada' || s.estado === 'no_asistio'
+      );
+      setHistorial(terminadas);
     } catch (err) {
       console.error('Error fetching tutoring data:', err);
       setError('No se pudieron cargar los datos de las tutorías. Intenta de nuevo más tarde.');
@@ -43,17 +56,40 @@ const GestionTutorias = () => {
     fetchData();
   }, [fetchData]);
 
+  // Extraer la lista única de materias del historial para alimentar el selector (<select>)
+  const listaMaterias = useMemo(() => {
+    const materias = historial.map(s => s.materiaNombre).filter(Boolean);
+    return [...new Set(materias)]; // Set elimina duplicados automáticamente
+  }, [historial]);
+
+  // Filtrar y ordenar el historial por fecha de forma descendente (más recientes primero)
+  const historialFiltradoYOrdenado = useMemo(() => {
+    return historial
+      .filter(sesion => {
+        // Filtro por materia
+        const cumpleMateria = filterMateria === '' || sesion.materiaNombre === filterMateria;
+
+        // Filtro por fecha (Compara en formato YYYY-MM-DD ignorando la hora)
+        let cumpleFecha = true;
+        if (filterDate) {
+          const fechaSesionStr = new Date(sesion.programadaPara).toISOString().split('T')[0];
+          cumpleFecha = fechaSesionStr === filterDate;
+        }
+
+        return cumpleMateria && cumpleFecha;
+      })
+      .sort((a, b) => new Date(b.programadaPara) - new Date(a.programadaPara));
+  }, [historial, filterMateria, filterDate]);
+
   const handleAccept = async (id) => {
     try {
       setProcessingId(id);
-      // 1. Buscamos la solicitud que vamos a aceptar para moverla localmente
       const solicitudAceptada = solicitudes.find(s => s.id === id);
-      
+
       await api.post(`/sesiones/desde-solicitud/${id}`);
-      
-      // 2. Actualizamos los estados LOCALES para que el cambio sea instantáneo
+
       setSolicitudes(prev => prev.filter(s => s.id !== id));
-      
+
       if (solicitudAceptada) {
         const nuevaSesion = {
           ...solicitudAceptada,
@@ -64,7 +100,7 @@ const GestionTutorias = () => {
       }
 
       alert("¡Tutoría aceptada y agendada exitosamente!");
-      // Opcional: fetchData() para asegurar sincronía total con BD
+      fetchData(); // Sincroniza completamente con el backend
     } catch (err) {
       console.error('Error accepting solicitud:', err);
       alert(err.message || 'Error al aceptar la solicitud. Es posible que haya un cruce de horarios.');
@@ -98,15 +134,8 @@ const GestionTutorias = () => {
         motivoCancelacion: motivoCancelacion
       });
 
-      setSesiones(prev =>
-        prev.map(s => {
-          if (s.id === id) {
-            return { ...s, estado: estadoNuevo, motivoCancelacion: motivoCancelacion };
-          }
-          return s;
-        })
-          .filter(s => s.estado === 'programada' || s.estado === 'en_progreso')
-      );
+      // Recargamos todos los datos para mover la sesión limpiamente al Historial
+      await fetchData();
 
       const mensajes = {
         en_progreso: "¡La tutoría ha iniciado! Está ahora en progreso.",
@@ -139,6 +168,14 @@ const GestionTutorias = () => {
     }
   };
 
+  // Formateador estético para la fecha y hora de las filas del historial
+  const formatFechaHistorial = (fechaIso) => {
+    const d = new Date(fechaIso);
+    const dateStr = d.toLocaleDateString('es-ES', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString('es-ES', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
+    return `${dateStr} a las ${timeStr}`;
+  };
+
   return (
     <MainLayout>
       <main className="flex-1 p-4 md:p-8 lg:p-12 min-h-screen">
@@ -148,7 +185,7 @@ const GestionTutorias = () => {
             Gestionar Tutorías
           </h1>
           <p className="text-base md:text-lg text-gray-500 leading-relaxed border-l-4 border-academic-gold/50 pl-4">
-            Administra tus encuentros académicos. Responde a solicitudes entrantes y gestiona o cancela tus tutorías ya programadas.
+            Administra tus encuentros académicos. Responde a solicitudes entrantes, gestiona tus tutorías agendadas y revisa tu historial de clases dictadas.
           </p>
         </header>
 
@@ -157,8 +194,8 @@ const GestionTutorias = () => {
           <button
             onClick={() => setActiveTab('solicitudes')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'solicitudes'
-              ? 'border-academic-gold text-academic-gold font-extrabold'
-              : 'border-transparent text-elegant-gray hover:text-primary'
+                ? 'border-academic-gold text-academic-gold font-extrabold'
+                : 'border-transparent text-elegant-gray hover:text-primary'
               }`}
           >
             Solicitudes Pendientes ({solicitudes.length})
@@ -166,11 +203,20 @@ const GestionTutorias = () => {
           <button
             onClick={() => setActiveTab('sesiones')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'sesiones'
-              ? 'border-academic-gold text-academic-gold font-extrabold'
-              : 'border-transparent text-elegant-gray hover:text-primary'
+                ? 'border-academic-gold text-academic-gold font-extrabold'
+                : 'border-transparent text-elegant-gray hover:text-primary'
               }`}
           >
             Tutorías Agendadas ({sesiones.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('historial')}
+            className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'historial'
+                ? 'border-academic-gold text-academic-gold font-extrabold'
+                : 'border-transparent text-elegant-gray hover:text-primary'
+              }`}
+          >
+            Historial de Clases ({historial.length})
           </button>
         </div>
 
@@ -194,6 +240,7 @@ const GestionTutorias = () => {
             </div>
           )}
 
+          {/* TAB 1: SOLICITUDES */}
           {!loading && !error && activeTab === 'solicitudes' && (
             <>
               {solicitudes.length === 0 ? (
@@ -218,6 +265,7 @@ const GestionTutorias = () => {
             </>
           )}
 
+          {/* TAB 2: TUTORÍAS AGENDADAS */}
           {!loading && !error && activeTab === 'sesiones' && (
             <>
               {sesiones.length === 0 ? (
@@ -232,7 +280,7 @@ const GestionTutorias = () => {
                     <SessionCard
                       key={session.id}
                       session={session}
-                      onUpdateStatus={handleUpdateStatus} // 👈 Corregido de onCancel a onUpdateStatus
+                      onUpdateStatus={handleUpdateStatus}
                       onUpdateLink={handleUpdateLink}
                       isLoading={processingId === session.id}
                     />
@@ -240,6 +288,98 @@ const GestionTutorias = () => {
                 </div>
               )}
             </>
+          )}
+
+          {/* TAB 3: HISTORIAL DE TUTORÍAS CON FILTROS */}
+          {!loading && !error && activeTab === 'historial' && (
+            <div className="space-y-6">
+
+              {/* Contenedor de Filtros Avanzados */}
+              <div className="bg-surface-container-low p-4 rounded-xl flex flex-col md:flex-row gap-4 items-end shadow-sm border border-outline-variant/5">
+                <div className="w-full md:w-1/3">
+                  <label className="text-[10px] font-bold text-elegant-gray uppercase tracking-widest block mb-1.5">Filtrar por Materia</label>
+                  <select
+                    value={filterMateria}
+                    onChange={(e) => setFilterMateria(e.target.value)}
+                    className="w-full text-sm p-2.5 border border-outline-variant/30 rounded-lg bg-surface-container-lowest text-primary focus:outline-none focus:border-primary"
+                  >
+                    <option value="">Todas las materias</option>
+                    {listaMaterias.map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="w-full md:w-1/3">
+                  <label className="text-[10px] font-bold text-elegant-gray uppercase tracking-widest block mb-1.5">Filtrar por Fecha</label>
+                  <input
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    className="w-full text-sm p-2 border border-outline-variant/30 rounded-lg bg-surface-container-lowest text-primary focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="w-full md:w-auto flex gap-2 shrink-0">
+                  <button
+                    onClick={() => { setFilterMateria(''); setFilterDate(''); }}
+                    className="w-full md:w-auto px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-elegant-gray rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
+                  >
+                    Limpiar Filtros
+                  </button>
+                </div>
+              </div>
+
+              {/* Renderizado de la lista del historial */}
+              {historialFiltradoYOrdenado.length === 0 ? (
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-8 md:p-12 text-center shadow-sm">
+                  <span className="material-symbols-outlined text-gray-300 text-5xl mb-3">manage_search</span>
+                  <h3 className="text-lg font-bold text-primary mb-1">No se encontraron clases</h3>
+                  <p className="text-gray-500 text-sm">No posees registros finalizados o que coincidan con los filtros seleccionados.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {historialFiltradoYOrdenado.map(sesion => (
+                    <div
+                      key={sesion.id}
+                      className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/10 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-outline-variant/30 transition-all"
+                    >
+                      <div className="space-y-1.5 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-bold text-primary">{sesion.estudianteNombre}</span>
+                          <span className="text-xs text-elegant-gray">•</span>
+                          <span className="text-xs font-semibold px-2 py-0.5 bg-surface-container-low text-primary rounded">
+                            {sesion.materiaNombre}
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-elegant-gray">
+                          🗓️ {formatFechaHistorial(sesion.programadaPara)} ({sesion.duracionMin} min)
+                        </p>
+
+                        {sesion.motivoCancelacion && (
+                          <p className="text-xs text-red-700 bg-red-50/60 px-3 py-1.5 rounded border border-red-100/40 italic mt-1">
+                            <strong>Detalle del cierre:</strong> "{sesion.motivoCancelacion}"
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Badge dinámico de estado */}
+                      <div className="shrink-0 self-start md:self-center">
+                        <span className={`text-[10px] uppercase font-extrabold tracking-widest px-3 py-1 rounded-full ${sesion.estado === 'completada' ? 'bg-green-50 text-green-700 border border-green-200' :
+                            sesion.estado === 'cancelada' ? 'bg-red-50 text-red-700 border border-red-200' :
+                              'bg-amber-50 text-amber-700 border border-amber-200'
+                          }`}>
+                          {sesion.estado === 'completada' ? '✅ Completada' :
+                            sesion.estado === 'cancelada' ? '❌ Cancelada' :
+                              '⚠️ No Asistió'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </section>
       </main>
