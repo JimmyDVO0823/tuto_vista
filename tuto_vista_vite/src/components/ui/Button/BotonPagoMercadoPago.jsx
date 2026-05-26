@@ -5,19 +5,13 @@ export const BotonPagoMercadoPago = ({ monto }) => {
   const [loading, setLoading] = useState(false);
 
   const handlePagar = async () => {
-    const montoFinal = Math.round(monto);
-    
-    // GUARD: Evitar peticiones con monto 0 o negativo que rompen el backend/MP
-    if (!montoFinal || montoFinal <= 0) {
-      console.error("Monto inválido para pago:", montoFinal);
-      alert("Error: El monto de la tutoría no es válido ($0). Contacta al administrador.");
-      return;
-    }
-
     setLoading(true);
+    const montoFinal = Math.round(monto); // Evitar decimales que MP rechaza en COP
     try {
+      // 1. Llamamos a nuestro backend de Spring Boot para generar el enlace
       const response = await api.post('/pagos/crear-preferencia', { monto: montoFinal });
       
+      // 2. Redirigimos directamente al estudiante a la pasarela segura de Mercado Pago
       if (response && response.urlPago) {
         window.location.href = response.urlPago;
       } else {
