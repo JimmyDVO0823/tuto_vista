@@ -30,7 +30,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     estudiante: [
       { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
       { label: 'Explorar Tutores', path: '/tutors', icon: 'search' },
-      { label: 'Mis Sesiones', path: '/dispo', icon: 'calendar_today' },
+      { label: 'Mis Sesiones', path: '/mis-sesiones', icon: 'calendar_today' },
       { label: 'Mis Materias', path: '/subjects', icon: 'menu_book' },
       { label: 'Chat', path: '/chat', icon: 'chat' },
     ],

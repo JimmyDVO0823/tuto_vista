@@ -10,6 +10,7 @@ import ProtectedRoute from "./features/auth/ProtectedRoute/ProtectedRoute";
 import TutorAgendaDetail from "./pages/TutorAgendaDetail";
 import GestionTutorias from "./pages/GestionTutorias";
 import AcademicChat from "./pages/AcademicChat";
+import MyTutorsHistory from "./pages/MyTutorsHistory";
 
 import { AuthProvider } from "./context/AuthContext";
 
@@ -77,6 +78,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <GestionTutorias />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mis-sesiones"
+            element={
+              <ProtectedRoute>
+                <MyTutorsHistory />
               </ProtectedRoute>
             }
           />

@@ -194,8 +194,8 @@ const GestionTutorias = () => {
           <button
             onClick={() => setActiveTab('solicitudes')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'solicitudes'
-                ? 'border-academic-gold text-academic-gold font-extrabold'
-                : 'border-transparent text-elegant-gray hover:text-primary'
+              ? 'border-academic-gold text-academic-gold font-extrabold'
+              : 'border-transparent text-elegant-gray hover:text-primary'
               }`}
           >
             Solicitudes Pendientes ({solicitudes.length})
@@ -203,8 +203,8 @@ const GestionTutorias = () => {
           <button
             onClick={() => setActiveTab('sesiones')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'sesiones'
-                ? 'border-academic-gold text-academic-gold font-extrabold'
-                : 'border-transparent text-elegant-gray hover:text-primary'
+              ? 'border-academic-gold text-academic-gold font-extrabold'
+              : 'border-transparent text-elegant-gray hover:text-primary'
               }`}
           >
             Tutorías Agendadas ({sesiones.length})
@@ -212,8 +212,8 @@ const GestionTutorias = () => {
           <button
             onClick={() => setActiveTab('historial')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'historial'
-                ? 'border-academic-gold text-academic-gold font-extrabold'
-                : 'border-transparent text-elegant-gray hover:text-primary'
+              ? 'border-academic-gold text-academic-gold font-extrabold'
+              : 'border-transparent text-elegant-gray hover:text-primary'
               }`}
           >
             Historial de Clases ({historial.length})
@@ -367,8 +367,8 @@ const GestionTutorias = () => {
                       {/* Badge dinámico de estado */}
                       <div className="shrink-0 self-start md:self-center">
                         <span className={`text-[10px] uppercase font-extrabold tracking-widest px-3 py-1 rounded-full ${sesion.estado === 'completada' ? 'bg-green-50 text-green-700 border border-green-200' :
-                            sesion.estado === 'cancelada' ? 'bg-red-50 text-red-700 border border-red-200' :
-                              'bg-amber-50 text-amber-700 border border-amber-200'
+                          sesion.estado === 'cancelada' ? 'bg-red-50 text-red-700 border border-red-200' :
+                            'bg-amber-50 text-amber-700 border border-amber-200'
                           }`}>
                           {sesion.estado === 'completada' ? '✅ Completada' :
                             sesion.estado === 'cancelada' ? '❌ Cancelada' :
