@@ -8,7 +8,7 @@ import { api } from "../services/api";
 import NotificationsWidget from "../features/dashboard/NotificationWidget/NotificationWidget";
 import SemesterProgressWidget from "../features/dashboard/SemesterProgressWidget/SemesterProgressWidget";
 import { BotonPagoMercadoPago } from "../components/ui/Button/BotonPagoMercadoPago";
-import ActivityCard from "../features/dashboard/ActivityCard/ActivityCard";
+import PorPagarSessions from "../features/dashboard/PorPagarSessions/PorPagarSessions";
 
 const DashboardStudent = () => {
   const { user } = useAuth();
@@ -34,53 +34,59 @@ const DashboardStudent = () => {
   }, [user]);
 
   useEffect(() => {
-    // 1. Formatear sesiones (Ya pagadas y programadas)
-    const formattedSessions = sessions.map((s) => {
-      const fechaLocalString = s.programadaPara
-        ? s.programadaPara.replace(/Z$|\+00:00$/, "")
-        : "";
-      const fechaBase = new Date(fechaLocalString);
+    const now = new Date();
 
-      return {
-        id: `session-${s.id}`,
-        title: `Tutoría: ${s.materiaNombre}`,
-        start: fechaLocalString,
-        end: new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000)
-          .toISOString()
-          .replace(/Z$|\+00:00$/, ""),
-        extendedProps: {
-          ...s,
-          type: "Sesión",
-          category: s.materiaNombre,
-          status: s.estado,
-          colorType: "academic-blue",
-        },
-      };
-    });
+    // 1. Formatear sesiones (Ya pagadas y programadas) - SOLO FUTURAS
+    const formattedSessions = sessions
+      .filter(s => {
+        const fechaLocalString = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, "") : "";
+        return new Date(fechaLocalString) > now;
+      })
+      .map((s) => {
+        const fechaLocalString = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, "") : "";
+        const fechaBase = new Date(fechaLocalString);
+
+        return {
+          id: `session-${s.id}`,
+          title: `Tutoría: ${s.materiaNombre}`,
+          start: fechaLocalString,
+          end: new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000)
+            .toISOString()
+            .replace(/Z$|\+00:00$/, ""),
+          extendedProps: {
+            ...s,
+            type: "Sesión",
+            category: s.materiaNombre,
+            status: s.estado,
+            colorType: "academic-blue",
+          },
+        };
+      });
 
     // 2. FILTRAR Y FORMATEAR SOLICITUDES
-    // - PENDIENTES: Van al calendario con color oro
-    // - ACEPTADAS: Se mostrarán en una sección especial para pago
-    const pendingSolicitudes = solicitudes.filter(
-      (s) => s.estado?.toUpperCase() === "PENDIENTE",
-    );
-
-    const formattedCalendarSolicitudes = pendingSolicitudes.map((s) => ({
-      id: `solicitud-${s.id}`,
-      title: `Solicitud: ${s.materiaNombre}`,
-      start: `${s.fechaPreferida}T${s.horaPreferida}`,
-      end: new Date(
-        new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
-          (s.duracionMin || 60) * 60000,
-      ).toISOString(),
-      extendedProps: {
-        ...s,
-        type: "Solicitud",
-        category: s.materiaNombre,
-        status: s.estado,
-        colorType: "academic-gold",
-      },
-    }));
+    // - PENDIENTES: Van al calendario con color oro (Solo futuras)
+    const formattedCalendarSolicitudes = solicitudes
+      .filter((s) => {
+        const isPending = s.estado?.toUpperCase() === "PENDIENTE";
+        const dateStr = `${s.fechaPreferida}T${s.horaPreferida}`;
+        return isPending && new Date(dateStr) > now;
+      })
+      .map((s) => ({
+        id: `solicitud-${s.id}`,
+        title: `Solicitud: ${s.materiaNombre}`,
+        start: `${s.fechaPreferida}T${s.horaPreferida}`,
+        end: new Date(
+          new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
+            (s.duracionMin || 60) * 60000,
+        ).toISOString(),
+        extendedProps: {
+          ...s,
+          type: "Solicitud",
+          category: s.materiaNombre,
+          status: s.estado,
+          colorType: "academic-gold",
+        },
+      }));
 
     // 3. Fusionar para el calendario
     setEvents([...formattedSessions, ...formattedCalendarSolicitudes]);
@@ -123,43 +129,10 @@ const DashboardStudent = () => {
                 </h3>
                 <AcademicCalendar events={events} />
               </div>
-              {/* Sección de Tutorías Aceptadas esperando Pago */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold text-primary font-headline">
-                  Por Pagar
-                </h3>
-                <div className="space-y-4">
-                  {solicitudes
-                    .filter((s) => s.estado?.toUpperCase() === "ACEPTADA")
-                    .map((soli, i) => {
-                      const montoTotal = Math.round(
-                        (soli.duracionMin / 60) * (soli.precioPorHora || 0),
-                      );
-                      return (
-                        <ActivityCard
-                          key={soli.id || i}
-                          initial={soli.materiaNombre?.charAt(0) || "A"}
-                          title={soli.materiaNombre || "Solicitud Aceptada"}
-                          subtitle={`Tutor: ${soli.tutorNombre || "Pendiente"}`}
-                          time={`${soli.fechaPreferida} ${soli.horaPreferida}`}
-                          buttonText="Ver Detalles"
-                          actionPath="#"
-                          extraContent={
-                            <BotonPagoMercadoPago monto={montoTotal} />
-                          }
-                        />
-                      );
-                    })}
-                  {solicitudes.filter(
-                    (s) => s.estado?.toUpperCase() === "ACEPTADA",
-                  ).length === 0 && (
-                    <p className="text-gray-400 italic text-sm">
-                      No tienes tutorías pendientes de pago.
-                    </p>
-                  )}
-                </div>
-              </div>
 
+              {/* Nueva sección modularizada */}
+              <PorPagarSessions solicitudes={solicitudes} />
+              
               <NextSessions sessions={sessions} isTutor={false} />
               <PendingAssignments />
             </article>
