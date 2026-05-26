@@ -27,7 +27,8 @@ const ActivityCard = ({
   subtitle, 
   time, 
   buttonText = "Unirse a sesión", 
-  actionPath = "#" 
+  actionPath = "#",
+  extraContent = null
 }) => {
   return (
     <div className="group bg-white p-5 md:p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between border-l-4 border-primary shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -40,14 +41,15 @@ const ActivityCard = ({
           <p className="text-sm font-medium text-gray-400 uppercase tracking-widest">{subtitle}</p>
         </div>
       </div>
-      <div className="flex flex-col items-end gap-3 text-right">
+      <div className="flex flex-col items-end gap-3 text-right w-full md:w-auto">
         <div className="flex items-center gap-2 text-primary font-bold">
            <span className="material-symbols-outlined text-sm">schedule</span>
            <span>{time}</span>
         </div>
+        {extraContent}
         <Link 
           to={actionPath}
-          className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all group-hover:px-8 text-center"
+          className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all group-hover:px-8 text-center w-full md:w-auto"
         >
           {buttonText}
         </Link>

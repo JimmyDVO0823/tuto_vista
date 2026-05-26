@@ -32,59 +32,52 @@ const DashboardStudent = () => {
   }, [user]);
 
   useEffect(() => {
-    // 1. Formatear sesiones (se muestran siempre)
+    // 1. Formatear sesiones (Ya pagadas y programadas)
     const formattedSessions = sessions.map((s) => {
-      // Si la fecha viene con zona horaria (ej: termina en 'Z' o '+00:00'), 
-      // le removemos el sufijo para que JavaScript lo procese en la hora local del navegador
       const fechaLocalString = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, '') : '';
       const fechaBase = new Date(fechaLocalString);
 
       return {
         id: `session-${s.id}`,
         title: `Tutoría: ${s.materiaNombre}`,
-        start: fechaLocalString, // Pasamos la fecha limpia sin 'Z'
+        start: fechaLocalString,
         end: new Date(
           fechaBase.getTime() + (s.duracionMin || 60) * 60000,
-        ).toISOString().replace(/Z$|\+00:00$/, ''), // Quitamos la Z también al final
+        ).toISOString().replace(/Z$|\+00:00$/, ''),
         extendedProps: {
+          ...s,
           type: "Sesión",
           category: s.materiaNombre,
-          time: fechaBase.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
           status: s.estado,
           colorType: "academic-blue",
         },
       };
     });
 
-    // 2. FILTRAR Y FORMATEAR SOLICITUDES: Solo dejamos pasar las que sigan 'PENDIENTE'
-    const formattedSolicitudes = solicitudes
-      .filter((s) => {
-        // Aseguramos la comparación transformando a mayúsculas por si el backend varía
-        const estadoLimpio = s.estado?.toUpperCase();
-        return estadoLimpio === "PENDIENTE" || estadoLimpio === "PENDING";
-      })
-      .map((s) => ({
-        id: `solicitud-${s.id}`,
-        title: `Solicitud: ${s.materiaNombre}`,
-        start: `${s.fechaPreferida}T${s.horaPreferida}`,
-        end: new Date(
-          new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
-          (s.duracionMin || 60) * 60000,
-        ).toISOString(),
-        extendedProps: {
-          type: "Solicitud",
-          category: s.materiaNombre,
-          time: s.horaPreferida,
-          status: s.estado,
-          colorType: "academic-gold",
-        },
-      }));
+    // 2. FILTRAR Y FORMATEAR SOLICITUDES
+    // - PENDIENTES: Van al calendario con color oro
+    // - ACEPTADAS: Se mostrarán en una sección especial para pago
+    const pendingSolicitudes = solicitudes.filter(s => s.estado?.toUpperCase() === "PENDIENTE");
+    
+    const formattedCalendarSolicitudes = pendingSolicitudes.map((s) => ({
+      id: `solicitud-${s.id}`,
+      title: `Solicitud: ${s.materiaNombre}`,
+      start: `${s.fechaPreferida}T${s.horaPreferida}`,
+      end: new Date(
+        new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
+        (s.duracionMin || 60) * 60000,
+      ).toISOString(),
+      extendedProps: {
+        ...s,
+        type: "Solicitud",
+        category: s.materiaNombre,
+        status: s.estado,
+        colorType: "academic-gold",
+      },
+    }));
 
-    // 3. Fusionar ambos conjuntos en el estado de eventos
-    setEvents([...formattedSessions, ...formattedSolicitudes]);
+    // 3. Fusionar para el calendario
+    setEvents([...formattedSessions, ...formattedCalendarSolicitudes]);
   }, [sessions, solicitudes]);
 
   return (
@@ -112,13 +105,43 @@ const DashboardStudent = () => {
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 mb-10 md:mb-20">
-          <article className="col-span-12 md:col-span-8">
+          <article className="col-span-12 md:col-span-8 space-y-12">
+            {/* Sección de Tutorías Aceptadas esperando Pago */}
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-primary font-headline">Por Pagar</h3>
+              <div className="space-y-4">
+                {solicitudes
+                  .filter(s => s.estado?.toUpperCase() === "ACEPTADA")
+                  .map((soli, i) => {
+                    const montoTotal = Math.round((soli.duracionMin / 60) * (soli.precioPorHora || 0));
+                    return (
+                      <ActivityCard 
+                        key={soli.id || i}
+                        initial={soli.materiaNombre?.charAt(0) || 'A'}
+                        title={soli.materiaNombre || 'Solicitud Aceptada'}
+                        subtitle={`Tutor: ${soli.tutorNombre || 'Pendiente'}`}
+                        time={`${soli.fechaPreferida} ${soli.horaPreferida}`}
+                        buttonText="Ver Detalles"
+                        actionPath="#"
+                        extraContent={
+                          <BotonPagoMercadoPago monto={montoTotal} />
+                        }
+                      />
+                    );
+                  })}
+                {solicitudes.filter(s => s.estado?.toUpperCase() === "ACEPTADA").length === 0 && (
+                  <p className="text-gray-400 italic text-sm">No tienes tutorías pendientes de pago.</p>
+                )}
+              </div>
+            </div>
+
             <div className="bg-white p-4 md:p-8 rounded-2xl border border-gray-100 shadow-sm">
               <h3 className="text-2xl font-bold text-primary mb-6 font-headline">
                 Calendario Académico
               </h3>
               <AcademicCalendar events={events} />
             </div>
+            
             <NextSessions sessions={sessions} isTutor={false} />
             <PendingAssignments />
           </article>
@@ -126,7 +149,6 @@ const DashboardStudent = () => {
           <aside className="col-span-12 md:col-span-4 space-y-10">
             <SemesterProgressWidget />
             <NotificationsWidget />
-            <BotonPagoMercadoPago monto={50000} />
           </aside>
         </section>
       </main>

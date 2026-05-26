@@ -9,6 +9,7 @@
 import React from 'react';
 import Pagination from '../../../components/ui/Pagination/Pagination';
 import ActivityCard from '../ActivityCard/ActivityCard';
+import { BotonPagoMercadoPago } from '../../../components/ui/Button/BotonPagoMercadoPago';
 
 /**
  * NextSessions Component.
