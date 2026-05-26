@@ -31,7 +31,8 @@ export default function AcademicCalendar({
       type: extendedProps.type || 'Evento',
       category: extendedProps.category || 'General',
       time: extendedProps.time || 'Todo el día',
-      status: extendedProps.status || 'Programado',
+      // 🛠️ CORRECCIÓN: Si existe statusLabel amigable lo muestra, si no usa el status base
+      status: extendedProps.statusLabel || extendedProps.status || 'Programado',
       x: info.jsEvent.clientX,
       y: info.jsEvent.clientY,
     });
@@ -41,14 +42,20 @@ export default function AcademicCalendar({
     setHoveredEvent(null);
   };
 
-  // 🛠️ CORRECCIÓN AQUÍ: En la vista de mes SÍ debe ser seleccionable para poder agendar días específicos
   const isViewSelectable = selectable;
 
+  // 🛠️ CORRECCIÓN AQUÍ: Filtro tolerante usando .includes() para que no discrimine strings largos
   const filteredEvents = events.filter(event => {
     const type = event.extendedProps?.type?.toLowerCase() || '';
     const status = event.extendedProps?.status?.toLowerCase() || '';
+
     if (type.includes('solicitud')) {
-      return status === 'pendiente' || status === 'pending';
+      return (
+        status.includes('pendiente') ||
+        status.includes('pending') ||
+        status.includes('aceptada') ||
+        status.includes('accepted')
+      );
     }
     return true;
   });
@@ -88,7 +95,7 @@ export default function AcademicCalendar({
         aspectRatio={1.1}
         headerToolbar={headerToolbar}
         events={filteredEvents}
-        selectable={isViewSelectable} // 👈 Ahora hereda directamente el true/false que le mandes
+        selectable={isViewSelectable}
         unselectAuto={true}
         editable={editable}
         select={onSelect}
@@ -99,7 +106,13 @@ export default function AcademicCalendar({
         displayEventTime={false}
         datesSet={(arg) => setCurrentView(arg.view.type)}
         eventClassNames={(arg) => {
-          // Si el evento ya viene con un color quemado desde FullCalendar, respetarlo
+          const status = arg.event.extendedProps?.status?.toLowerCase() || '';
+
+          // 💡 ESTILIZADO DE SOLICITUD ACEPTADA (POR PAGAR) - Corregido con .includes
+          if (status.includes('aceptada') || status.includes('accepted')) {
+            return `rounded-md font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer bg-amber-100 text-amber-800 border-2 border-dashed border-amber-400 animate-pulse-slow`;
+          }
+
           if (arg.event.backgroundColor) return `rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer`;
 
           const colorType = arg.event.extendedProps.colorType;

@@ -19,22 +19,19 @@ const DashboardStudent = () => {
 
   useEffect(() => {
     const handlePaymentConfirmation = async () => {
-      // Check query params in both window.location.search and window.location.hash
       const fullUrl = window.location.href;
-      const urlObj = new URL(fullUrl.replace('#/', '')); // Simple normalization for parsing query params from hash router
+      const urlObj = new URL(fullUrl.replace('#/', ''));
       const searchParams = new URLSearchParams(urlObj.search || window.location.search);
-      
+
       const status = searchParams.get('status');
       const externalReference = searchParams.get('external_reference');
-      
+
       if (status === 'approved' && externalReference) {
         try {
           setLoading(true);
-          // Confirm payment and create session
           await api.post('/pagos/confirmar', { solicitudId: externalReference });
           alert("¡Pago confirmado exitosamente! Tu sesión de tutoría ha sido programada.");
-          
-          // Clear query params from the URL to prevent double submission
+
           const cleanUrl = window.location.href.split('?')[0];
           window.history.replaceState({}, document.title, cleanUrl);
         } catch (error) {
@@ -46,7 +43,6 @@ const DashboardStudent = () => {
 
     if (user?.id) {
       handlePaymentConfirmation().then(() => {
-        // Cargar sesiones y solicitudes en paralelo
         Promise.all([
           api.get(`/sesiones/estudiante/${user.id}`).then(setSessions),
           api.get(`/solicitudes/estudiante/${user.id}`).then(setSolicitudes),
@@ -69,6 +65,10 @@ const DashboardStudent = () => {
         : "";
       const fechaBase = new Date(fechaLocalString);
 
+      const horaInicio = fechaBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const horaFin = new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000)
+        .toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
       return {
         id: `session-${s.id}`,
         title: `Tutoría: ${s.materiaNombre}`,
@@ -81,38 +81,74 @@ const DashboardStudent = () => {
           type: "Sesión",
           category: s.materiaNombre,
           status: s.estado,
+          time: `${horaInicio} - ${horaFin}`,
           colorType: "academic-blue",
         },
       };
     });
 
-    // 2. FILTRAR Y FORMATEAR SOLICITUDES
-    // - PENDIENTES: Van al calendario con color oro
-    // - ACEPTADAS: Se mostrarán en una sección especial para pago
-    const pendingSolicitudes = solicitudes.filter(
-      (s) => s.estado?.toUpperCase() === "PENDIENTE",
-    );
+    // 2. Filtrar y formatear solicitudes (Pendientes y Aceptadas)
+    const calendarSolicitudes = solicitudes.filter((s) => {
+      const estadoUpper = s.estado?.toUpperCase();
+      return estadoUpper === "PENDIENTE" || estadoUpper === "ACEPTADA";
+    });
 
-    const formattedCalendarSolicitudes = pendingSolicitudes.map((s) => ({
-      id: `solicitud-${s.id}`,
-      title: `Solicitud: ${s.materiaNombre}`,
-      start: `${s.fechaPreferida}T${s.horaPreferida}`,
-      end: new Date(
-        new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
-        (s.duracionMin || 60) * 60000,
-      ).toISOString(),
-      extendedProps: {
-        ...s,
-        type: "Solicitud",
-        category: s.materiaNombre,
-        status: s.estado,
-        colorType: "academic-gold",
-      },
-    }));
+    const formattedCalendarSolicitudes = calendarSolicitudes.map((s) => {
+      try {
+        const fecha = s.fechaPreferida;
+        const horaCompleta = s.horaPreferida;
 
-    // 3. Fusionar para el calendario
+        const [hh, mm] = horaCompleta.split(':');
+        const horaInicioShort = `${hh.padStart(2, '0')}:${mm.padStart(2, '0')}`;
+        const startISO = `${fecha}T${horaInicioShort}:00`;
+
+        const duracion = s.duracionMin || 60;
+        const totalMinutosInicio = parseInt(hh, 10) * 60 + parseInt(mm, 10);
+        const totalMinutosFin = totalMinutosInicio + duracion;
+
+        const horasFinNum = Math.floor(totalMinutosFin / 60);
+        const minutosFinNum = totalMinutosFin % 60;
+
+        const hrsFinStr = String(horasFinNum).padStart(2, '0');
+        const minsFinStr = String(minutosFinNum).padStart(2, '0');
+        const endISO = `${fecha}T${hrsFinStr}:${minsFinStr}:00`;
+
+        return {
+          id: `solicitud-${s.id}`,
+          title: s.estado?.toUpperCase() === "ACEPTADA" ? `⚠️ Pagar: ${s.materiaNombre}` : `Solicitud: ${s.materiaNombre}`,
+          start: startISO,
+          end: endISO,
+          extendedProps: {
+            ...s,
+            type: "Solicitud",
+            category: s.materiaNombre,
+            status: s.estado, // 👈 Se mantiene limpio ("aceptada") para que pase los filtros de FullCalendar
+            statusLabel: s.estado?.toUpperCase() === "ACEPTADA" ? "Aceptada (Por Pagar)" : s.estado, // 👈 Para la tarjeta Hover
+            time: `${horaInicioShort} - ${hrsFinStr}:${minsFinStr}`,
+            colorType: "academic-gold",
+          },
+        };
+      } catch (err) {
+        console.error(`Error procesando solicitud ID ${s?.id}:`, err);
+        return null;
+      }
+    }).filter(Boolean);
+
     setEvents([...formattedSessions, ...formattedCalendarSolicitudes]);
   }, [sessions, solicitudes]);
+
+  // Helper para validar la vigencia de la sección inferior "Por Pagar" usando texto plano
+  const filtrarPorPagarVigente = (s) => {
+    if (s.estado?.toUpperCase() !== "ACEPTADA") return false;
+
+    const hoyString = new Date().toISOString().split('T')[0];
+    if (s.fechaPreferida > hoyString) return true;
+    if (s.fechaPreferida === hoyString) {
+      const ahoraHora = new Date().toLocaleTimeString('es-ES', { hour12: false, hour: '2-digit', minute: '2-digit' });
+      return s.horaPreferida >= ahoraHora;
+    }
+    return false;
+  };
 
   return (
     <MainLayout>
@@ -151,6 +187,7 @@ const DashboardStudent = () => {
                 </h3>
                 <AcademicCalendar events={events} />
               </div>
+
               {/* Sección de Tutorías Aceptadas esperando Pago */}
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold text-primary font-headline">
@@ -158,11 +195,7 @@ const DashboardStudent = () => {
                 </h3>
                 <div className="space-y-4">
                   {solicitudes
-                    .filter((s) => {
-                      if (s.estado?.toUpperCase() !== "ACEPTADA") return false;
-                      const requestDateTime = new Date(`${s.fechaPreferida}T${s.horaPreferida}`);
-                      return requestDateTime >= new Date();
-                    })
+                    .filter(filtrarPorPagarVigente)
                     .map((soli, i) => {
                       const montoTotal = Math.round(
                         (soli.duracionMin / 60) * (soli.precioPorHora || 0),
@@ -182,15 +215,11 @@ const DashboardStudent = () => {
                         />
                       );
                     })}
-                  {solicitudes.filter((s) => {
-                    if (s.estado?.toUpperCase() !== "ACEPTADA") return false;
-                    const requestDateTime = new Date(`${s.fechaPreferida}T${s.horaPreferida}`);
-                    return requestDateTime >= new Date();
-                  }).length === 0 && (
-                      <p className="text-gray-400 italic text-sm">
-                        No tienes tutorías pendientes de pago.
-                      </p>
-                    )}
+                  {solicitudes.filter(filtrarPorPagarVigente).length === 0 && (
+                    <p className="text-gray-400 italic text-sm">
+                      No tienes tutorías pendientes de pago.
+                    </p>
+                  )}
                 </div>
               </div>
 
