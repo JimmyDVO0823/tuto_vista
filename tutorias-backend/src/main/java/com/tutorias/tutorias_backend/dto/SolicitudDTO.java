@@ -2,6 +2,7 @@ package com.tutorias.tutorias_backend.dto;
 
 import com.tutorias.tutorias_backend.enums.EstadoSolicitud;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -25,4 +26,5 @@ public class SolicitudDTO {
     private String mensaje;
     private EstadoSolicitud estado;
     private OffsetDateTime creadoEn;
+    private BigDecimal precioPorHora;
 }

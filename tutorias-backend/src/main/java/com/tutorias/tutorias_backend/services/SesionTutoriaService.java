@@ -26,63 +26,11 @@ public class SesionTutoriaService {
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
 
-        if (solicitud.getEstado() != EstadoSolicitud.pendiente) {
-            throw new RuntimeException("La solicitud no está pendiente, por lo que no puede ser aceptada.");
-        }
-
         // Combinar fecha y hora preferida para programar la nueva sesión
         OffsetDateTime programada = OffsetDateTime.of(
                 solicitud.getFechaPreferida(),
                 solicitud.getHoraPreferida(),
                 ZoneOffset.UTC);
-        OffsetDateTime nuevaInicio = programada;
-        OffsetDateTime nuevaFin = programada.plusMinutes(solicitud.getDuracionMin());
-
-        // 1. Validar solapamiento con sesiones existentes (programadas o en progreso)
-        List<SesionTutoria> activeSessions = sesionTutoriaRepository.findByTutorIdAndEstadoIn(
-                solicitud.getTutor().getId(),
-                List.of(EstadoSesion.programada, EstadoSesion.en_progreso));
-
-        for (SesionTutoria s : activeSessions) {
-            OffsetDateTime extInicio = s.getProgramadaPara();
-            OffsetDateTime extFin = extInicio.plusMinutes(s.getDuracionMin());
-
-            // Solapamiento si: nuevaInicio < extFin AND nuevaFin > extInicio
-            if (nuevaInicio.isBefore(extFin) && nuevaFin.isAfter(extInicio)) {
-                throw new RuntimeException("El tutor ya tiene otra sesión activa programada en esta franja horaria: " +
-                        extInicio.toLocalTime() + " - " + extFin.toLocalTime());
-            }
-        }
-
-        // 2. Cambiar estado de la solicitud actual a aceptada
-        solicitud.setEstado(EstadoSolicitud.aceptada);
-        solicitudRepository.save(solicitud);
-
-        // 3. Auto-rechazar otras solicitudes pendientes que se solapen
-        List<Solicitud> pendingRequests = solicitudRepository.findByTutorIdAndEstado(
-                solicitud.getTutor().getId(),
-                EstadoSolicitud.pendiente);
-
-        for (Solicitud p : pendingRequests) {
-            if (p.getId().equals(solicitud.getId())) {
-                continue;
-            }
-
-            OffsetDateTime reqInicio = OffsetDateTime.of(
-                    p.getFechaPreferida(),
-                    p.getHoraPreferida(),
-                    ZoneOffset.UTC);
-            OffsetDateTime reqFin = reqInicio.plusMinutes(p.getDuracionMin());
-
-            if (reqInicio.isBefore(nuevaFin) && reqFin.isAfter(nuevaInicio)) {
-                p.setEstado(EstadoSolicitud.rechazada);
-                p.setMensaje(p.getMensaje() == null
-                        ? "Cruce de horarios con otra sesión ya confirmada"
-                        : p.getMensaje()
-                                + " [Rechazada automáticamente por cruce de horarios con otra tutoría confirmada]");
-                solicitudRepository.save(p);
-            }
-        }
 
         SesionTutoria sesion = new SesionTutoria();
         sesion.setSolicitud(solicitud);
@@ -91,7 +39,10 @@ public class SesionTutoriaService {
         sesion.setMateria(solicitud.getMateria());
         sesion.setProgramadaPara(programada);
         sesion.setDuracionMin(solicitud.getDuracionMin());
-        sesion.setPrecio(solicitud.getTutor().getPrecioPorHora());
+        // El precio total se calcula en base a la duración y precio por hora de la solicitud
+        java.math.BigDecimal precioPorHora = solicitud.getTutor().getPrecioPorHora();
+        java.math.BigDecimal duracionHoras = java.math.BigDecimal.valueOf(solicitud.getDuracionMin()).divide(java.math.BigDecimal.valueOf(60), 2, java.math.RoundingMode.HALF_UP);
+        sesion.setPrecio(precioPorHora.multiply(duracionHoras));
         sesion.setEstado(EstadoSesion.programada);
 
         SesionTutoria guardada = sesionTutoriaRepository.save(sesion);

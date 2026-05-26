@@ -84,22 +84,12 @@ const GestionTutorias = () => {
   const handleAccept = async (id) => {
     try {
       setProcessingId(id);
-      const solicitudAceptada = solicitudes.find(s => s.id === id);
 
-      await api.post(`/sesiones/desde-solicitud/${id}`);
+      await api.patch(`/solicitudes/${id}/estado?estado=aceptada`);
 
       setSolicitudes(prev => prev.filter(s => s.id !== id));
 
-      if (solicitudAceptada) {
-        const nuevaSesion = {
-          ...solicitudAceptada,
-          estado: 'programada',
-          programadaPara: `${solicitudAceptada.fechaPreferida}T${solicitudAceptada.horaPreferida}`
-        };
-        setSesiones(prev => [nuevaSesion, ...prev]);
-      }
-
-      alert("¡Tutoría aceptada y agendada exitosamente!");
+      alert("¡Solicitud de tutoría aceptada! Aparecerá en tu agenda una vez el estudiante realice el pago.");
       fetchData(); // Sincroniza completamente con el backend
     } catch (err) {
       console.error('Error accepting solicitud:', err);

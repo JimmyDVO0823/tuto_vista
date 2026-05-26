@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../../../services/api';
 
-export const BotonPagoMercadoPago = ({ monto }) => {
+export const BotonPagoMercadoPago = ({ monto, solicitudId }) => {
   const [loading, setLoading] = useState(false);
 
   const handlePagar = async () => {
@@ -9,7 +9,7 @@ export const BotonPagoMercadoPago = ({ monto }) => {
     const montoFinal = Math.round(monto); // Evitar decimales que MP rechaza en COP
     try {
       // 1. Llamamos a nuestro backend de Spring Boot para generar el enlace
-      const response = await api.post('/pagos/crear-preferencia', { monto: montoFinal });
+      const response = await api.post('/pagos/crear-preferencia', { monto: montoFinal, solicitudId });
       
       // 2. Redirigimos directamente al estudiante a la pasarela segura de Mercado Pago
       if (response && response.urlPago) {

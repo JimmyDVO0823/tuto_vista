@@ -18,6 +18,38 @@ public class PagoService {
 
     private final PagoRepository pagoRepository;
     private final SesionTutoriaRepository sesionTutoriaRepository;
+    private final com.tutorias.tutorias_backend.repositories.SolicitudRepository solicitudRepository;
+    private final SesionTutoriaService sesionTutoriaService;
+
+    @Transactional
+    public PagoDTO registrarPagoYCrearSesion(Long solicitudId) {
+        Solicitud solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
+
+        if (solicitud.getEstado() != com.tutorias.tutorias_backend.enums.EstadoSolicitud.aceptada) {
+            throw new RuntimeException("La solicitud no está aceptada por el tutor. No se puede realizar el pago.");
+        }
+
+        // Crear la sesión a partir de la solicitud aceptada
+        com.tutorias.tutorias_backend.dto.SesionTutoriaDTO sesionDto = sesionTutoriaService.crearDesdeSolicitud(solicitudId);
+        SesionTutoria sesion = sesionTutoriaRepository.findById(sesionDto.getId())
+                .orElseThrow(() -> new RuntimeException("Sesión no encontrada después de crear"));
+
+        Pago pago = new Pago();
+        pago.setSesion(sesion);
+        pago.setEstudiante(sesion.getEstudiante());
+        pago.setTutor(sesion.getTutor());
+        pago.setMonto(sesion.getPrecio());
+
+        // Comisión fija del 10%
+        BigDecimal comision = sesion.getPrecio().multiply(new BigDecimal("0.10"));
+        pago.setComisionPlataforma(comision);
+
+        pago.setEstado(EstadoPago.completado);
+        pago.setPagadoEn(OffsetDateTime.now());
+
+        return toDTO(pagoRepository.save(pago));
+    }
 
     @Transactional
     public PagoDTO registrarPago(Long sesionId) {

@@ -144,6 +144,63 @@ public class SolicitudService {
     public SolicitudDTO actualizarEstado(Long solicitudId, EstadoSolicitud nuevoEstado) {
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
+
+        if (nuevoEstado == EstadoSolicitud.aceptada) {
+            if (solicitud.getEstado() != EstadoSolicitud.pendiente) {
+                throw new RuntimeException("La solicitud no está pendiente, por lo que no puede ser aceptada.");
+            }
+
+            // Combinar fecha y hora preferida para programar la nueva sesión
+            java.time.OffsetDateTime programada = java.time.OffsetDateTime.of(
+                    solicitud.getFechaPreferida(),
+                    solicitud.getHoraPreferida(),
+                    java.time.ZoneOffset.UTC);
+            java.time.OffsetDateTime nuevaInicio = programada;
+            java.time.OffsetDateTime nuevaFin = programada.plusMinutes(solicitud.getDuracionMin());
+
+            // 1. Validar solapamiento con sesiones existentes (programadas o en progreso)
+            List<SesionTutoria> activeSessions = sesionTutoriaRepository.findByTutorIdAndEstadoIn(
+                    solicitud.getTutor().getId(),
+                    List.of(com.tutorias.tutorias_backend.enums.EstadoSesion.programada, com.tutorias.tutorias_backend.enums.EstadoSesion.en_progreso));
+
+            for (SesionTutoria s : activeSessions) {
+                java.time.OffsetDateTime extInicio = s.getProgramadaPara();
+                java.time.OffsetDateTime extFin = extInicio.plusMinutes(s.getDuracionMin());
+
+                // Solapamiento si: nuevaInicio < extFin AND nuevaFin > extInicio
+                if (nuevaInicio.isBefore(extFin) && nuevaFin.isAfter(extInicio)) {
+                    throw new RuntimeException("El tutor ya tiene otra sesión activa programada en esta franja horaria: " +
+                            extInicio.toLocalTime() + " - " + extFin.toLocalTime());
+                }
+            }
+
+            // 2. Auto-rechazar otras solicitudes pendientes que se solapen
+            List<Solicitud> pendingRequests = solicitudRepository.findByTutorIdAndEstado(
+                    solicitud.getTutor().getId(),
+                    EstadoSolicitud.pendiente);
+
+            for (Solicitud p : pendingRequests) {
+                if (p.getId().equals(solicitud.getId())) {
+                    continue;
+                }
+
+                java.time.OffsetDateTime reqInicio = java.time.OffsetDateTime.of(
+                        p.getFechaPreferida(),
+                        p.getHoraPreferida(),
+                        java.time.ZoneOffset.UTC);
+                java.time.OffsetDateTime reqFin = reqInicio.plusMinutes(p.getDuracionMin());
+
+                if (reqInicio.isBefore(nuevaFin) && reqFin.isAfter(nuevaInicio)) {
+                    p.setEstado(EstadoSolicitud.rechazada);
+                    p.setMensaje(p.getMensaje() == null
+                            ? "Cruce de horarios con otra sesión ya confirmada"
+                            : p.getMensaje()
+                                    + " [Rechazada automáticamente por cruce de horarios con otra tutoría confirmada]");
+                    solicitudRepository.save(p);
+                }
+            }
+        }
+
         solicitud.setEstado(nuevoEstado);
         return toDTO(solicitudRepository.save(solicitud));
     }
@@ -178,6 +235,7 @@ public class SolicitudService {
                 .mensaje(s.getMensaje())
                 .estado(s.getEstado())
                 .creadoEn(s.getCreadoEn())
+                .precioPorHora(s.getTutor().getPrecioPorHora())
                 .build();
     }
 }

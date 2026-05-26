@@ -99,46 +99,48 @@ const DashboardTutor = () => {
               Próximas Sesiones
             </h2>
             <div className="space-y-4">
-              {sessions.length > 0 ? (
-                sessions.map((s, i) => (
-                  <div
-                    key={s.id || i}
-                    className="bg-white p-6 rounded-lg flex flex-col md:flex-row items-center justify-between group hover:translate-x-2 transition-transform duration-300 shadow-sm border border-gray-50 gap-4 md:gap-8"
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-full bg-mini-gray overflow-hidden border-2 border-white flex items-center justify-center text-xl font-bold text-gray-500">
-                        {s.estudianteNombre
-                          ? s.estudianteNombre.charAt(0)
-                          : "E"}
+              {sessions.filter(s => s.programadaPara && new Date(s.programadaPara) >= new Date()).length > 0 ? (
+                sessions
+                  .filter(s => s.programadaPara && new Date(s.programadaPara) >= new Date())
+                  .map((s, i) => (
+                    <div
+                      key={s.id || i}
+                      className="bg-white p-6 rounded-lg flex flex-col md:flex-row items-center justify-between group hover:translate-x-2 transition-transform duration-300 shadow-sm border border-gray-50 gap-4 md:gap-8"
+                    >
+                      <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-full bg-mini-gray overflow-hidden border-2 border-white flex items-center justify-center text-xl font-bold text-gray-500">
+                          {s.estudianteNombre
+                            ? s.estudianteNombre.charAt(0)
+                            : "E"}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-lg text-primary">
+                            {s.estudianteNombre || `Estudiante ${i + 1}`}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            {s.materiaNombre || "Materia Académica"}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-bold text-lg text-primary">
-                          {s.estudianteNombre || `Estudiante ${i + 1}`}
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          {s.materiaNombre || "Materia Académica"}
-                        </p>
+                      <div className="text-right">
+                        <div className="flex items-center gap-2 text-primary font-bold mb-1">
+                          <span className="material-symbols-outlined text-sm">
+                            schedule
+                          </span>
+                          <span>
+                            {s.programadaPara
+                              ? new Date(s.programadaPara).toLocaleString([], {
+                                timeZone: "UTC",
+                              })
+                              : "Pendiente"}
+                          </span>
+                        </div>
+                        <span className="text-[0.65rem] uppercase tracking-widest font-bold text-academic-gold px-2 py-1 bg-academic-gold/10 rounded">
+                          {s.estado || "Programada"}
+                        </span>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-2 text-primary font-bold mb-1">
-                        <span className="material-symbols-outlined text-sm">
-                          schedule
-                        </span>
-                        <span>
-                          {s.programadaPara
-                            ? new Date(s.programadaPara).toLocaleString([], {
-                              timeZone: "UTC",
-                            })
-                            : "Pendiente"}
-                        </span>
-                      </div>
-                      <span className="text-[0.65rem] uppercase tracking-widest font-bold text-academic-gold px-2 py-1 bg-academic-gold/10 rounded">
-                        {s.estado || "Programada"}
-                      </span>
-                    </div>
-                  </div>
-                ))
+                  ))
               ) : (
                 <p className="text-gray-500">No tienes sesiones programadas.</p>
               )}

@@ -40,6 +40,8 @@ public class PagoController {
             String montoStr = payload.get("monto").toString();
             BigDecimal monto = new BigDecimal(montoStr);
 
+            String solicitudIdStr = payload.get("solicitudId").toString();
+
             // Creamos el ítem conceptual de la transacción
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
                     .title("Asesoría Académica - The Academic")
@@ -55,10 +57,11 @@ public class PagoController {
                     .pending("https://jimmydvo0823.github.io/tuto_vista/#/dashboard")
                     .build();
 
-            // Construimos la preferencia
+            // Construimos la preferencia con la referencia externa (solicitudId)
             PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                     .items(Collections.singletonList(itemRequest))
                     .backUrls(backUrls)
+                    .externalReference(solicitudIdStr)
                     .autoReturn("approved") // Te devuelve automáticamente a la app si sale bien
                     .build();
 
@@ -77,6 +80,13 @@ public class PagoController {
             errorResponse.put("error", "No se pudo generar la pasarela de pagos");
             return ResponseEntity.status(500).body(errorResponse);
         }
+    }
+
+    @PostMapping("/confirmar")
+    public ResponseEntity<PagoDTO> confirmarPago(@RequestBody Map<String, Object> payload) {
+        String solicitudIdStr = payload.get("solicitudId").toString();
+        Long solicitudId = Long.parseLong(solicitudIdStr);
+        return ResponseEntity.ok(pagoService.registrarPagoYCrearSesion(solicitudId));
     }
 
     // ── 📝 MÉTODOS ADMINISTRATIVOS EXISTENTES (NO LOS BORRES) ─────────────────

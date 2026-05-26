@@ -18,16 +18,44 @@ const DashboardStudent = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const handlePaymentConfirmation = async () => {
+      // Check query params in both window.location.search and window.location.hash
+      const fullUrl = window.location.href;
+      const urlObj = new URL(fullUrl.replace('#/', '')); // Simple normalization for parsing query params from hash router
+      const searchParams = new URLSearchParams(urlObj.search || window.location.search);
+      
+      const status = searchParams.get('status');
+      const externalReference = searchParams.get('external_reference');
+      
+      if (status === 'approved' && externalReference) {
+        try {
+          setLoading(true);
+          // Confirm payment and create session
+          await api.post('/pagos/confirmar', { solicitudId: externalReference });
+          alert("¡Pago confirmado exitosamente! Tu sesión de tutoría ha sido programada.");
+          
+          // Clear query params from the URL to prevent double submission
+          const cleanUrl = window.location.href.split('?')[0];
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch (error) {
+          console.error("Error al confirmar el pago:", error);
+          alert("Hubo un error al confirmar tu pago en el servidor.");
+        }
+      }
+    };
+
     if (user?.id) {
-      // Cargar sesiones y solicitudes en paralelo
-      Promise.all([
-        api.get(`/sesiones/estudiante/${user.id}`).then(setSessions),
-        api.get(`/solicitudes/estudiante/${user.id}`).then(setSolicitudes),
-      ])
-        .catch((err) =>
-          console.error("Error cargando datos del dashboard:", err),
-        )
-        .finally(() => setLoading(false));
+      handlePaymentConfirmation().then(() => {
+        // Cargar sesiones y solicitudes en paralelo
+        Promise.all([
+          api.get(`/sesiones/estudiante/${user.id}`).then(setSessions),
+          api.get(`/solicitudes/estudiante/${user.id}`).then(setSolicitudes),
+        ])
+          .catch((err) =>
+            console.error("Error cargando datos del dashboard:", err),
+          )
+          .finally(() => setLoading(false));
+      });
     } else {
       setLoading(false);
     }
@@ -71,7 +99,7 @@ const DashboardStudent = () => {
       start: `${s.fechaPreferida}T${s.horaPreferida}`,
       end: new Date(
         new Date(`${s.fechaPreferida}T${s.horaPreferida}`).getTime() +
-          (s.duracionMin || 60) * 60000,
+        (s.duracionMin || 60) * 60000,
       ).toISOString(),
       extendedProps: {
         ...s,
@@ -130,7 +158,11 @@ const DashboardStudent = () => {
                 </h3>
                 <div className="space-y-4">
                   {solicitudes
-                    .filter((s) => s.estado?.toUpperCase() === "ACEPTADA")
+                    .filter((s) => {
+                      if (s.estado?.toUpperCase() !== "ACEPTADA") return false;
+                      const requestDateTime = new Date(`${s.fechaPreferida}T${s.horaPreferida}`);
+                      return requestDateTime >= new Date();
+                    })
                     .map((soli, i) => {
                       const montoTotal = Math.round(
                         (soli.duracionMin / 60) * (soli.precioPorHora || 0),
@@ -145,22 +177,24 @@ const DashboardStudent = () => {
                           buttonText="Ver Detalles"
                           actionPath="#"
                           extraContent={
-                            <BotonPagoMercadoPago monto={montoTotal} />
+                            <BotonPagoMercadoPago monto={montoTotal} solicitudId={soli.id} />
                           }
                         />
                       );
                     })}
-                  {solicitudes.filter(
-                    (s) => s.estado?.toUpperCase() === "ACEPTADA",
-                  ).length === 0 && (
-                    <p className="text-gray-400 italic text-sm">
-                      No tienes tutorías pendientes de pago.
-                    </p>
-                  )}
+                  {solicitudes.filter((s) => {
+                    if (s.estado?.toUpperCase() !== "ACEPTADA") return false;
+                    const requestDateTime = new Date(`${s.fechaPreferida}T${s.horaPreferida}`);
+                    return requestDateTime >= new Date();
+                  }).length === 0 && (
+                      <p className="text-gray-400 italic text-sm">
+                        No tienes tutorías pendientes de pago.
+                      </p>
+                    )}
                 </div>
               </div>
 
-              <NextSessions sessions={sessions} isTutor={false} />
+              <NextSessions sessions={sessions.filter(s => s.programadaPara && new Date(s.programadaPara) >= new Date())} isTutor={false} />
               <PendingAssignments />
             </article>
 
