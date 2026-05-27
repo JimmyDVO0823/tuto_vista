@@ -61,11 +61,11 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
    */
   const currentUser = user
     ? {
-        name: user.name,
-        role: user.role === "tutor" ? "Tutor Académico" : "Estudiante",
-        avatar: user.user_metadata?.avatar_url || "",
-        email: user.email,
-      }
+      name: user.name,
+      role: user.role === "tutor" ? "Tutor Académico" : "Estudiante",
+      avatar: user.user_metadata?.avatar_url || "",
+      email: user.email,
+    }
     : null;
 
   const handleLogout = () => {
@@ -76,27 +76,25 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     <nav
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className={`h-screen fixed left-0 top-0 bg-mini-gray py-8 z-50 transition-all duration-300 ease-in-out shadow-sm ${
-        isCollapsed
-          ? "hidden md:flex flex-col md:translate-x-0 w-64 md:w-20"
-          : "flex flex-col translate-x-0 w-64"
-      }`}
+      className={`h-screen fixed left-0 top-0 bg-mini-gray py-8 z-50 transition-all duration-300 ease-in-out shadow-sm ${isCollapsed
+        ? "hidden md:flex flex-col md:translate-x-0 w-64 md:w-20"
+        : "flex flex-col translate-x-0 w-64"
+        }`}
     >
       {/* Brand & Toggle */}
       <div
-        className={`px-6 mb-10 flex items-center ${isCollapsed ? "justify-center" : "justify-between"}`}
+        className={`mb-10 flex items-center ${isCollapsed ? "px-6 justify-center" : "px-4 justify-start gap-2"}`}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {!isCollapsed && (
-            <span className="text-lg font-black tracking-widest uppercase text-primary font-display whitespace-nowrap animate-in fade-in duration-500">
+            <span className="text-sm font-black tracking-widest uppercase text-primary font-display whitespace-nowrap animate-in fade-in duration-500">
               THE ACADEMIC
             </span>
           )}
-          <NotificationBell isCollapsed={isCollapsed} />
         </div>
         <button
           onClick={onToggle}
-          className={`material-symbols-outlined text-primary hover:bg-[#e6e8ea] p-2 rounded-full transition-colors ${isCollapsed ? "scale-110" : ""}`}
+          className={`material-symbols-outlined text-primary hover:bg-[#e6e8ea] p-1.5 rounded-full transition-colors ${isCollapsed ? "scale-110" : ""}`}
         >
           {isCollapsed ? "menu" : "menu_open"}
         </button>
@@ -124,22 +122,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       <div
         className={`px-5 mt-auto flex flex-col gap-4 ${isCollapsed ? "items-center" : ""}`}
       >
-        {/* El botón de "Book New Session" se mantiene igual por ser un botón de acción principal (CTA) */}
-        <button
-          className={`bg-academic-gold text-primary font-bold rounded-md flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-sm ${
-            isCollapsed
-              ? "w-10 h-10 p-0 rounded-full"
-              : "py-3 px-4 text-sm w-full"
-          }`}
-          title={isCollapsed ? "Book New Session" : ""}
-        >
-          <span className="material-symbols-outlined !text-[20px]">
-            add_circle
-          </span>
-          {!isCollapsed && (
-            <span className="whitespace-nowrap">Book New Session</span>
-          )}
-        </button>
+        <NotificationBell isCollapsed={isCollapsed} />
 
         {/* Bloque inferior usando la consistencia de SidebarItem */}
         <div
