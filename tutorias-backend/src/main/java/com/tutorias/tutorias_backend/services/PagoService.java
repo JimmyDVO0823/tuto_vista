@@ -57,7 +57,7 @@ public class PagoService {
                 sesion.getEstudiante().getPerfil().getNombreCompleto());
         
         notificacionService.enviar(sesion.getTutor().getPerfil().getId(), 
-                com.tutorias.tutorias_backend.enums.TipoNotificacion.PAGO_RECIBIDO, 
+                com.tutorias.tutorias_backend.enums.TipoNotificacion.SOLICITUD_TUTORIA, 
                 "Pago recibido", 
                 msg);
 
@@ -90,7 +90,7 @@ public class PagoService {
                 sesion.getEstudiante().getPerfil().getNombreCompleto());
         
         notificacionService.enviar(sesion.getTutor().getPerfil().getId(), 
-                com.tutorias.tutorias_backend.enums.TipoNotificacion.PAGO_RECIBIDO, 
+                com.tutorias.tutorias_backend.enums.TipoNotificacion.SOLICITUD_TUTORIA, 
                 "Pago recibido", 
                 msg2);
 

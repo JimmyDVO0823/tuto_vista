@@ -227,7 +227,7 @@ public class SolicitudService {
             String msg = String.format("Solicitud de tutoria de %s aceptada para el día %s por %s", 
                     materiaNombre, fechaStr, tutorNombre);
             notificacionService.enviar(guardada.getEstudiante().getPerfil().getId(), 
-                    com.tutorias.tutorias_backend.enums.TipoNotificacion.SOLICITUD_ACEPTADA, 
+                    com.tutorias.tutorias_backend.enums.TipoNotificacion.SOLICITUD_TUTORIA, 
                     "Solicitud aceptada", 
                     msg);
         } else if (nuevoEstado == EstadoSolicitud.rechazada) {
