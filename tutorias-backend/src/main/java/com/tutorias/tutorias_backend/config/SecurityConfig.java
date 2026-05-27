@@ -37,10 +37,16 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.disable())
                         .contentSecurityPolicy(csp -> csp
-                                .policyDirectives("script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.mercadopago.com https://www.mercadolibre.com https://http2.mlstatic.com; " +
-                                                "connect-src 'self' https://api.mercadopago.com https://www.mercadopago.com.co; " +
-                                                "img-src 'self' data: https://*.mlstatic.com; " +
-                                                "frame-src https://*.mercadopago.com https://*.mercadopago.com.co;")))
+                                .policyDirectives(
+                                        "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+                                        "https://sdk.mercadopago.com https://www.mercadopago.com https://secure.mlstatic.com; " +
+                                        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
+                                        "img-src 'self' data: https://*.mlstatic.com; " +
+                                        "connect-src 'self' https://api.mercadopago.com https://www.mercadopago.com.co; " +
+                                        "frame-src https://*.mercadopago.com https://*.mercadopago.com.co; " +
+                                        "object-src 'none'; " +
+                                        "base-uri 'self'; " +
+                                        "form-action 'self' https://checkout.mercadopago.com;"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
