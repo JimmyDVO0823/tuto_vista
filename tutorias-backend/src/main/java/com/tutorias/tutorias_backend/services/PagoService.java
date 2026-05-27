@@ -21,6 +21,7 @@ public class PagoService {
     private final com.tutorias.tutorias_backend.repositories.SolicitudRepository solicitudRepository;
     private final SesionTutoriaService sesionTutoriaService;
     private final NotificacionService notificacionService;
+    private final ConfiguracionService configuracionService;
 
     @Transactional
     public PagoDTO registrarPagoYCrearSesion(Long solicitudId) {
@@ -42,8 +43,9 @@ public class PagoService {
         pago.setTutor(sesion.getTutor());
         pago.setMonto(sesion.getPrecio());
 
-        // Comisión fija del 10%
-        BigDecimal comision = sesion.getPrecio().multiply(new BigDecimal("0.10"));
+        // Comisión dinámica obtenida de configuración
+        BigDecimal tasaComision = configuracionService.obtenerComision();
+        BigDecimal comision = sesion.getPrecio().multiply(tasaComision);
         pago.setComisionPlataforma(comision);
 
         pago.setEstado(EstadoPago.completado);
@@ -75,8 +77,9 @@ public class PagoService {
         pago.setTutor(sesion.getTutor());
         pago.setMonto(sesion.getPrecio());
         
-        // Comisión fija del 10% para la plataforma por ejemplo
-        BigDecimal comision = sesion.getPrecio().multiply(new BigDecimal("0.10"));
+        // Comisión dinámica para la plataforma
+        BigDecimal tasaComision = configuracionService.obtenerComision();
+        BigDecimal comision = sesion.getPrecio().multiply(tasaComision);
         pago.setComisionPlataforma(comision);
         
         pago.setEstado(EstadoPago.completado);

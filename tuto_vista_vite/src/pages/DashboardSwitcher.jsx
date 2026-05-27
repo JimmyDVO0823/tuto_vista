@@ -11,6 +11,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DashboardStudent from './DashboardStudent';
 import DashboardTutor from './DashboardTutor';
+import DashboardAdmin from './DashboardAdmin';
 
 /**
  * DashboardSwitcher Component.
@@ -38,6 +39,10 @@ const DashboardSwitcher = () => {
 
     if (user.role === 'tutor') {
         return <DashboardTutor />;
+    }
+
+    if (user.role === 'administrador') {
+        return <DashboardAdmin />;
     }
 
     // Default to student if role is student or unknown (for safety)

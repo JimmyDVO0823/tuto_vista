@@ -18,4 +18,9 @@ public class DepartamentoController {
     public ResponseEntity<List<DepartamentoDTO>> getAll() {
         return ResponseEntity.ok(departamentoService.getAllDepartamentos());
     }
+
+    @PostMapping
+    public ResponseEntity<DepartamentoDTO> create(@RequestBody DepartamentoDTO dto) {
+        return ResponseEntity.ok(departamentoService.create(dto));
+    }
 }
