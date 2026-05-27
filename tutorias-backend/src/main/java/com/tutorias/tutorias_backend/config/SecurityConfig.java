@@ -46,7 +46,7 @@ public class SecurityConfig {
                                         "frame-src https://*.mercadopago.com https://*.mercadopago.com.co; " +
                                         "object-src 'none'; " +
                                         "base-uri 'self'; " +
-                                        "form-action 'self' https://checkout.mercadopago.com;")))
+                                        "form-action 'self' https://checkout.mercadopago.com;"))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
