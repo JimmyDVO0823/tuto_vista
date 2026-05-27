@@ -34,7 +34,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable())
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives("script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.mercadopago.com https://www.mercadolibre.com https://http2.mlstatic.com; " +
+                                                "connect-src 'self' https://api.mercadopago.com https://www.mercadopago.com.co; " +
+                                                "img-src 'self' data: https://*.mlstatic.com; " +
+                                                "frame-src https://*.mercadopago.com https://*.mercadopago.com.co;")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
