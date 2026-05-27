@@ -24,4 +24,11 @@ public class ReporteController {
     public ResponseEntity<ReporteDTO> createReporte(@RequestBody ReporteDTO dto) {
         return ResponseEntity.ok(reporteService.create(dto));
     }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ReporteDTO> updateEstado(
+            @PathVariable Long id,
+            @RequestParam com.tutorias.tutorias_backend.enums.EstadoReporte estado) {
+        return ResponseEntity.ok(reporteService.updateEstado(id, estado));
+    }
 }

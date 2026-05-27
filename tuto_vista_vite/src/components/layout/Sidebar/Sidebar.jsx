@@ -47,6 +47,9 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       { label: "Ingresos", path: "#", icon: "payments" },
       { label: "Chat", path: "/chat", icon: "chat" },
     ],
+    administrador: [
+      { label: "Panel Admin", path: "/dashboard", icon: "admin_panel_settings" },
+    ],
   };
 
   /**
@@ -62,7 +65,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
   const currentUser = user
     ? {
       name: user.name,
-      role: user.role === "tutor" ? "Tutor Académico" : "Estudiante",
+      role: user.role === "tutor" ? "Tutor Académico" : user.role === "administrador" ? "Administrador" : "Estudiante",
       avatar: user.user_metadata?.avatar_url || "",
       email: user.email,
     }

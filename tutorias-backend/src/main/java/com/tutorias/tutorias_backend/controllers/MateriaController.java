@@ -22,4 +22,9 @@ public class MateriaController {
         }
         return ResponseEntity.ok(materiaService.getAllMaterias());
     }
+
+    @PostMapping
+    public ResponseEntity<MateriaDTO> create(@RequestBody MateriaDTO dto) {
+        return ResponseEntity.ok(materiaService.create(dto));
+    }
 }

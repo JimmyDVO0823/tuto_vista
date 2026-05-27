@@ -46,6 +46,14 @@ public class ReporteService {
         return mapToDTO(reporteRepository.save(reporte));
     }
 
+    @org.springframework.transaction.annotation.Transactional
+    public ReporteDTO updateEstado(Long id, com.tutorias.tutorias_backend.enums.EstadoReporte nuevoEstado) {
+        Reporte reporte = reporteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
+        reporte.setEstado(nuevoEstado);
+        return mapToDTO(reporteRepository.save(reporte));
+    }
+
     private ReporteDTO mapToDTO(Reporte entity) {
         return ReporteDTO.builder()
                 .id(entity.getId())
