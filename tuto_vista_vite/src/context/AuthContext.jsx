@@ -10,11 +10,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);
-    const base = import.meta.env.BASE_URL; // lee el base de vite.config automáticamente
-    if (window.location.pathname !== `${base}loginform`) {
-      window.location.href = `${base}loginform`;
+
+    // En lugar de cambiar la ruta del pathname, cambiamos el hash (#)
+    if (window.location.hash !== '#/loginform') {
+      window.location.href = `${window.location.origin}${window.location.pathname}#/loginform`;
     }
   };
+
 
   useEffect(() => {
     const checkToken = () => {

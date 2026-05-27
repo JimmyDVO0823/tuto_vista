@@ -10,8 +10,9 @@ import React from 'react';
  * @param {Function} props.onAccept - Handler for accepting the request
  * @param {Function} props.onReject - Handler for rejecting the request
  * @param {boolean} props.isLoading - Whether an action is currently loading
+ * @param {boolean} props.isAcceptedView - 🆕 Whether it's displayed in the accepted tab
  */
-const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
+const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false, isAcceptedView = false }) => {
   const {
     id,
     estudianteNombre,
@@ -31,7 +32,7 @@ const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
     month: 'long',
     day: 'numeric'
   });
-  
+
   // Calculate end time
   const [hours, minutes] = horaPreferida.split(':').map(Number);
   const startDate = new Date();
@@ -48,9 +49,9 @@ const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Left column: User info (Asymmetrical layout 30/70) */}
         <div className="flex items-center gap-4 lg:w-1/3 border-b lg:border-b-0 lg:border-r border-outline-variant/10 pb-6 lg:pb-0 lg:pr-6">
-          <img 
-            src={avatarUrl} 
-            alt={estudianteNombre} 
+          <img
+            src={avatarUrl}
+            alt={estudianteNombre}
             className="w-16 h-16 rounded-full object-cover bg-surface-container-low"
           />
           <div>
@@ -68,7 +69,7 @@ const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
             <div className="inline-block px-3 py-1 bg-surface-container-low rounded-md">
               <span className="text-xs font-bold text-primary uppercase tracking-widest">{materiaNombre}</span>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <span className="text-[10px] font-bold text-elegant-gray uppercase tracking-widest block mb-1">Fecha Propuesta</span>
@@ -90,20 +91,34 @@ const RequestCard = ({ solicitud, onAccept, onReject, isLoading = false }) => {
 
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3 pt-4 justify-end">
-            <button
-              onClick={() => onReject(id)}
-              disabled={isLoading}
-              className="px-6 py-2.5 rounded-md text-sm font-bold bg-surface text-elegant-gray hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
-            >
-              Rechazar
-            </button>
-            <button
-              onClick={() => onAccept(id)}
-              disabled={isLoading}
-              className="signature-gradient text-white px-8 py-2.5 rounded-md text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
-            >
-              {isLoading ? 'Procesando...' : 'Aceptar Tutoría'}
-            </button>
+            {isAcceptedView ? (
+              /* 🆕 VISTA DE SOLICITUD YA ACEPTADA: Solo muestra botón de cancelar */
+              <button
+                onClick={() => onReject(id)}
+                disabled={isLoading}
+                className="px-6 py-2.5 rounded-md text-sm font-bold bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Cancelando...' : 'Cancelar Tutoría'}
+              </button>
+            ) : (
+              /* VISTA POR DEFECTO: Pendientes (Aceptar / Rechazar) */
+              <>
+                <button
+                  onClick={() => onReject(id)}
+                  disabled={isLoading}
+                  className="px-6 py-2.5 rounded-md text-sm font-bold bg-surface text-elegant-gray hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+                >
+                  Rechazar
+                </button>
+                <button
+                  onClick={() => onAccept(id)}
+                  disabled={isLoading}
+                  className="signature-gradient text-white px-8 py-2.5 rounded-md text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none"
+                >
+                  {isLoading ? 'Procesando...' : 'Aceptar Tutoría'}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
