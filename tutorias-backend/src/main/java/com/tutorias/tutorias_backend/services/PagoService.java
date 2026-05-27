@@ -61,7 +61,7 @@ public class PagoService {
                 "Pago recibido", 
                 msg);
 
-        return toDTO(guardada);
+        return toDTO(guardado);
     }
 
     @Transactional
