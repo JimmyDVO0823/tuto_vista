@@ -18,10 +18,8 @@ const handleApiError = async (response) => {
   }
 
   if (response.status === 401 || errorMessage.includes('JWT expired')) {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    window.location.href = '/loginform';
-    throw new Error('Tu sesión ha expirado por inactividad. Por favor, inicia sesión nuevamente.');
+    // No redirigir automáticamente, dejar que el contexto o componente maneje la expiración
+    throw new Error('TOKEN_EXPIRED');
   }
 
   throw new Error(errorMessage);

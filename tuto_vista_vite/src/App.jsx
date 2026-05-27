@@ -13,6 +13,7 @@ import AcademicChat from "./pages/AcademicChat";
 import MyTutorsHistory from "./pages/MyTutorsHistory";
 
 import { AuthProvider } from "./context/AuthContext";
+import SessionRenewalModal from "./components/ui/SessionRenewalModal";
 
 /**
  * Root Application Component with HashRouter configuration.
@@ -20,6 +21,7 @@ import { AuthProvider } from "./context/AuthContext";
 function App() {
   return (
     <AuthProvider>
+      <SessionRenewalModal />
       {/* Usamos Router (HashRouter) sin la propiedad basename */}
       <Router>
         <Routes>

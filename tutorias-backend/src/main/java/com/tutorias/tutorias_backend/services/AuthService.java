@@ -72,6 +72,14 @@ public class AuthService {
         return generateAuthResponse(perfilGuardado);
     }
 
+    public AuthResponse refreshToken(String token) {
+        String email = jwtUtil.extractUsername(token);
+        Perfil perfil = perfilRepository.findByCorreo(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        return generateAuthResponse(perfil);
+    }
+
     private AuthResponse generateAuthResponse(Perfil perfil) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("id", perfil.getId());

@@ -229,7 +229,7 @@ const DashboardStudent = () => {
 
             <aside className="col-span-12 md:col-span-4 space-y-10">
               <SemesterProgressWidget />
-              <NotificationsWidget />
+              {/*<NotificationsWidget />*/}
             </aside>
           </section>
         )}

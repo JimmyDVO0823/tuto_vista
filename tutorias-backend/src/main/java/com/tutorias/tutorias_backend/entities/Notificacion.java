@@ -1,5 +1,6 @@
 package com.tutorias.tutorias_backend.entities;
 
+import com.tutorias.tutorias_backend.enums.TipoNotificacion;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
@@ -20,8 +21,9 @@ public class Notificacion {
     @JoinColumn(name = "perfil_id", nullable = false)
     private Perfil perfil;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String tipo;
+    private TipoNotificacion tipo;
 
     @Column(nullable = false)
     private String titulo;

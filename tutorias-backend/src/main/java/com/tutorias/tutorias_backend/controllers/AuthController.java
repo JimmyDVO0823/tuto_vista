@@ -36,4 +36,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
+
+    @PostMapping("/refresh")
+    @Operation(summary = "Renovar el token de sesión")
+    public ResponseEntity<AuthResponse> refresh(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+        String token = authHeader.substring(7);
+        return ResponseEntity.ok(authService.refreshToken(token));
+    }
 }

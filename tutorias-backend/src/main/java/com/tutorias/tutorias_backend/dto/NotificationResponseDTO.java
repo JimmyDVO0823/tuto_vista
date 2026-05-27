@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NotificationResponseDTO {
+    private Long id;
     private String user;
     private String msg;
     private String time;
     private String tipo;
+    private boolean leida;
 }

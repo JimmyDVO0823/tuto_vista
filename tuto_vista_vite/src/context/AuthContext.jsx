@@ -7,18 +7,29 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Restaurar sesión al cargar
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    const checkToken = () => {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
 
-    if (storedUser && token) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Error al cargar sesión:", e);
+      if (storedUser && token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const expiry = payload.exp * 1000;
+          const now = Date.now();
+          
+          if (now > expiry) {
+            logout();
+          } else {
+            setUser(JSON.parse(storedUser));
+          }
+        } catch (e) {
+          logout();
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    checkToken();
   }, []);
 
   const login = (userData, token) => {
@@ -38,6 +49,20 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     setUser(null);
+    if (window.location.pathname !== '/loginform') {
+      window.location.href = '/loginform';
+    }
+  };
+
+  const renewSession = async () => {
+    try {
+      const { token, ...userData } = await import('../services/api').then(m => m.api.refresh());
+      login(userData, token);
+      return true;
+    } catch (error) {
+      logout();
+      return false;
+    }
   };
 
   return (

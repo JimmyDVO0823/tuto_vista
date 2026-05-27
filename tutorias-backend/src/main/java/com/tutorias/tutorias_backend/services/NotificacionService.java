@@ -1,5 +1,6 @@
 package com.tutorias.tutorias_backend.services;
 
+import com.tutorias.tutorias_backend.enums.TipoNotificacion;
 import com.tutorias.tutorias_backend.entities.Notificacion;
 import com.tutorias.tutorias_backend.entities.Perfil;
 import com.tutorias.tutorias_backend.repositories.NotificacionRepository;
@@ -15,7 +16,7 @@ public class NotificacionService {
     private final NotificacionRepository notificacionRepository;
     private final PerfilRepository perfilRepository;
 
-    public void enviar(Long perfilId, String tipo, String titulo, String cuerpo) {
+    public void enviar(Long perfilId, TipoNotificacion tipo, String titulo, String cuerpo) {
         Perfil perfil = perfilRepository.findById(perfilId).orElseThrow();
         
         Notificacion n = new Notificacion();
@@ -28,7 +29,11 @@ public class NotificacionService {
     }
 
     public List<Notificacion> getByPerfil(Long perfilId) {
-        return notificacionRepository.findByPerfilId(perfilId);
+        return notificacionRepository.findByPerfilIdOrderByCreadoEnDesc(perfilId);
+    }
+
+    public List<Notificacion> getUnreadByPerfil(Long perfilId) {
+        return notificacionRepository.findByPerfilIdAndLeidaFalse(perfilId);
     }
 
     public List<com.tutorias.tutorias_backend.dto.NotificationResponseDTO> getNotificationsByUserId(Long userId) {
@@ -37,10 +42,12 @@ public class NotificacionService {
         
         return notificaciones.stream()
                 .map(n -> com.tutorias.tutorias_backend.dto.NotificationResponseDTO.builder()
+                        .id(n.getId())
                         .user(n.getTitulo())
                         .msg(n.getCuerpo())
                         .time(n.getCreadoEn().format(formatter))
-                        .tipo(n.getTipo())
+                        .tipo(n.getTipo().name())
+                        .leida(n.getLeida())
                         .build())
                 .collect(java.util.stream.Collectors.toList());
     }
