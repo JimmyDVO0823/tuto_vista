@@ -27,19 +27,16 @@ const handleApiError = async (response) => {
 
 // Función auxiliar para procesar la respuesta de forma segura según su tipo
 const parseResponse = async (response) => {
-  // 1. Si es 204 No Content, retornamos objeto vacío de inmediato
   if (response.status === 204) {
     return {};
   }
 
   const contentType = response.headers.get("content-type");
 
-  // 2. Si es un JSON válido, lo parseamos normalmente
   if (contentType && contentType.includes("application/json")) {
     return response.json();
   }
 
-  // 3. Si es texto plano (como "Materia asignada..."), lo devolvemos estructurado como objeto
   const textData = await response.text();
   return textData ? { message: textData } : {};
 };
@@ -71,6 +68,25 @@ export const api = {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       method: 'GET',
       headers,
+    });
+
+    if (!response.ok) {
+      await handleApiError(response);
+    }
+
+    return parseResponse(response);
+  },
+
+  // ✨ ¡AQUÍ ESTÁ EL MÉTODO QUE HACÍA FALTA!
+  async put(endpoint, data, token) {
+    const storedToken = token || localStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {

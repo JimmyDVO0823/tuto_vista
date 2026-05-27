@@ -95,7 +95,10 @@ const DashboardAdmin = () => {
   const handleGuardarComision = async (e) => {
     e.preventDefault();
     try {
-      const decValue = comision / 100;
+      // Forzamos a que sea un número flotante válido para el backend (ej: 0.15)
+      const porcentajeNumerico = parseInt(comision) || 0;
+      const decValue = porcentajeNumerico / 100;
+
       await api.put('/configuracion/comision', { comision: decValue });
       alert('Comisión de la plataforma actualizada correctamente.');
       fetchData();
@@ -185,11 +188,10 @@ const DashboardAdmin = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-3 px-6 font-bold text-sm border-b-2 flex items-center gap-2 transition-all ${
-                activeTab === tab.id
+              className={`py-3 px-6 font-bold text-sm border-b-2 flex items-center gap-2 transition-all ${activeTab === tab.id
                   ? 'border-academic-gold text-academic-gold font-extrabold'
                   : 'border-transparent text-elegant-gray hover:text-primary'
-              }`}
+                }`}
             >
               <span className="material-symbols-outlined text-base">{tab.icon}</span>
               {tab.label}
@@ -212,7 +214,7 @@ const DashboardAdmin = () => {
 
         {!loading && !error && (
           <section className="mt-4">
-            
+
             {/* TABS 1: USUARIOS */}
             {activeTab === 'usuarios' && (
               <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl shadow-sm overflow-hidden">
@@ -242,29 +244,26 @@ const DashboardAdmin = () => {
                           <td className="p-4">{u.nombreCompleto}</td>
                           <td className="p-4 text-gray-600">{u.correo}</td>
                           <td className="p-4">
-                            <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase font-bold ${
-                              u.rol === 'administrador' ? 'bg-red-50 text-red-600 border border-red-200' :
-                              u.rol === 'tutor' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                              'bg-blue-50 text-blue-700 border border-blue-200'
-                            }`}>
+                            <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase font-bold ${u.rol === 'administrador' ? 'bg-red-50 text-red-600 border border-red-200' :
+                                u.rol === 'tutor' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                                  'bg-blue-50 text-blue-700 border border-blue-200'
+                              }`}>
                               {u.rol}
                             </span>
                           </td>
                           <td className="p-4">
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                              u.estaActivo ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
-                            }`}>
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${u.estaActivo ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                              }`}>
                               {u.estaActivo ? 'Activo' : 'Desactivado'}
                             </span>
                           </td>
                           <td className="p-4 text-right">
                             <button
                               onClick={() => handleToggleUsuario(u.id, u.estaActivo)}
-                              className={`px-4 py-1.5 rounded text-xs font-bold transition-all border ${
-                                u.estaActivo 
+                              className={`px-4 py-1.5 rounded text-xs font-bold transition-all border ${u.estaActivo
                                   ? 'bg-red-50 text-red-600 hover:bg-red-100 border-red-100'
                                   : 'bg-green-50 text-green-600 hover:bg-green-100 border-green-100'
-                              }`}
+                                }`}
                             >
                               {u.estaActivo ? 'Desactivar' : 'Activar'}
                             </button>
@@ -301,9 +300,8 @@ const DashboardAdmin = () => {
                               <span className="text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded uppercase border border-red-100">
                                 {r.motivo}
                               </span>
-                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                                r.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-green-50 text-green-700 border border-green-200'
-                              }`}>
+                              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${r.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-green-50 text-green-700 border border-green-200'
+                                }`}>
                                 {r.estado}
                               </span>
                             </div>
@@ -452,7 +450,7 @@ const DashboardAdmin = () => {
                         min="0"
                         max="100"
                         value={comision}
-                        onChange={e => setComision(e.target.value)}
+                        onChange={e => setComision(e.target.value === '' ? 0 : parseInt(e.target.value))}
                         className="w-full pl-4 pr-12 py-3 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary font-bold"
                       />
                       <span className="absolute right-4 top-1/2 -translate-y-1/2 text-primary font-bold">%</span>
@@ -471,12 +469,12 @@ const DashboardAdmin = () => {
             {/* TABS 5: ACADEMIC */}
             {activeTab === 'academic' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
+
                 {/* Departamentos */}
                 <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
                   <div>
                     <h3 className="text-lg font-bold text-primary font-display mb-4">Departamentos</h3>
-                    
+
                     <form onSubmit={handleCrearDepartamento} className="flex gap-2 mb-6 items-end">
                       <div className="flex-1">
                         <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Nuevo Departamento</label>
@@ -498,7 +496,7 @@ const DashboardAdmin = () => {
 
                     <h4 className="text-xs font-bold text-elegant-gray uppercase tracking-widest mb-3">Departamentos Creados ({departamentos.length})</h4>
                   </div>
-                  
+
                   <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10 max-h-60 overflow-y-auto space-y-2 no-scrollbar">
                     {departamentos.map(d => (
                       <div key={d.id} className="px-3 py-2 bg-surface-container-lowest border border-outline-variant/5 rounded text-sm text-primary font-medium flex justify-between items-center">
@@ -513,7 +511,7 @@ const DashboardAdmin = () => {
                 <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
                   <div>
                     <h3 className="text-lg font-bold text-primary font-display mb-4">Materias</h3>
-                    
+
                     <form onSubmit={handleCrearMateria} className="space-y-4 mb-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -549,7 +547,7 @@ const DashboardAdmin = () => {
 
                     <h4 className="text-xs font-bold text-elegant-gray uppercase tracking-widest mb-3">Materias Creadas ({materias.length})</h4>
                   </div>
-                  
+
                   <div className="bg-surface-container-low p-4 rounded-xl border border-outline-variant/10 max-h-60 overflow-y-auto space-y-2 no-scrollbar">
                     {materias.map(m => (
                       <div key={m.id} className="px-3 py-2 bg-surface-container-lowest border border-outline-variant/5 rounded text-sm text-primary font-medium flex justify-between items-center">
