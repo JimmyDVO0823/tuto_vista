@@ -20,6 +20,7 @@ public class SesionTutoriaService {
     private final SesionTutoriaRepository sesionTutoriaRepository;
     private final SolicitudRepository solicitudRepository;
     private final ChatService chatService;
+    private final NotificacionService notificacionService;
 
     @Transactional
     public SesionTutoriaDTO crearDesdeSolicitud(Long solicitudId) {
@@ -83,7 +84,23 @@ public class SesionTutoriaService {
             sesion.setMotivoCancelacion(null);
         }
 
-        return toDTO(sesionTutoriaRepository.save(sesion));
+        SesionTutoria guardada = sesionTutoriaRepository.save(sesion);
+        
+        // Notificar si se cancela
+        if (estado == EstadoSesion.cancelada) {
+            String fechaStr = guardada.getProgramadaPara().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM"));
+            String msg = String.format("Tutoría de %s para el dia %s cancelada por %s", 
+                    guardada.getMateria().getNombre(), 
+                    fechaStr, 
+                    guardada.getTutor().getPerfil().getNombreCompleto());
+            
+            notificacionService.enviar(guardada.getEstudiante().getPerfil().getId(), 
+                    com.tutorias.tutorias_backend.enums.TipoNotificacion.CANCELACION_RECHAZO, 
+                    "Sesión cancelada", 
+                    msg);
+        }
+        
+        return toDTO(guardada);
     }
 
     @Transactional

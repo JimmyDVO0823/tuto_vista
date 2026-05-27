@@ -20,6 +20,7 @@ public class PagoService {
     private final SesionTutoriaRepository sesionTutoriaRepository;
     private final com.tutorias.tutorias_backend.repositories.SolicitudRepository solicitudRepository;
     private final SesionTutoriaService sesionTutoriaService;
+    private final NotificacionService notificacionService;
 
     @Transactional
     public PagoDTO registrarPagoYCrearSesion(Long solicitudId) {
@@ -48,7 +49,19 @@ public class PagoService {
         pago.setEstado(EstadoPago.completado);
         pago.setPagadoEn(OffsetDateTime.now());
 
-        return toDTO(pagoRepository.save(pago));
+        Pago guardado = pagoRepository.save(pago);
+        
+        // Notificar al tutor: "Tutoría de (materia) pagada por (estudiante)"
+        String msg = String.format("Tutoría de %s pagada por %s", 
+                sesion.getMateria().getNombre(), 
+                sesion.getEstudiante().getPerfil().getNombreCompleto());
+        
+        notificacionService.enviar(sesion.getTutor().getPerfil().getId(), 
+                com.tutorias.tutorias_backend.enums.TipoNotificacion.PAGO_RECIBIDO, 
+                "Pago recibido", 
+                msg);
+
+        return toDTO(guardada);
     }
 
     @Transactional
@@ -69,7 +82,19 @@ public class PagoService {
         pago.setEstado(EstadoPago.completado);
         pago.setPagadoEn(OffsetDateTime.now());
 
-        return toDTO(pagoRepository.save(pago));
+        Pago guardadoPago = pagoRepository.save(pago);
+        
+        // Notificar al tutor: "Tutoría de (materia) pagada por (estudiante)"
+        String msg2 = String.format("Tutoría de %s pagada por %s", 
+                sesion.getMateria().getNombre(), 
+                sesion.getEstudiante().getPerfil().getNombreCompleto());
+        
+        notificacionService.enviar(sesion.getTutor().getPerfil().getId(), 
+                com.tutorias.tutorias_backend.enums.TipoNotificacion.PAGO_RECIBIDO, 
+                "Pago recibido", 
+                msg2);
+
+        return toDTO(guardadoPago);
     }
 
     public List<PagoDTO> getByTutor(Long tutorId) {

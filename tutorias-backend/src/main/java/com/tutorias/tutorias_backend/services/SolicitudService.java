@@ -21,9 +21,8 @@ public class SolicitudService {
     private final MateriaRepository materiaRepository;
     private final DisponibilidadRepository disponibilidadRepository;
     private final SesionTutoriaRepository sesionTutoriaRepository;
-
-    // 🌟 INYECTAMOS EL REPOSITORIO DE ESPECÍFICAS
     private final DispoEspecificaRepository dispoEspecificaRepository;
+    private final NotificacionService notificacionService;
 
     @Transactional
     public SolicitudDTO crear(Long estudianteId, SolicitudRequest request) {
@@ -118,7 +117,21 @@ public class SolicitudService {
         solicitud.setMensaje(request.getMensaje());
         solicitud.setEstado(EstadoSolicitud.pendiente);
 
-        return toDTO(solicitudRepository.save(solicitud));
+        Solicitud guardada = solicitudRepository.save(solicitud);
+        
+        // Notificar al tutor: "Solicitud de (materia) enviada por (estudiante) para (dia/mes)"
+        String fechaStr = solicitud.getFechaPreferida().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM"));
+        String msg = String.format("Solicitud de %s enviada por %s para %s", 
+                materia.getNombre(), 
+                estudiante.getPerfil().getNombreCompleto(), 
+                fechaStr);
+        
+        notificacionService.enviar(tutor.getPerfil().getId(), 
+                com.tutorias.tutorias_backend.enums.TipoNotificacion.SOLICITUD_TUTORIA, 
+                "Nueva solicitud recibida", 
+                msg);
+
+        return toDTO(guardada);
     }
 
     // 🌟 MÉTODO AUXILIAR ENCAPSULADO PARA VALIDAR EL HORARIO SEMANAL RECURRENTE
@@ -202,7 +215,32 @@ public class SolicitudService {
         }
 
         solicitud.setEstado(nuevoEstado);
-        return toDTO(solicitudRepository.save(solicitud));
+        Solicitud guardada = solicitudRepository.save(solicitud);
+        
+        // Formatear fecha para el mensaje
+        String fechaStr = guardada.getFechaPreferida().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM"));
+        String materiaNombre = guardada.getMateria().getNombre();
+        String tutorNombre = guardada.getTutor().getPerfil().getNombreCompleto();
+        
+        if (nuevoEstado == EstadoSolicitud.aceptada) {
+            // "Solicitud de tutoria de (materia) aceptada para el día (mes/dia) por (profesor)"
+            String msg = String.format("Solicitud de tutoria de %s aceptada para el día %s por %s", 
+                    materiaNombre, fechaStr, tutorNombre);
+            notificacionService.enviar(guardada.getEstudiante().getPerfil().getId(), 
+                    com.tutorias.tutorias_backend.enums.TipoNotificacion.SOLICITUD_ACEPTADA, 
+                    "Solicitud aceptada", 
+                    msg);
+        } else if (nuevoEstado == EstadoSolicitud.rechazada) {
+            // "Solicitud de tutoría de (materia) para el dia (mes/dia) rechazada por (profesor)"
+            String msg = String.format("Solicitud de tutoría de %s para el dia %s rechazada por %s", 
+                    materiaNombre, fechaStr, tutorNombre);
+            notificacionService.enviar(guardada.getEstudiante().getPerfil().getId(), 
+                    com.tutorias.tutorias_backend.enums.TipoNotificacion.CANCELACION_RECHAZO, 
+                    "Solicitud rechazada", 
+                    msg);
+        }
+        
+        return toDTO(guardada);
     }
 
     public List<SolicitudDTO> getByEstudiante(Long estudianteId) {

@@ -17,6 +17,7 @@ public class ChatService {
     private final ConversacionRepository conversacionRepository;
     private final MensajeRepository mensajeRepository;
     private final PerfilRepository perfilRepository;
+    private final NotificacionService notificacionService;
 
     @Transactional
     public ConversacionDTO crearOObtenerConversacion(Long p1, Long p2) {
@@ -46,7 +47,32 @@ public class ChatService {
         mensaje.setRemitente(remitente);
         mensaje.setContenido(contenido);
         
-        return toMsgDTO(mensajeRepository.save(mensaje));
+
+        Mensaje guardado = mensajeRepository.save(mensaje);
+        
+        // Notificar al destinatario
+        conv.getParticipantes().stream()
+            .filter(p -> !p.getId().equals(remitenteId))
+            .findFirst()
+            .ifPresent(destinatario -> {
+                String rolRemitente = remitente.getRol().name().toLowerCase();
+                String msg;
+                if (rolRemitente.equals("tutor")) {
+                    // "Mensaje enviado por (profesor) de la materia (materia)"
+                    // Buscamos una materia relacionada si es posible, o mensaje genérico
+                    msg = String.format("Mensaje enviado por tutor %s", remitente.getNombreCompleto());
+                } else {
+                    // "Mensaje enviado por (estudiante) de (materia)"
+                    msg = String.format("Mensaje enviado por estudiante %s", remitente.getNombreCompleto());
+                }
+                
+                notificacionService.enviar(destinatario.getId(), 
+                        com.tutorias.tutorias_backend.enums.TipoNotificacion.MENSAJE_RECIBIDO, 
+                        "Nuevo mensaje", 
+                        msg);
+            });
+
+        return toMsgDTO(guardado);
     }
 
     public List<MensajeDTO> getMensajes(Long convId) {
