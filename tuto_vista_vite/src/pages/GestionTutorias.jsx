@@ -8,9 +8,10 @@ import SessionCard from '../features/tutors/SessionCard/SessionCard';
 const GestionTutorias = () => {
   const { user } = useAuth();
   const [solicitudes, setSolicitudes] = useState([]);
+  const [aceptadas, setAceptadas] = useState([]); // 👈 🆕 Estado para guardar las solicitudes aceptadas (esperando pago)
   const [sesiones, setSesiones] = useState([]);
-  const [historial, setHistorial] = useState([]); // 👈 Estado para guardar las tutorías terminadas
-  const [activeTab, setActiveTab] = useState('solicitudes'); // 'solicitudes' | 'sesiones' | 'historial'
+  const [historial, setHistorial] = useState([]);
+  const [activeTab, setActiveTab] = useState('solicitudes'); // 'solicitudes' | 'aceptadas' | 'sesiones' | 'historial'
 
   // Estados para los filtros avanzados del Historial
   const [filterDate, setFilterDate] = useState('');
@@ -35,11 +36,15 @@ const GestionTutorias = () => {
       const pendientes = solicitudesData.filter(s => s.estado === 'pendiente');
       setSolicitudes(pendientes);
 
-      // 2. Filtrar tutorías activas (programadas o en progreso)
+      // 2. 🆕 Filtrar solicitudes aceptadas (esperando por el pago del alumno)
+      const aprobadas = solicitudesData.filter(s => s.estado === 'aceptada');
+      setAceptadas(aprobadas);
+
+      // 3. Filtrar tutorías activas (programadas o en progreso)
       const agendadas = sesionesData.filter(s => s.estado === 'programada' || s.estado === 'en_progreso');
       setSesiones(agendadas);
 
-      // 3. Filtrar historial (completadas, canceladas o inasistencias)
+      // 4. Filtrar historial (completadas, canceladas o inasistencias)
       const terminadas = sesionesData.filter(s =>
         s.estado === 'completada' || s.estado === 'cancelada' || s.estado === 'no_asistio'
       );
@@ -59,23 +64,19 @@ const GestionTutorias = () => {
   // Extraer la lista única de materias del historial para alimentar el selector (<select>)
   const listaMaterias = useMemo(() => {
     const materias = historial.map(s => s.materiaNombre).filter(Boolean);
-    return [...new Set(materias)]; // Set elimina duplicados automáticamente
+    return [...new Set(materias)];
   }, [historial]);
 
-  // Filtrar y ordenar el historial por fecha de forma descendente (más recientes primero)
+  // Filtrar y ordenar el historial por fecha de forma descendente
   const historialFiltradoYOrdenado = useMemo(() => {
     return historial
       .filter(sesion => {
-        // Filtro por materia
         const cumpleMateria = filterMateria === '' || sesion.materiaNombre === filterMateria;
-
-        // Filtro por fecha (Compara en formato YYYY-MM-DD ignorando la hora)
         let cumpleFecha = true;
         if (filterDate) {
           const fechaSesionStr = new Date(sesion.programadaPara).toISOString().split('T')[0];
           cumpleFecha = fechaSesionStr === filterDate;
         }
-
         return cumpleMateria && cumpleFecha;
       })
       .sort((a, b) => new Date(b.programadaPara) - new Date(a.programadaPara));
@@ -84,16 +85,13 @@ const GestionTutorias = () => {
   const handleAccept = async (id) => {
     try {
       setProcessingId(id);
-
       await api.patch(`/solicitudes/${id}/estado?estado=aceptada`);
 
-      setSolicitudes(prev => prev.filter(s => s.id !== id));
-
-      alert("¡Solicitud de tutoría aceptada! Aparecerá en tu agenda una vez el estudiante realice el pago.");
-      fetchData(); // Sincroniza completamente con el backend
+      alert("¡Solicitud de tutoría aceptada! Ha sido movida a la sección de Aceptadas, en espera de pago.");
+      fetchData(); // Recarga limpia para distribuir estados
     } catch (err) {
       console.error('Error accepting solicitud:', err);
-      alert(err.message || 'Error al aceptar la solicitud. Es posible que haya un cruce de horarios.');
+      alert(err.message || 'Error al aceptar la solicitud.');
       fetchData();
     } finally {
       setProcessingId(null);
@@ -106,7 +104,7 @@ const GestionTutorias = () => {
     try {
       setProcessingId(id);
       await api.patch(`/solicitudes/${id}/estado?estado=rechazada`);
-      setSolicitudes(prev => prev.filter(s => s.id !== id));
+      fetchData();
     } catch (err) {
       console.error('Error rejecting solicitud:', err);
       alert(err.message || 'Error al rechazar la solicitud.');
@@ -115,16 +113,31 @@ const GestionTutorias = () => {
     }
   };
 
+  // 🆕 Función para cancelar una solicitud que ya habías aceptado pero aún no pagan
+  const handleCancelarAceptada = async (id) => {
+    if (!window.confirm("¿Deseas cancelar esta solicitud aceptada? El estudiante ya no podrá pagarla.")) return;
+
+    try {
+      setProcessingId(id);
+      await api.patch(`/solicitudes/${id}/estado?estado=cancelada`);
+      alert("Solicitud cancelada correctamente.");
+      fetchData();
+    } catch (err) {
+      console.error('Error al cancelar solicitud aceptada:', err);
+      alert(err.message || 'Error al cancelar la solicitud.');
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
   const handleUpdateStatus = async (id, estadoNuevo, motivoCancelacion = null) => {
     try {
       setProcessingId(id);
-
       await api.patch(`/sesiones/${id}/estado`, {
         estado: estadoNuevo,
         motivoCancelacion: motivoCancelacion
       });
 
-      // Recargamos todos los datos para mover la sesión limpiamente al Historial
       await fetchData();
 
       const mensajes = {
@@ -158,7 +171,6 @@ const GestionTutorias = () => {
     }
   };
 
-  // Formateador estético para la fecha y hora de las filas del historial
   const formatFechaHistorial = (fechaIso) => {
     const d = new Date(fechaIso);
     const dateStr = d.toLocaleDateString('es-ES', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' });
@@ -180,7 +192,7 @@ const GestionTutorias = () => {
         </header>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-outline-variant/10 mb-8 max-w-4xl">
+        <div className="flex border-b border-outline-variant/10 mb-8 max-w-4xl overflow-x-auto whitespace-nowrap">
           <button
             onClick={() => setActiveTab('solicitudes')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'solicitudes'
@@ -190,6 +202,18 @@ const GestionTutorias = () => {
           >
             Solicitudes Pendientes ({solicitudes.length})
           </button>
+
+          {/* 🆕 NUEVO TAB ADICIONAL */}
+          <button
+            onClick={() => setActiveTab('aceptadas')}
+            className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'aceptadas'
+              ? 'border-academic-gold text-academic-gold font-extrabold'
+              : 'border-transparent text-elegant-gray hover:text-primary'
+              }`}
+          >
+            Aceptadas (Por Pagar) ({aceptadas.length})
+          </button>
+
           <button
             onClick={() => setActiveTab('sesiones')}
             className={`min-h-[2.75rem] py-3 px-4 md:py-4 md:px-6 font-bold text-sm border-b-2 transition-all ${activeTab === 'sesiones'
@@ -255,6 +279,33 @@ const GestionTutorias = () => {
             </>
           )}
 
+          {/* 🆕 TAB 新: SOLICITUDES ACEPTADAS EN ESPERA DE PAGO */}
+          {!loading && !error && activeTab === 'aceptadas' && (
+            <>
+              {aceptadas.length === 0 ? (
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-8 md:p-16 text-center shadow-sm">
+                  <span className="material-symbols-outlined text-gray-300 text-6xl mb-4">hourglass_empty</span>
+                  <h3 className="text-xl font-bold text-primary mb-2 font-display">No hay solicitudes por pagar</h3>
+                  <p className="text-gray-500 text-sm">Aquí verás las tutorías que aceptaste y cuyos alumnos están por pagar.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {aceptadas.map(solicitud => (
+                    <RequestCard
+                      key={solicitud.id}
+                      solicitud={solicitud}
+                      onAccept={null} // Ocultamos el botón aceptar pasándole null
+                      onReject={handleCancelarAceptada} // Mapeamos el botón de rechazar para "Cancelar Aceptada"
+                      isLoading={processingId === solicitud.id}
+                      // Pasamos una propiedad para que la tarjeta sepa cambiar el texto del botón si tu RequestCard lo soporta
+                      isAcceptedView={true}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
           {/* TAB 2: TUTORÍAS AGENDADAS */}
           {!loading && !error && activeTab === 'sesiones' && (
             <>
@@ -283,7 +334,6 @@ const GestionTutorias = () => {
           {/* TAB 3: HISTORIAL DE TUTORÍAS CON FILTROS */}
           {!loading && !error && activeTab === 'historial' && (
             <div className="space-y-6">
-
               {/* Contenedor de Filtros Avanzados */}
               <div className="bg-surface-container-low p-4 rounded-xl flex flex-col md:flex-row gap-4 items-end shadow-sm border border-outline-variant/5">
                 <div className="w-full md:w-1/3">
@@ -354,7 +404,6 @@ const GestionTutorias = () => {
                         )}
                       </div>
 
-                      {/* Badge dinámico de estado */}
                       <div className="shrink-0 self-start md:self-center">
                         <span className={`text-[10px] uppercase font-extrabold tracking-widest px-3 py-1 rounded-full ${sesion.estado === 'completada' ? 'bg-green-50 text-green-700 border border-green-200' :
                           sesion.estado === 'cancelada' ? 'bg-red-50 text-red-700 border border-red-200' :
