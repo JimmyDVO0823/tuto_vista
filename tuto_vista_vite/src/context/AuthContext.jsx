@@ -6,6 +6,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
+    const base = import.meta.env.BASE_URL; // lee el base de vite.config automáticamente
+    if (window.location.pathname !== `${base}loginform`) {
+      window.location.href = `${base}loginform`;
+    }
+  };
+
   useEffect(() => {
     const checkToken = () => {
       const storedUser = localStorage.getItem('user');
@@ -16,7 +26,7 @@ export const AuthProvider = ({ children }) => {
           const payload = JSON.parse(atob(token.split('.')[1]));
           const expiry = payload.exp * 1000;
           const now = Date.now();
-          
+
           if (now > expiry) {
             logout();
           } else {
@@ -39,19 +49,10 @@ export const AuthProvider = ({ children }) => {
       role: userData.rol || userData.role,
       id: userData.id
     };
-    
+
     localStorage.setItem('user', JSON.stringify(normalizedUser));
     localStorage.setItem('token', token);
     setUser(normalizedUser);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    setUser(null);
-    if (window.location.pathname !== '/loginform') {
-      window.location.href = '/loginform';
-    }
   };
 
   const renewSession = async () => {
