@@ -11,6 +11,7 @@ import TutorAgendaDetail from "./pages/TutorAgendaDetail";
 import GestionTutorias from "./pages/GestionTutorias";
 import AcademicChat from "./pages/AcademicChat";
 import MyTutorsHistory from "./pages/MyTutorsHistory";
+import Settings from "./pages/Settings";
 
 import { AuthProvider } from "./context/AuthContext";
 import SessionRenewalModal from "./components/ui/SessionRenewalModal";
@@ -96,6 +97,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AcademicChat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />

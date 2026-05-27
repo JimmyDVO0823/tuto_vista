@@ -49,13 +49,22 @@ const NotificationBell = ({ isCollapsed }) => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className={`flex items-center justify-center p-2 rounded-full hover:bg-black/5 transition-colors relative ${
-          isCollapsed ? 'w-10 h-10' : ''
+        className={`flex items-center gap-3 p-2.5 rounded-xl hover:bg-black/5 transition-all relative group ${
+          isCollapsed ? 'justify-center w-10 h-10' : 'w-full px-4'
         }`}
       >
-        <span className="material-symbols-outlined text-primary">notifications</span>
+        <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">notifications</span>
+        
+        {!isCollapsed && (
+          <span className="text-sm font-bold text-primary font-body animate-in slide-in-from-left-2 transition-all">
+            Notificaciones
+          </span>
+        )}
+
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-white">
+          <span className={`absolute bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm ${
+            isCollapsed ? 'top-1 right-1 px-1.5 py-0.5 min-w-[18px] h-[18px]' : 'right-4 px-2 py-0.5'
+          }`}>
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

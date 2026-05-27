@@ -28,6 +28,10 @@ public class PerfilService {
         t.setBiografia(updateDto.getBiografia());
         t.setFrasePersonal(updateDto.getFrase_personal());
         t.setPrecioPorHora(updateDto.getPrecio_por_hora());
+        t.setAniosExperiencia(updateDto.getAnios_experiencia());
+        t.setDuracionSesionMin(updateDto.getDuracion_sesion_min());
+        t.setTitulos(updateDto.getTitulos());
+        t.setLogros(updateDto.getLogros());
         return tutorRepository.save(t);
     }
 }

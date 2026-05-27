@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import IncomeChart from "../features/dashboard/IncomeChart/IncomeChart";
 import StatCard from "../components/ui/StatCard/StatCard"; // Importación del nuevo componente
+import EditChart from "../features/dashboard/Perfil/EditChart";
 
 const DashboardTutor = () => {
   const { user } = useAuth();
@@ -64,7 +65,6 @@ const DashboardTutor = () => {
             </label>
           </div>
         </header>
-
         {/* Grid de Estadísticas Limpio empleando el componente genérico */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8 md:mb-12">
           <StatCard
