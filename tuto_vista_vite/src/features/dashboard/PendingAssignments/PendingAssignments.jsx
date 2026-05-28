@@ -30,6 +30,16 @@ const PendingAssignments = () => {
     fetchActivities();
   }, [user]);
 
+  const handleCompleteActivity = async (id) => {
+    try {
+      await api.patch(`/actividades/${id}/completar`);
+      setActivities(prev => prev.filter(act => act.id !== id));
+    } catch (error) {
+      console.error("Error completing activity:", error);
+      alert("Error al completar la actividad: " + (error.message || error));
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-8 mt-16 animate-pulse">
@@ -62,6 +72,15 @@ const PendingAssignments = () => {
               buttonText="Ir a actividad"
               actionPath={act.recursoUrl}
               isExternal={true}
+              extraContent={
+                <button
+                  onClick={() => handleCompleteActivity(act.id)}
+                  className="flex items-center gap-1.5 px-6 py-2.5 text-xs font-bold text-green-700 bg-green-50 hover:bg-green-100 rounded-xl transition-all border border-green-200 w-full md:w-auto justify-center text-center cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[16px]">check_circle</span>
+                  Actividad terminada
+                </button>
+              }
             />
           ))}
         </div>

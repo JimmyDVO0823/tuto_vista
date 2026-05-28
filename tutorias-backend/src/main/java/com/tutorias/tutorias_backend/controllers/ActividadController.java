@@ -31,4 +31,9 @@ public class ActividadController {
     public ResponseEntity<List<ActividadEstudianteDTO>> getPendientes(@PathVariable Long id) {
         return ResponseEntity.ok(actividadService.obtenerPendientesEstudiante(id));
     }
+
+    @PatchMapping("/{id}/completar")
+    public ResponseEntity<ActividadEstudianteDTO> completar(@PathVariable Long id) {
+        return ResponseEntity.ok(actividadService.completarActividad(id));
+    }
 }

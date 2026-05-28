@@ -89,6 +89,14 @@ public class ActividadService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public ActividadEstudianteDTO completarActividad(Long actividadId) {
+        ActividadEstudiante actividad = actividadRepository.findById(actividadId)
+                .orElseThrow(() -> new RuntimeException("Actividad no encontrada"));
+        actividad.setEstado(EstadoActividad.completado);
+        return toDTO(actividadRepository.save(actividad));
+    }
+
     private ActividadEstudianteDTO toDTO(ActividadEstudiante a) {
         return ActividadEstudianteDTO.builder()
                 .id(a.getId())
