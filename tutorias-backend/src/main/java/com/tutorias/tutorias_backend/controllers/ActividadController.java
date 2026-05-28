@@ -20,10 +20,10 @@ public class ActividadController {
     public ResponseEntity<ActividadEstudianteDTO> asignar(@RequestBody AsignarActividadRequest request) {
         return ResponseEntity.ok(actividadService.asignarActividad(
                 request.getSesionId(),
+                request.getRecursoId(), // 🌟 Se añade aquí el recursoId
                 request.getTitulo(),
                 request.getUrl(),
-                request.getDescripcion()
-        ));
+                request.getDescripcion()));
     }
 
     @GetMapping("/estudiante/{id}/pendientes")

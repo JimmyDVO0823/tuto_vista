@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AsignarActividadRequest {
     private Long sesionId;
+    private Long recursoId;
     private String titulo;
     private String url;
     private String descripcion;
