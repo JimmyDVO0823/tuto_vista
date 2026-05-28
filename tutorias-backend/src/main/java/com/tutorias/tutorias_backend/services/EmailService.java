@@ -22,7 +22,7 @@ public class EmailService {
             // True indica que el correo contendrá elementos multimedia/HTML
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("jimmyvelandia@outlook.es"); // El remitente
+            helper.setFrom("jimmydfrancovo@ufps.edu.co"); // El remitente
             helper.setTo(correoDestino);
             helper.setSubject("🔑 Verifica tu cuenta de Tutorías");
 
@@ -33,7 +33,7 @@ public class EmailService {
                     + "<p>Hola, <strong>" + nombreUsuario + "</strong>,</p>"
                     + "<p>Gracias por registrarte. Para activar tu cuenta de tutor o estudiante y empezar a usar todos nuestros servicios, por favor haz clic en el siguiente enlace:</p>"
                     + "<div style='text-align: center; margin: 30px 0;'>"
-                    + "  <a href='https://jimmydvo0823.github.io/tuto_vista/verified?token=" + tokenVerificacion + "' "
+                    + "  <a href='https://jimmydvo0823.github.io/tuto_vista/#/verified?token=" + tokenVerificacion + "' "
                     + "     style='background-color: #D4AF37; color: #002045; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 8px; display: inline-block;'>"
                     + "     Verificar Mi Correo"
                     + "  </a>"
