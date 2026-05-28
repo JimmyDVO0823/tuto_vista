@@ -22,7 +22,7 @@ public class EmailService {
             // True indica que el correo contendrá elementos multimedia/HTML
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("acd9de001@smtp-brevo.com"); // El remitente
+            helper.setFrom("jimmyvelandia@outlook.es"); // El remitente
             helper.setTo(correoDestino);
             helper.setSubject("🔑 Verifica tu cuenta de Tutorías");
 
