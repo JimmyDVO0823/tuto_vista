@@ -12,6 +12,7 @@ import GestionTutorias from "./pages/GestionTutorias";
 import AcademicChat from "./pages/AcademicChat";
 import MyTutorsHistory from "./pages/MyTutorsHistory";
 import Settings from "./pages/Settings";
+import Support from "./pages/Support";
 
 import { AuthProvider } from "./context/AuthContext";
 import SessionRenewalModal from "./components/ui/SessionRenewalModal";
@@ -105,6 +106,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/support"
+            element={
+              <ProtectedRoute>
+                <Support />
               </ProtectedRoute>
             }
           />

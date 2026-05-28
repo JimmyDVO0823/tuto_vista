@@ -10,7 +10,7 @@ const EditChart = () => {
     // Estado para controlar los campos del formulario
     const [profile, setProfile] = useState({
         nombre: user?.name || '',
-        email: user?.email || '',
+        email: user?.correo || user?.email || '',
         avatar: user?.avatar || '',
         biografia: '',
         frase_personal: '',
@@ -31,7 +31,7 @@ const EditChart = () => {
                     setProfile(prev => ({
                         ...prev,
                         nombre: tutorData.nombre_completo || user.name || '',
-                        email: tutorData.correo || user.email || '',
+                        email: tutorData.correo || user.correo || user.email || '',
                         biografia: tutorData.biografia || '',
                         frase_personal: tutorData.frase_personal || '',
                         anios_experiencia: tutorData.anios_experiencia || 0,
@@ -145,9 +145,11 @@ const EditChart = () => {
                                 <p className="font-label text-xs text-tertiary font-black tracking-[0.1em] uppercase mb-4 py-1 px-3 bg-tertiary/10 inline-block rounded">
                                     {user?.role === 'tutor' ? 'Tutor Académico' : 'Estudiante'}
                                 </p>
-                                <p className="text-on-surface-variant font-body text-md leading-relaxed opacity-80 italic">
-                                    "{profile.frase_personal || "Actualiza tu frase personal para inspirar a otros."}"
-                                </p>
+                                {user?.role === 'tutor' && (
+                                    <p className="text-on-surface-variant font-body text-md leading-relaxed opacity-80 italic">
+                                        "{profile.frase_personal || "Actualiza tu frase personal para inspirar a otros."}"
+                                    </p>
+                                )}
                             </div>
                         </div>
 
