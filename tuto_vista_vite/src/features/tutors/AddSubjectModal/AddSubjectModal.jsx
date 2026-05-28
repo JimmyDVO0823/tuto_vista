@@ -73,7 +73,9 @@ const AddSubjectModal = ({ isOpen, onClose, onAdd }) => {
 
       onAdd({
         materiaId: subject.id,
+        nombre: subject.nombre,
         name: subject.nombre,
+        departamento: dept?.nombre || 'General',
         dept: dept?.nombre || 'General',
       });
       onClose();

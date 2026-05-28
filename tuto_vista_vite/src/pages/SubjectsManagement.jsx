@@ -87,13 +87,19 @@ const SubjectsManagement = () => {
     }
   };
 
-  const normalizeString = (str) =>
-    str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const normalizeString = (str) => {
+    if (!str) return '';
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  };
 
-  const filteredSubjects = subjects.filter((s) =>
-    normalizeString(s.name).includes(normalizeString(searchQuery)) ||
-    normalizeString(s.dept || '').includes(normalizeString(searchQuery))
-  );
+  const filteredSubjects = subjects.filter((s) => {
+    const name = s.nombre || s.name || '';
+    const dept = s.departamento || s.dept || '';
+    return (
+      normalizeString(name).includes(normalizeString(searchQuery)) ||
+      normalizeString(dept).includes(normalizeString(searchQuery))
+    );
+  });
 
   return (
     <MainLayout>
