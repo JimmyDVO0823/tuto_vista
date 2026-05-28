@@ -75,24 +75,18 @@ const DashboardTutor = () => {
               Bienvenido, {user?.name || "Tutor"}.
             </h1>
           </div>
-          <div className="bg-white p-4 rounded-xl flex items-center gap-6 shadow-sm border border-gray-100">
+          <div className="bg-white px-6 py-4 rounded-xl flex items-center gap-6 shadow-sm border border-gray-100">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">
-                Estado
+                Estado Actual
               </p>
-              <p className="text-sm font-semibold text-primary">
-                {tutorData?.esta_disponible ? "Disponible para clases" : "No disponible"}
-              </p>
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${tutorData?.esta_disponible ? "bg-academic-gold" : "bg-gray-300"}`} />
+                <p className={`text-sm font-bold ${tutorData?.esta_disponible ? "text-primary" : "text-gray-400"}`}>
+                  {tutorData?.esta_disponible ? "Disponible para Clases" : "No Disponible"}
+                </p>
+              </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer group">
-              <input 
-                type="checkbox"
-                className="sr-only peer"
-                checked={tutorData?.esta_disponible || false} 
-                onChange={handleToggleAvailability}
-              />
-              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:bg-academic-gold after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:after:translate-x-full shadow-inner" />
-            </label>
           </div>
         </header>
         {/* Grid de Estadísticas Limpio empleando el componente genérico */}

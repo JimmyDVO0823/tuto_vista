@@ -10,6 +10,7 @@ const DispoManagement = () => {
   const { user } = useAuth();
   const [disponibilidad, setDisponibilidad] = useState([]);
   const [hourlyRate, setHourlyRate] = useState(0);
+  const [estaDisponible, setEstaDisponible] = useState(true);
   const [loading, setLoading] = useState(true);
 
   // Estados para el manejo de Disponibilidad Específica (Por fecha)
@@ -25,22 +26,16 @@ const DispoManagement = () => {
     if (!Array.isArray(dispoList)) return [];
 
     return dispoList
-      .filter((d) => d !== null && d !== undefined) // Evitamos romper si viene algún nulo
+      .filter((d) => d !== null && d !== undefined)
       .map((d) => {
-        // Extraemos las horas soportando tanto CamelCase como snake_case
         const horaInicioRaw = d.horaInicio || d.hora_inicio;
         const horaFinRaw = d.horaFin || d.hora_fin;
-
-        // Si por algún motivo no hay horas válidas, evitamos romper el substring usando un fallback seguro
         const startFmt = horaInicioRaw ? horaInicioRaw.substring(0, 5) : "00:00";
         const endFmt = horaFinRaw ? horaFinRaw.substring(0, 5) : "00:00";
-
-        // Detectar si contiene el campo de fecha única (Disponibilidad Específica)
         const fechaPuntual = d.fecha || d.fecha_especifica;
 
         if (fechaPuntual) {
           const disponible = d.estaDisponible !== undefined ? d.estaDisponible : (d.esta_disponible !== undefined ? d.esta_disponible : true);
-
           return {
             id: `specific-${d.id}`,
             title: `Puntual: ${startFmt} - ${endFmt}`,
@@ -56,9 +51,7 @@ const DispoManagement = () => {
           };
         }
 
-        // --- Registro estándar recurrente ---
         const diaSemana = d.diaSemana !== undefined ? d.diaSemana : d.dia_semana;
-
         return {
           id: `recur-${d.id}`,
           title: `${startFmt} - ${endFmt}`,
@@ -79,18 +72,9 @@ const DispoManagement = () => {
     if (!user?.id) return;
     try {
       setLoading(true);
-
-      // Desacomplamos el Promise.all con bloques .catch individuales para asegurar que 
-      // si el endpoint de específicas falla, las recurrentes sigan cargando sin problemas.
       const [dispoRecurrente, dispoEspecifica, tutorProfile] = await Promise.all([
-        api.get(`/disponibilidad/tutor/${user.id}`).catch((err) => {
-          console.error("Error obteniendo recurrentes:", err);
-          return [];
-        }),
-        api.get(`/disponibilidad/especifica/tutor/${user.id}`).catch((err) => {
-          console.warn("Endpoint específico no disponible o vacío aún:", err);
-          return []; // Retorno seguro para que no rompa el spread operator
-        }),
+        api.get(`/disponibilidad/tutor/${user.id}`).catch(() => []),
+        api.get(`/disponibilidad/especifica/tutor/${user.id}`).catch(() => []),
         api.get(`/tutores/${user.id}`).catch(() => null),
       ]);
 
@@ -102,6 +86,7 @@ const DispoManagement = () => {
       const eventosMapeados = mapDispoToEvents(todasLasDisponibilidades);
       setDisponibilidad(eventosMapeados);
       setHourlyRate(tutorProfile?.precio_por_hora || 0);
+      setEstaDisponible(tutorProfile?.esta_disponible ?? true);
 
     } catch (err) {
       console.error("Error general cargando las configuraciones:", err);
@@ -113,6 +98,23 @@ const DispoManagement = () => {
   useEffect(() => {
     loadDisponibilidad();
   }, [loadDisponibilidad]);
+
+  const handleToggleAvailability = async () => {
+    const nuevoEstado = !estaDisponible;
+    const mensajeAlerta = nuevoEstado 
+      ? "¿Deseas volver a estar disponible para recibir nuevas solicitudes?" 
+      : "⚠️ Al desactivar tu disponibilidad, recuerda que debes cumplir con las tutorías ya agendadas o cancelarlas debidamente para evitar reportes. ¿Deseas continuar?";
+    
+    if (window.confirm(mensajeAlerta)) {
+      try {
+        await api.patch(`/tutores/${user.id}/disponibilidad?estado=${nuevoEstado}`);
+        setEstaDisponible(nuevoEstado);
+      } catch (err) {
+        console.error("Error al cambiar disponibilidad:", err);
+        alert("No se pudo cambiar el estado de disponibilidad.");
+      }
+    }
+  };
 
   const handleSaveRate = async (newRate) => {
     try {
@@ -168,7 +170,6 @@ const DispoManagement = () => {
         horaFin: `${specificHours.horaFin}:00`,
         estaDisponible: specificHours.estaDisponible
       });
-
       setShowSpecificModal(false);
       loadDisponibilidad();
     } catch (err) {
@@ -180,7 +181,6 @@ const DispoManagement = () => {
   const handleEventClick = async (info) => {
     const isSpecific = info.event.id.toString().startsWith("specific-");
     const dbId = info.event.id.toString().replace("specific-", "").replace("recur-", "");
-
     if (window.confirm(`¿Deseas eliminar este bloque de disponibilidad ${isSpecific ? "puntual" : "recurrente"}?`)) {
       try {
         const endpoint = isSpecific ? `/disponibilidad/especifica/${dbId}` : `/disponibilidad/${dbId}`;
@@ -253,6 +253,34 @@ const DispoManagement = () => {
                 </div>
 
                 <div className="lg:col-span-4 xl:col-span-3 space-y-6 w-full">
+                  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Visibilidad Global</p>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2.5 h-2.5 rounded-full ${estaDisponible ? "bg-academic-gold" : "bg-gray-300"}`} />
+                          <p className={`text-sm font-bold ${estaDisponible ? "text-primary" : "text-gray-400"}`}>
+                            {estaDisponible ? "Disponible" : "No Disponible"}
+                          </p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer group">
+                        <input 
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={estaDisponible} 
+                          onChange={handleToggleAvailability}
+                        />
+                        <div className="w-12 h-6 bg-gray-200 rounded-full peer peer-checked:bg-academic-gold after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full shadow-inner" />
+                      </label>
+                    </div>
+                    <p className="text-[10px] text-gray-400 leading-relaxed italic">
+                      {estaDisponible 
+                        ? "Tu perfil es visible y puedes recibir nuevas solicitudes de tutoría." 
+                        : "Tu perfil está oculto. No recibirás nuevas solicitudes hasta que lo actives."}
+                    </p>
+                  </div>
+
                   <StatCard
                     label="Tarifa Vigente Actual"
                     value={formattedRate}
