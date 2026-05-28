@@ -1,4 +1,5 @@
 import React from 'react';
+import ReportTutorButton from './ReportTutorButton';
 
 const TutorProfileSidebar = ({ tutor }) => {
   const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.nombre_completo)}&background=002045&color=fff&size=200`;
@@ -25,6 +26,10 @@ const TutorProfileSidebar = ({ tutor }) => {
             </span>
           ))}
         </div>
+      </div>
+
+      <div className="pt-8 border-t border-outline-variant/10">
+        <ReportTutorButton tutorId={tutor.id} tutorName={tutor.nombre_completo} />
       </div>
     </aside>
   );
