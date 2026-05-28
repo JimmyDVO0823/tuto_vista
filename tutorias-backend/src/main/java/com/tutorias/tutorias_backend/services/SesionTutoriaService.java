@@ -21,6 +21,9 @@ public class SesionTutoriaService {
     private final SolicitudRepository solicitudRepository;
     private final ChatService chatService;
     private final NotificacionService notificacionService;
+    private final com.tutorias.tutorias_backend.repositories.TutorRepository tutorRepository;
+    private final com.tutorias.tutorias_backend.repositories.InsigniaRepository insigniaRepository;
+    private final com.tutorias.tutorias_backend.repositories.TutorInsigniaRepository tutorInsigniaRepository;
 
     @Transactional
     public SesionTutoriaDTO crearDesdeSolicitud(Long solicitudId) {
@@ -77,6 +80,8 @@ public class SesionTutoriaService {
         SesionTutoria sesion = sesionTutoriaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
 
+        boolean yaCompletada = sesion.getEstado() == EstadoSesion.completada;
+
         sesion.setEstado(estado);
 
         // Si la sesión pasa a un estado de cierre negativo, acoplamos el motivo
@@ -91,6 +96,15 @@ public class SesionTutoriaService {
         }
 
         SesionTutoria guardada = sesionTutoriaRepository.save(sesion);
+
+        if (estado == EstadoSesion.completada && !yaCompletada) {
+            Tutor tutor = guardada.getTutor();
+            if (tutor != null) {
+                tutor.setTotalSesiones(tutor.getTotalSesiones() + 1);
+                tutorRepository.save(tutor);
+                checkAndAssignInsignias(tutor);
+            }
+        }
         
         // Notificar si se cancela
         if (estado == EstadoSesion.cancelada) {
@@ -107,6 +121,25 @@ public class SesionTutoriaService {
         }
         
         return toDTO(guardada);
+    }
+
+    private void checkAndAssignInsignias(Tutor tutor) {
+        List<Insignia> insigniasDisponibles = insigniaRepository.findAll();
+        for (Insignia insignia : insigniasDisponibles) {
+            if (insignia.getCondicionTipo() == com.tutorias.tutorias_backend.enums.TipoCondicionInsignia.TOTAL_SESIONES) {
+                if (tutor.getTotalSesiones() >= insignia.getCondicionValor()) {
+                    TutorInsigniaId linkId = new TutorInsigniaId(tutor.getId(), insignia.getId());
+                    if (!tutorInsigniaRepository.existsById(linkId)) {
+                        TutorInsignia tutorInsignia = TutorInsignia.builder()
+                                .id(linkId)
+                                .tutor(tutor)
+                                .insignia(insignia)
+                                .build();
+                        tutorInsigniaRepository.save(tutorInsignia);
+                    }
+                }
+            }
+        }
     }
 
     @Transactional

@@ -66,17 +66,18 @@ const DashboardStudent = () => {
         : "";
       const fechaBase = new Date(fechaLocalString);
 
+      const endBase = new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000);
       const horaInicio = fechaBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-      const horaFin = new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000)
-        .toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const horaFin = endBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+      const pad = (num) => String(num).padStart(2, '0');
+      const endLocalString = `${endBase.getFullYear()}-${pad(endBase.getMonth() + 1)}-${pad(endBase.getDate())}T${pad(endBase.getHours())}:${pad(endBase.getMinutes())}:${pad(endBase.getSeconds())}`;
 
       return {
         id: `session-${s.id}`,
         title: `Tutoría: ${s.materiaNombre}`,
         start: fechaLocalString,
-        end: new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000)
-          .toISOString()
-          .replace(/Z$|\+00:00$/, ""),
+        end: endLocalString,
         extendedProps: {
           ...s,
           type: "Sesión",
