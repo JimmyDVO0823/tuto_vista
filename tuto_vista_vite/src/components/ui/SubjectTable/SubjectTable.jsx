@@ -74,7 +74,6 @@ const SubjectTable = ({ subjects, showTutorColumn = true, onToggleStatus, onDele
                   <div className={`font-bold ${isInactive ? 'text-gray-400' : 'text-primary'}`}>
                     {s.nombre || s.name}
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">{s.sem || '2024-A'}</div>
                 </td>
                 <td className="px-8 py-6 text-sm text-gray-500">{s.departamento || s.dept}</td>
 
