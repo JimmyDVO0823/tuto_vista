@@ -12,6 +12,7 @@ import java.util.List;
 public class TutorDTO {
     private Long id;
     private String nombre_completo;
+    private String correo;
     private String url_avatar;
     private String biografia;
     private String frase_personal;
@@ -19,6 +20,7 @@ public class TutorDTO {
     private BigDecimal calificacion_promedio;
     private Integer total_sesiones;
     private Integer anios_experiencia;
+    private Integer duracion_sesion_min;
     private Boolean esta_disponible;
     private String[] titulos;
     private String[] logros;

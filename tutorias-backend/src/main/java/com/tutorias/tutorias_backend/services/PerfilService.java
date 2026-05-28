@@ -26,6 +26,7 @@ public class PerfilService {
         return com.tutorias.tutorias_backend.dto.PerfilDTO.builder()
                 .id(p.getId())
                 .nombreCompleto(p.getNombreCompleto())
+                .correo(p.getCorreo())
                 .urlAvatar(p.getUrlAvatar())
                 .rol(p.getRol().name())
                 .build();

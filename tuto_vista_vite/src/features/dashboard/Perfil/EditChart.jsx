@@ -30,11 +30,13 @@ const EditChart = () => {
                     const tutorData = await api.get(`/tutores/${user.id}`);
                     setProfile(prev => ({
                         ...prev,
+                        nombre: tutorData.nombre_completo || user.name || '',
+                        email: tutorData.correo || user.email || '',
                         biografia: tutorData.biografia || '',
-                        frase_personal: tutorData.frasePersonal || '',
-                        anios_experiencia: tutorData.aniosExperiencia || 0,
-                        precio_por_hora: tutorData.precioPorHora || 0,
-                        duracion_sesion_min: tutorData.duracionSesionMin || 90,
+                        frase_personal: tutorData.frase_personal || '',
+                        anios_experiencia: tutorData.anios_experiencia || 0,
+                        precio_por_hora: tutorData.precio_por_hora || 0,
+                        duracion_sesion_min: tutorData.duracion_sesion_min || 90,
                         titulos: tutorData.titulos ? tutorData.titulos.join(', ') : '',
                         logros: tutorData.logros ? tutorData.logros.join(', ') : ''
                     }));

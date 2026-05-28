@@ -10,6 +10,7 @@ import lombok.*;
 public class PerfilDTO {
     private Long id;
     private String nombreCompleto;
+    private String correo;
     private String urlAvatar;
     private String rol;
 }
