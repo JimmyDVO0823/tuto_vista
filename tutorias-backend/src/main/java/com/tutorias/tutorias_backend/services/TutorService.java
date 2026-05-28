@@ -6,7 +6,6 @@ import com.tutorias.tutorias_backend.dto.TutorDTO;
 import com.tutorias.tutorias_backend.dto.IngresoDto;
 import com.tutorias.tutorias_backend.dto.TutorIncomeReportDto;
 import com.tutorias.tutorias_backend.entities.Tutor;
-import com.tutorias.tutorias_backend.entities.TutorMateria;
 import com.tutorias.tutorias_backend.entities.Pago;
 import com.tutorias.tutorias_backend.enums.EstadoPago;
 import com.tutorias.tutorias_backend.repositories.TutorRepository;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 public class TutorService {
 
     private final TutorRepository tutorRepository;
-    private final com.tutorias.tutorias_backend.repositories.MateriaRepository materiaRepository;
     private final com.tutorias.tutorias_backend.repositories.SesionTutoriaRepository sesionTutoriaRepository;
     private final com.tutorias.tutorias_backend.repositories.PagoRepository pagoRepository;
     private final com.tutorias.tutorias_backend.repositories.ResenaRepository resenaRepository;
@@ -164,28 +162,6 @@ public class TutorService {
     }
 
     /**
-     * Asigna una materia a un tutor.
-     */
-    @org.springframework.transaction.annotation.Transactional
-    public void asignarMateria(Long tutorId, Long materiaId) {
-        Tutor tutor = tutorRepository.findById(tutorId)
-                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
-        com.tutorias.tutorias_backend.entities.Materia materia = materiaRepository.findById(materiaId)
-                .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
-
-        if (tutor.getTutorMaterias().stream().noneMatch(tm -> tm.getMateria().getId().equals(materiaId))) {
-            TutorMateria tm = TutorMateria.builder()
-                    .id(new com.tutorias.tutorias_backend.entities.TutorMateriaId(tutorId, materiaId))
-                    .tutor(tutor)
-                    .materia(materia)
-                    .activo(true)
-                    .build();
-            tutor.getTutorMaterias().add(tm);
-            tutorRepository.save(tutor);
-        }
-    }
-
-    /**
      * Actualiza la tarifa por hora de un tutor.
      */
     @org.springframework.transaction.annotation.Transactional
@@ -224,23 +200,6 @@ public class TutorService {
                 .filter(t -> departamentoId == null || t.getTutorMaterias().stream()
                         .anyMatch(tm -> tm.getMateria().getDepartamento().getId().equals(departamentoId)))
                 .map(this::toDTO)
-                .toList();
-    }
-
-    /**
-     * Obtiene las materias asignadas a un tutor específico.
-     */
-    public List<MateriaDTO> getMateriasByTutor(Long tutorId) {
-        Tutor tutor = tutorRepository.findById(tutorId)
-                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
-
-        return tutor.getTutorMaterias().stream()
-                .map(tm -> MateriaDTO.builder()
-                        .id(tm.getMateria().getId())
-                        .nombre(tm.getMateria().getNombre())
-                        .departamento_id(tm.getMateria().getDepartamento().getId())
-                        .departamento_nombre(tm.getMateria().getDepartamento().getNombre())
-                        .build())
                 .toList();
     }
 

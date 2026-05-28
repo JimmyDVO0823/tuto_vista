@@ -20,6 +20,15 @@ public class TutorMateriaController {
         return ResponseEntity.ok(tutorMateriaService.getTutorMaterias(tutorId));
     }
 
+    @PostMapping
+    public ResponseEntity<String> asignarMateria(
+            @PathVariable Long tutorId,
+            @RequestBody java.util.Map<String, Long> payload) {
+        Long materiaId = payload.get("materiaId");
+        tutorMateriaService.asignarMateria(tutorId, materiaId);
+        return ResponseEntity.ok("Materia asignada exitosamente");
+    }
+
     @PatchMapping("/{materiaId}/toggle")
     public ResponseEntity<Void> toggleStatus(@PathVariable Long tutorId, @PathVariable Long materiaId) {
         tutorMateriaService.toggleStatus(tutorId, materiaId);

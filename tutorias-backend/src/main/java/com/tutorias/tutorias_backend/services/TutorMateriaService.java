@@ -22,6 +22,8 @@ public class TutorMateriaService {
 
     private final TutorMateriaRepository tutorMateriaRepository;
     private final SesionTutoriaRepository sesionTutoriaRepository;
+    private final com.tutorias.tutorias_backend.repositories.TutorRepository tutorRepository;
+    private final com.tutorias.tutorias_backend.repositories.MateriaRepository materiaRepository;
 
     public List<TutorMateriaDTO> getTutorMaterias(Long tutorId) {
         List<TutorMateria> tms = tutorMateriaRepository.findByTutorId(tutorId);
@@ -83,5 +85,24 @@ public class TutorMateriaService {
         }
 
         tutorMateriaRepository.deleteById(new TutorMateriaId(tutorId, materiaId));
+    }
+
+    @Transactional
+    public void asignarMateria(Long tutorId, Long materiaId) {
+        com.tutorias.tutorias_backend.entities.Tutor tutor = tutorRepository.findById(tutorId)
+                .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
+        com.tutorias.tutorias_backend.entities.Materia materia = materiaRepository.findById(materiaId)
+                .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
+
+        if (tutor.getTutorMaterias().stream().noneMatch(tm -> tm.getMateria().getId().equals(materiaId))) {
+            TutorMateria tm = TutorMateria.builder()
+                    .id(new TutorMateriaId(tutorId, materiaId))
+                    .tutor(tutor)
+                    .materia(materia)
+                    .activo(true)
+                    .build();
+            tutor.getTutorMaterias().add(tm);
+            tutorRepository.save(tutor);
+        }
     }
 }
