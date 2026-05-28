@@ -1,10 +1,12 @@
 package com.tutorias.tutorias_backend.controllers;
 
 import com.tutorias.tutorias_backend.dto.SemesterProgressResponseDTO;
+import com.tutorias.tutorias_backend.dto.StudentMateriaDTO;
 import com.tutorias.tutorias_backend.services.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 /**
  * Controlador para operaciones relacionadas con el estudiante.
@@ -20,5 +22,10 @@ public class StudentController {
     @GetMapping("/{id}/semester-progress")
     public ResponseEntity<SemesterProgressResponseDTO> getSemesterProgress(@PathVariable Long id) {
         return ResponseEntity.ok(studentService.getSemesterProgress(id));
+    }
+
+    @GetMapping("/{id}/materias")
+    public ResponseEntity<List<StudentMateriaDTO>> getStudentMaterias(@PathVariable Long id) {
+        return ResponseEntity.ok(studentService.getStudentMaterias(id));
     }
 }

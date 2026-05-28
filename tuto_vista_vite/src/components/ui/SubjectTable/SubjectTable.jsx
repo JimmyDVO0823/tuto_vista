@@ -29,8 +29,8 @@ const SubjectTable = ({ subjects, showTutorColumn = true, onToggleStatus, onDele
     { label: 'Tutor', visible: showTutorColumn },
     { label: 'Próxima sesión', visible: true },
     { label: 'Progreso', visible: true },
-    { label: 'Estado', visible: true },
-    { label: 'Baja', visible: true, center: true },
+    { label: 'Estado', visible: !showTutorColumn },
+    { label: 'Baja', visible: !showTutorColumn, center: true },
   ].filter(h => h.visible);
 
   const formatDate = (dateStr) => {
@@ -96,6 +96,7 @@ const SubjectTable = ({ subjects, showTutorColumn = true, onToggleStatus, onDele
                   <div className="flex flex-col gap-2 min-w-[120px]">
                     <div className={`flex justify-between items-center text-[0.7rem] font-bold ${isInactive ? 'text-gray-400' : 'text-primary'}`}>
                       <span>
+                        {showTutorColumn ? 'Actividades: ' : 'Sesiones: '}
                         {s.sesionesDictadas || 0}/{(s.sesionesDictadas || 0) + (s.sesionesPendientes || 0)}
                       </span>
                       <span>{progress}%</span>
@@ -108,25 +109,29 @@ const SubjectTable = ({ subjects, showTutorColumn = true, onToggleStatus, onDele
                     </div>
                   </div>
                 </td>
-                <td className="px-8 py-6">
-                  <button
-                    onClick={() => onToggleStatus && onToggleStatus(s.materiaId)}
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ${!isInactive
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-200 text-gray-600'
-                      }`}
-                  >
-                    {!isInactive ? 'ACTIVO' : 'NO ACTIVO'}
-                  </button>
-                </td>
-                <td className="px-8 py-6 text-center">
-                  <button 
-                    onClick={() => onDelete && onDelete(s.materiaId)}
-                    className="material-symbols-outlined text-gray-300 hover:text-red-500 transition-colors"
-                  >
-                    delete
-                  </button>
-                </td>
+                {!showTutorColumn && (
+                  <td className="px-8 py-6">
+                    <button
+                      onClick={() => onToggleStatus && onToggleStatus(s.materiaId)}
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold transition-all hover:scale-105 active:scale-95 ${!isInactive
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-200 text-gray-600'
+                        }`}
+                    >
+                      {!isInactive ? 'ACTIVO' : 'NO ACTIVO'}
+                    </button>
+                  </td>
+                )}
+                {!showTutorColumn && (
+                  <td className="px-8 py-6 text-center">
+                    <button 
+                      onClick={() => onDelete && onDelete(s.materiaId)}
+                      className="material-symbols-outlined text-gray-300 hover:text-red-500 transition-colors"
+                    >
+                      delete
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}
