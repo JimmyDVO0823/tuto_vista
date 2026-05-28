@@ -29,4 +29,10 @@ public class NotificacionController {
         notificacionService.marcarComoLeida(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/read-all/{perfilId}")
+    public ResponseEntity<Void> markAllAsRead(@PathVariable Long perfilId) {
+        notificacionService.marcarTodasComoLeidas(perfilId);
+        return ResponseEntity.noContent().build();
+    }
 }
