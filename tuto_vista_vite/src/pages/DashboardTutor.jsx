@@ -45,6 +45,24 @@ const DashboardTutor = () => {
     maximumFractionDigits: 0 // Quita decimales innecesarios para pesos colombianos
   }).format(stats.incomeLastMonth || 0);
 
+  const handleToggleAvailability = async () => {
+    if (!tutorData) return;
+    const nuevoEstado = !tutorData.esta_disponible;
+    const mensajeAlerta = nuevoEstado 
+      ? "¿Deseas volver a estar disponible para recibir nuevas solicitudes?" 
+      : "⚠️ Al desactivar tu disponibilidad, recuerda que debes cumplir con las tutorías ya agendadas o cancelarlas debidamente para evitar reportes. ¿Deseas continuar?";
+    
+    if (window.confirm(mensajeAlerta)) {
+      try {
+        await api.patch(`/tutores/${user.id}/disponibilidad?estado=${nuevoEstado}`);
+        setTutorData(prev => ({ ...prev, esta_disponible: nuevoEstado }));
+      } catch (err) {
+        console.error("Error al cambiar disponibilidad:", err);
+        alert("No se pudo cambiar el estado de disponibilidad.");
+      }
+    }
+  };
+
   return (
     <MainLayout>
       <main className="p-4 md:p-10">
@@ -66,29 +84,14 @@ const DashboardTutor = () => {
                 {tutorData?.esta_disponible ? "Disponible para clases" : "No disponible"}
               </p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="relative inline-flex items-center cursor-pointer group">
               <input 
+                type="checkbox"
+                className="sr-only peer"
                 checked={tutorData?.esta_disponible || false} 
-                onChange={async () => {
-                  const nuevoEstado = !tutorData.esta_disponible;
-                  const mensajeAlerta = nuevoEstado 
-                    ? "¿Deseas volver a estar disponible para recibir nuevas solicitudes?" 
-                    : "⚠️ Al desactivar tu disponibilidad, recuerda que debes cumplir con las tutorías ya agendadas o cancelarlas debidamente para evitar reportes. ¿Deseas continuar?";
-                  
-                  if (window.confirm(mensajeAlerta)) {
-                    try {
-                      await api.patch(`/tutores/${user.id}/disponibilidad?estado=${nuevoEstado}`);
-                      setTutorData(prev => ({ ...prev, esta_disponible: nuevoEstado }));
-                    } catch (err) {
-                      console.error("Error al cambiar disponibilidad:", err);
-                      alert("No se pudo cambiar el estado de disponibilidad.");
-                    }
-                  }
-                }}
-                className="sr-only peer" 
-                type="checkbox" 
+                onChange={handleToggleAvailability}
               />
-              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:bg-academic-gold after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:after:translate-x-full" />
+              <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:bg-academic-gold after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:after:translate-x-full shadow-inner" />
             </label>
           </div>
         </header>

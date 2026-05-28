@@ -42,6 +42,14 @@ export const ChatHeader = ({ name, specialty, avatarUrl, isOnline, onAction }) =
         </button>
         <button 
           onClick={() => onAction && onAction('more')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors text-xs font-bold mr-1"
+          title="Abandonar esta conversación"
+        >
+          <span className="material-symbols-outlined text-sm">logout</span>
+          <span className="hidden md:inline">Abandonar</span>
+        </button>
+        <button 
+          onClick={() => onAction && onAction('more')}
           className="p-2.5 rounded-full hover:bg-surface-container transition-colors text-primary"
           title="Más opciones"
         >

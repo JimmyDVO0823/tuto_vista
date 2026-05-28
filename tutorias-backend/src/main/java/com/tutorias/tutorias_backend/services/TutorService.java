@@ -208,8 +208,7 @@ public class TutorService {
             Long materiaId,
             Long departamentoId
     ) {
-        return tutorRepository.findAll().stream()
-                .filter(t -> t.getEstaDisponible())
+        return tutorRepository.findByEstaDisponibleTrue().stream()
                 .filter(t -> minPrecio == null || t.getPrecioPorHora().compareTo(minPrecio) >= 0)
                 .filter(t -> maxPrecio == null || t.getPrecioPorHora().compareTo(maxPrecio) <= 0)
                 .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
