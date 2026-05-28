@@ -155,17 +155,7 @@ const DashboardTutor = () => {
           </div>
 
           <aside className="col-span-12 lg:col-span-4 space-y-8">
-            <div className="bg-academic-gold/10 text-primary p-8 rounded-lg relative overflow-hidden">
-              <h3 className="font-headline font-bold text-xl mb-3">
-                Sugerencia Editorial
-              </h3>
-              <p className="text-sm leading-relaxed mb-6 opacity-90">
-                Mejora tus materiales para el próximo trimestre.
-              </p>
-              <button className="bg-primary text-white py-2 px-6 rounded-md text-xs font-bold uppercase tracking-wider">
-                Revisar Biblioteca
-              </button>
-            </div>
+            
 
             {/* Nueva Sección de Insignias */}
             <div className="bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/10 shadow-sm space-y-6">

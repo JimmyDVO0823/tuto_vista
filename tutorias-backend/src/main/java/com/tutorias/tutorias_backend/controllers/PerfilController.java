@@ -16,7 +16,7 @@ public class PerfilController {
     private final com.tutorias.tutorias_backend.repositories.PerfilRepository perfilRepository;
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Perfil> actualizarBasico(
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.PerfilDTO> actualizarBasico(
             @PathVariable Long id,
             @RequestParam String nombre,
             @RequestParam(required = false) String avatar) {

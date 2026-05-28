@@ -15,11 +15,20 @@ public class PerfilService {
     private final EstudianteRepository estudianteRepository;
 
     @Transactional
-    public Perfil actualizarBasico(Long id, String nombre, String avatar) {
+    public com.tutorias.tutorias_backend.dto.PerfilDTO actualizarBasico(Long id, String nombre, String avatar) {
         Perfil p = perfilRepository.findById(id).orElseThrow();
         p.setNombreCompleto(nombre);
         p.setUrlAvatar(avatar);
-        return perfilRepository.save(p);
+        return mapToDTO(perfilRepository.save(p));
+    }
+
+    private com.tutorias.tutorias_backend.dto.PerfilDTO mapToDTO(Perfil p) {
+        return com.tutorias.tutorias_backend.dto.PerfilDTO.builder()
+                .id(p.getId())
+                .nombreCompleto(p.getNombreCompleto())
+                .urlAvatar(p.getUrlAvatar())
+                .rol(p.getRol().name())
+                .build();
     }
 
     @org.springframework.transaction.annotation.Transactional
