@@ -63,18 +63,31 @@ const DashboardStudent = () => {
 
   useEffect(() => {
     const activeSessions = sessions.filter(s => s.estado !== 'cancelada' && s.estado !== 'no_asistio');
+    
     const formattedSessions = activeSessions.map((s) => {
       const fechaLocalString = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, "") : "";
       const fechaBase = new Date(fechaLocalString);
+
+      const endBase = new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000);
       const horaInicio = fechaBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-      const horaFin = new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const horaFin = endBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+
+      const pad = (num) => String(num).padStart(2, '0');
+      const endLocalString = `${endBase.getFullYear()}-${pad(endBase.getMonth() + 1)}-${pad(endBase.getDate())}T${pad(endBase.getHours())}:${pad(endBase.getMinutes())}:${pad(endBase.getSeconds())}`;
 
       return {
         id: `session-${s.id}`,
         title: `Tutoría: ${s.materiaNombre}`,
         start: fechaLocalString,
-        end: new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000).toISOString().replace(/Z$|\+00:00$/, ""),
-        extendedProps: { ...s, type: "Sesión", category: s.materiaNombre, status: s.estado, time: `${horaInicio} - ${horaFin}`, colorType: "academic-blue" },
+        end: endLocalString,
+        extendedProps: {
+          ...s,
+          type: "Sesión",
+          category: s.materiaNombre,
+          status: s.estado,
+          time: `${horaInicio} - ${horaFin}`,
+          colorType: "academic-blue",
+        },
       };
     });
 
@@ -98,7 +111,15 @@ const DashboardStudent = () => {
           title: s.estado?.toUpperCase() === "ACEPTADA" ? `⚠️ Pagar: ${s.materiaNombre}` : `Solicitud: ${s.materiaNombre}`,
           start: startISO,
           end: endISO,
-          extendedProps: { ...s, type: "Solicitud", category: s.materiaNombre, status: s.estado, statusLabel: s.estado?.toUpperCase() === "ACEPTADA" ? "Aceptada (Por Pagar)" : s.estado, time: `${horaInicioShort} - ${hrsFinStr}:${minsFinStr}`, colorType: "academic-gold" },
+          extendedProps: { 
+            ...s, 
+            type: "Solicitud", 
+            category: s.materiaNombre, 
+            status: s.estado, 
+            statusLabel: s.estado?.toUpperCase() === "ACEPTADA" ? "Aceptada (Por Pagar)" : s.estado, 
+            time: `${horaInicioShort} - ${hrsFinStr}:${minsFinStr}`, 
+            colorType: "academic-gold" 
+          },
         };
       } catch (err) {
         return null;
