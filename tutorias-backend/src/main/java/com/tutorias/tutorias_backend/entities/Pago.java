@@ -22,10 +22,6 @@ public class Pago {
     @JoinColumn(name = "sesion_id", unique = true)
     private SesionTutoria sesion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estudiante_plan_id")
-    private EstudiantePlan estudiantePlan;
-
     @Column(nullable = false)
     private String tipo = "sesion";
 
