@@ -182,16 +182,21 @@ public class TutorService {
     }
 
     /**
-     * Obtiene todos los tutores disponibles con filtros opcionales.
+     * Obtiene todos los tutores disponibles con filtros opcionales y paginación.
      */
-    public List<TutorDTO> getTutoresDisponibles(
+    public com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO getTutoresDisponibles(
             BigDecimal minPrecio,
             BigDecimal maxPrecio,
             BigDecimal minCalificacion,
             Long materiaId,
-            Long departamentoId
+            Long departamentoId,
+            int page,
+            int size
     ) {
-        return tutorRepository.findByEstaDisponibleTrue().stream()
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Tutor> tutorPage = tutorRepository.findByEstaDisponibleTrue(pageable);
+
+        List<TutorDTO> content = tutorPage.getContent().stream()
                 .filter(t -> minPrecio == null || t.getPrecioPorHora().compareTo(minPrecio) >= 0)
                 .filter(t -> maxPrecio == null || t.getPrecioPorHora().compareTo(maxPrecio) <= 0)
                 .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
@@ -201,6 +206,14 @@ public class TutorService {
                         .anyMatch(tm -> tm.getMateria().getDepartamento().getId().equals(departamentoId) && Boolean.TRUE.equals(tm.getActivo())))
                 .map(this::toDTO)
                 .toList();
+
+        return com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO.builder()
+                .content(content)
+                .totalPages(tutorPage.getTotalPages())
+                .totalElements(tutorPage.getTotalElements())
+                .currentPage(tutorPage.getNumber())
+                .size(tutorPage.getSize())
+                .build();
     }
 
     /**
