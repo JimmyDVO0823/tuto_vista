@@ -38,6 +38,7 @@ public class Recurso {
     @Enumerated(EnumType.STRING)
     private TipoRecurso tipo;
 
+    @Builder.Default
     @Column(name = "creado_en", nullable = false, updatable = false)
     private OffsetDateTime creadoEn = OffsetDateTime.now();
 }
