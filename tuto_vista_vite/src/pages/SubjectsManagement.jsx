@@ -25,23 +25,13 @@ const SubjectsManagement = () => {
       setLoading(true);
       try {
         if (role === 'tutor') {
-          // Obtener materias del tutor desde el backend
+          // Obtener materias del tutor con progreso y próxima sesión
           const data = await api.get(`/tutores/${user.id}/materias`);
-          const mapped = (data || []).map(m => ({
-            name: m.nombre,
-            dept: m.departamento_nombre || 'General',
-            status: 'ACTIVO',
-            sem: '2024-A',
-            tutor: user.name,
-            nextActivity: 'Pendiente',
-            completedActivities: 2,
-            totalActivities: 5,
-          }));
-          setSubjects(mapped);
+          setSubjects(data || []);
         } else {
           // Mock para estudiantes (hasta que exista el endpoint)
           setSubjects([
-            { name: 'Cálculo Diferencial', dept: 'Matemáticas', status: 'ACTIVO', sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', nextActivity: 'Mañana', completedActivities: 3, totalActivities: 5 },
+            { materiaId: 1, nombre: 'Cálculo Diferencial', departamento: 'Matemáticas', activo: true, sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', proximaSesion: '2024-06-01T10:00:00Z', sesionesDictadas: 3, sesionesPendientes: 2, progreso: 60 },
           ]);
         }
       } catch (err) {
@@ -54,6 +44,30 @@ const SubjectsManagement = () => {
     fetchSubjects();
   }, [user, role]);
 
+  const handleToggleStatus = async (materiaId) => {
+    try {
+      await api.patch(`/tutores/${user.id}/materias/${materiaId}/toggle`);
+      setSubjects(prev => prev.map(s => 
+        s.materiaId === materiaId ? { ...s, activo: !s.activo } : s
+      ));
+    } catch (err) {
+      console.error('Error al cambiar estado:', err);
+      alert('No se pudo cambiar el estado de la materia.');
+    }
+  };
+
+  const handleDeleteMateria = async (materiaId) => {
+    if (!window.confirm('¿Estás seguro de que deseas darte de baja de esta materia?')) return;
+    
+    try {
+      await api.delete(`/tutores/${user.id}/materias/${materiaId}`);
+      setSubjects(prev => prev.filter(s => s.materiaId !== materiaId));
+    } catch (err) {
+      console.error('Error al borrar materia:', err);
+      alert(err.message || 'No se pudo eliminar la materia. Verifica si tienes sesiones programadas.');
+    }
+  };
+
   const handleAddSubject = async (newSubjectData) => {
     try {
       if (!user?.id) throw new Error('Usuario no autenticado');
@@ -64,16 +78,9 @@ const SubjectsManagement = () => {
         token
       );
 
-      setSubjects(prev => [{
-        name: newSubjectData.name,
-        dept: newSubjectData.dept,
-        status: 'ACTIVO',
-        sem: 'Reciente',
-        tutor: user.name,
-        nextActivity: 'Por programar',
-        completedActivities: 0,
-        totalActivities: 5,
-      }, ...prev]);
+      // Recargar para obtener la estructura completa del DTO
+      const data = await api.get(`/tutores/${user.id}/materias`);
+      setSubjects(data || []);
     } catch (err) {
       console.error('Error añadiendo materia:', err);
       alert(`Error: ${err.message || 'No se pudo añadir la materia'}`);
@@ -132,6 +139,8 @@ const SubjectsManagement = () => {
           <SubjectTable
             subjects={filteredSubjects}
             showTutorColumn={role !== 'tutor'}
+            onToggleStatus={handleToggleStatus}
+            onDelete={handleDeleteMateria}
           />
         </div>
 

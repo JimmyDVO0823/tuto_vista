@@ -6,6 +6,7 @@ import com.tutorias.tutorias_backend.dto.TutorDTO;
 import com.tutorias.tutorias_backend.dto.IngresoDto;
 import com.tutorias.tutorias_backend.dto.TutorIncomeReportDto;
 import com.tutorias.tutorias_backend.entities.Tutor;
+import com.tutorias.tutorias_backend.entities.TutorMateria;
 import com.tutorias.tutorias_backend.entities.Pago;
 import com.tutorias.tutorias_backend.enums.EstadoPago;
 import com.tutorias.tutorias_backend.repositories.TutorRepository;
@@ -172,8 +173,14 @@ public class TutorService {
         com.tutorias.tutorias_backend.entities.Materia materia = materiaRepository.findById(materiaId)
                 .orElseThrow(() -> new RuntimeException("Materia no encontrada"));
 
-        if (!tutor.getMaterias().contains(materia)) {
-            tutor.getMaterias().add(materia);
+        if (tutor.getTutorMaterias().stream().noneMatch(tm -> tm.getMateria().getId().equals(materiaId))) {
+            TutorMateria tm = TutorMateria.builder()
+                    .id(new com.tutorias.tutorias_backend.entities.TutorMateriaId(tutorId, materiaId))
+                    .tutor(tutor)
+                    .materia(materia)
+                    .activo(true)
+                    .build();
+            tutor.getTutorMaterias().add(tm);
             tutorRepository.save(tutor);
         }
     }
@@ -212,10 +219,10 @@ public class TutorService {
                 .filter(t -> minPrecio == null || t.getPrecioPorHora().compareTo(minPrecio) >= 0)
                 .filter(t -> maxPrecio == null || t.getPrecioPorHora().compareTo(maxPrecio) <= 0)
                 .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
-                .filter(t -> materiaId == null || t.getMaterias().stream()
-                        .anyMatch(m -> m.getId().equals(materiaId)))
-                .filter(t -> departamentoId == null || t.getMaterias().stream()
-                        .anyMatch(m -> m.getDepartamento().getId().equals(departamentoId)))
+                .filter(t -> materiaId == null || t.getTutorMaterias().stream()
+                        .anyMatch(tm -> tm.getMateria().getId().equals(materiaId)))
+                .filter(t -> departamentoId == null || t.getTutorMaterias().stream()
+                        .anyMatch(tm -> tm.getMateria().getDepartamento().getId().equals(departamentoId)))
                 .map(this::toDTO)
                 .toList();
     }
@@ -227,12 +234,12 @@ public class TutorService {
         Tutor tutor = tutorRepository.findById(tutorId)
                 .orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
 
-        return tutor.getMaterias().stream()
-                .map(m -> MateriaDTO.builder()
-                        .id(m.getId())
-                        .nombre(m.getNombre())
-                        .departamento_id(m.getDepartamento().getId())
-                        .departamento_nombre(m.getDepartamento().getNombre())
+        return tutor.getTutorMaterias().stream()
+                .map(tm -> MateriaDTO.builder()
+                        .id(tm.getMateria().getId())
+                        .nombre(tm.getMateria().getNombre())
+                        .departamento_id(tm.getMateria().getDepartamento().getId())
+                        .departamento_nombre(tm.getMateria().getDepartamento().getNombre())
                         .build())
                 .toList();
     }
@@ -248,13 +255,13 @@ public class TutorService {
     }
 
     public TutorDTO toDTO(Tutor t) {
-        List<MateriaDTO> materiasDTO = t.getMaterias() == null ? List.of() :
-                t.getMaterias().stream()
-                        .map(m -> MateriaDTO.builder()
-                                .id(m.getId())
-                                .nombre(m.getNombre())
-                                .departamento_id(m.getDepartamento().getId())
-                                .departamento_nombre(m.getDepartamento().getNombre())
+        List<MateriaDTO> materiasDTO = t.getTutorMaterias() == null ? List.of() :
+                t.getTutorMaterias().stream()
+                        .map(tm -> MateriaDTO.builder()
+                                .id(tm.getMateria().getId())
+                                .nombre(tm.getMateria().getNombre())
+                                .departamento_id(tm.getMateria().getDepartamento().getId())
+                                .departamento_nombre(tm.getMateria().getDepartamento().getNombre())
                                 .build())
                         .toList();
 

@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -62,13 +63,8 @@ public class Tutor {
     private OffsetDateTime creadoEn = OffsetDateTime.now();
 
     // Relaciones
-    @ManyToMany
-    @JoinTable(
-        name = "tutor_materias",
-        joinColumns = @JoinColumn(name = "tutor_id"),
-        inverseJoinColumns = @JoinColumn(name = "materia_id")
-    )
-    private Set<Materia> materias;
+    @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<TutorMateria> tutorMaterias = new HashSet<>();
 
     @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Disponibilidad> disponibilidades = new ArrayList<>();
