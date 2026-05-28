@@ -1,84 +1,65 @@
 package com.tutorias.tutorias_backend.services;
 
-import com.google.api.client.auth.oauth2.TokenResponse;
-import com.google.api.client.googleapis.auth.oauth2.GoogleRefreshTokenRequest;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Message;
-import jakarta.mail.Session;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Properties;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    @Value("${google.gmail.client-id:}")
-    private String clientId;
+    @Value("${brevo.api.url}")
+    private String apiUrl;
 
-    @Value("${google.gmail.client-secret:}")
-    private String clientSecret;
+    @Value("${brevo.api.key}")
+    private String apiKey;
 
-    @Value("${google.gmail.refresh-token:}")
-    private String refreshToken;
-
-    @Value("${spring.mail.username}")
+    @Value("${brevo.sender.email}")
     private String senderEmail;
 
+    @Value("${brevo.sender.name}")
+    private String senderName;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
     /**
-     * Envía un correo electrónico en formato HTML para verificación de cuenta usando Gmail API (HTTP).
+     * Envía un correo electrónico en formato HTML para verificación de cuenta usando la API REST de Brevo.
      */
     public void enviarCorreoVerificacion(String correoDestino, String nombreUsuario, String tokenVerificacion) {
-        System.out.println("🚀 Iniciando envío vía GMAIL API (HTTP) a: " + correoDestino);
+        System.out.println("🚀 Iniciando envío vía BREVO API (HTTP) a: " + correoDestino);
         
         try {
-            // 1. Obtener Access Token usando el Refresh Token
-            String accessToken = getAccessToken();
+            // Configurar Headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", apiKey);
 
-            // 2. Construir el correo (MimeMessage)
-            MimeMessage email = createEmail(correoDestino, senderEmail, "🔑 Verifica tu cuenta de Tutorías", nombreUsuario, tokenVerificacion);
-
-            // 3. Enviar vía Gmail API
-            sendMessage(accessToken, "me", email);
+            // Construir el cuerpo de la petición (JSON)
+            Map<String, Object> body = new HashMap<>();
             
-            System.out.println("✅ Correo enviado con éxito mediante GMAIL API a: " + correoDestino);
+            // Remitente
+            Map<String, String> sender = new HashMap<>();
+            sender.put("name", senderName);
+            sender.put("email", senderEmail);
+            body.put("sender", sender);
 
-        } catch (Exception e) {
-            System.err.println("❌ Falló el envío del correo electrónico vía GMAIL API: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+            // Destinatario
+            Map<String, String> receiver = new HashMap<>();
+            receiver.put("email", correoDestino);
+            receiver.put("name", nombreUsuario);
+            body.put("to", Collections.singletonList(receiver));
 
-    private String getAccessToken() throws IOException {
-        TokenResponse response = new GoogleRefreshTokenRequest(
-                new com.google.api.client.http.javanet.NetHttpTransport(),
-                new GsonFactory(),
-                refreshToken,
-                clientId,
-                clientSecret)
-                .execute();
-        return response.getAccessToken();
-    }
+            // Asunto
+            body.put("subject", "🔑 Activa tu cuenta de Tutorías");
 
-    private MimeMessage createEmail(String to, String from, String subject, String nombreUsuario, String tokenVerificacion) throws Exception {
-        Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
-
-        MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(from));
-        email.addRecipient(jakarta.mail.Message.RecipientType.TO, new InternetAddress(to));
-        email.setSubject(subject);
-
-        String contenidoHtml = "<html><body style='font-family: Arial, sans-serif; color: #333;'>"
+            // Contenido HTML
+            String contenidoHtml = "<html><body style='font-family: Arial, sans-serif; color: #333;'>"
                 + "<div style='max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; padding: 20px; border-radius: 12px;'>"
                 + "<h2 style='color: #002045;'>¡Bienvenido a nuestra Plataforma de Tutorías!</h2>"
                 + "<p>Hola, <strong>" + nombreUsuario + "</strong>,</p>"
@@ -92,26 +73,22 @@ public class EmailService {
                 + "<p style='font-size: 12px; color: #666;'>Si tú no solicitaste este registro, puedes ignorar este mensaje.</p>"
                 + "</div>"
                 + "</body></html>";
+            
+            body.put("htmlContent", contenidoHtml);
 
-        email.setContent(contenidoHtml, "text/html; charset=utf-8");
-        return email;
-    }
+            // Enviar Petición
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
 
-    private void sendMessage(String accessToken, String userId, MimeMessage emailContent) throws Exception {
-        Gmail service = new Gmail.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(),
-                request -> request.getHeaders().setAuthorization("Bearer " + accessToken))
-                .setApplicationName("TutoriasApp")
-                .build();
+            if (response.getStatusCode() == HttpStatus.CREATED || response.getStatusCode() == HttpStatus.OK) {
+                System.out.println("✅ Correo enviado con éxito mediante BREVO API a: " + correoDestino);
+            } else {
+                System.err.println("⚠️ Brevo respondió con código: " + response.getStatusCode() + " - " + response.getBody());
+            }
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        emailContent.writeTo(buffer);
-        byte[] bytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(bytes);
-        Message message = new Message();
-        message.setRaw(encodedEmail);
-
-        service.users().messages().send(userId, message).execute();
+        } catch (Exception e) {
+            System.err.println("❌ Falló el envío del correo electrónico vía BREVO API: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
