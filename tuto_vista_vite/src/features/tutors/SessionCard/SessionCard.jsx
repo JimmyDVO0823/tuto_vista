@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const SessionCard = ({ session, onUpdateStatus, onUpdateLink, isLoading = false }) => {
+const SessionCard = ({ session, onUpdateStatus, onUpdateLink, onAsignarActividad, isLoading = false }) => {
   const {
     id,
     estudianteNombre,
@@ -264,21 +264,30 @@ const SessionCard = ({ session, onUpdateStatus, onUpdateLink, isLoading = false 
 
               {/* Botón de Cancelación / Inasistencia */}
               <div>
-                <button
-                  onClick={() => {
-                    // Si ya es la hora y está en progreso, forzamos por defecto inasistencia
-                    if (estado === 'en_progreso') {
-                      setTipoCancelacion('no_asistio');
-                    } else {
-                      setTipoCancelacion('cancelada');
-                    }
-                    setShowCancelForm(true);
-                  }}
-                  disabled={isLoading}
-                  className="px-4 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors uppercase tracking-wider"
-                >
-                  {estado === 'en_progreso' ? 'Reportar Inasistencia' : 'Cancelar / Resolver'}
-                </button>
+                  <button
+                    onClick={() => {
+                      // Si ya es la hora y está en progreso, forzamos por defecto inasistencia
+                      if (estado === 'en_progreso') {
+                        setTipoCancelacion('no_asistio');
+                      } else {
+                        setTipoCancelacion('cancelada');
+                      }
+                      setShowCancelForm(true);
+                    }}
+                    disabled={isLoading}
+                    className="px-4 py-2 text-xs font-bold text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors uppercase tracking-wider"
+                  >
+                    {estado === 'en_progreso' ? 'Reportar Inasistencia' : 'Cancelar / Resolver'}
+                  </button>
+
+                  {/* 🆕 Botón para Asignar Actividad */}
+                  <button
+                    onClick={() => onAsignarActividad(session)}
+                    className="px-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors uppercase tracking-wider flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-sm">assignment_add</span>
+                    Asignar Actividad
+                  </button>
               </div>
 
               {/* Botones de flujo feliz (Iniciar / Completar) */}

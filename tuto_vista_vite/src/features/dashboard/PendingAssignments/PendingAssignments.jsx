@@ -1,64 +1,73 @@
-/**
- * @fileoverview Dashboard Feature - Pending Commitments Registry
- * @module components/features/dashboard/PendingAssignments
- * @description Manages the display of urgent and upcoming academic tasks. 
- * Reuses the ActivityCard pattern to maintain visual consistency while 
- * shifting the context toward deadlines and assignment status.
- */
-
-import React from 'react';
-import Pagination from '../../../components/ui/Pagination/Pagination';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 import ActivityCard from '../ActivityCard/ActivityCard';
+import Pagination from '../../../components/ui/Pagination/Pagination';
 
 /**
  * PendingAssignments Component.
- * 
- * @component
+ * Fetches real activities assigned by tutors from the backend.
  */
 const PendingAssignments = () => {
-  const assignments = [
-    { 
-      title: 'Ensayo Final: Macroeconómica', 
-      time: 'Vence en: 2 días', 
-      subject: 'Econometría', 
-      status: 'Urgente',
-      initial: 'M'
-    },
-    { 
-      title: 'Taller de Cálculo Vectorial', 
-      time: 'Vence en: 5 días', 
-      subject: 'Cálculo III', 
-      status: 'Pendiente',
-      initial: 'C'
-    },
-    { 
-      title: 'Análisis Literario: El Quijote', 
-      time: 'Vence en: 1 semana', 
-      subject: 'Literatura', 
-      status: 'En progreso',
-      initial: 'L'
-    }
-  ];
+  const { user } = useAuth();
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        const data = await api.get(`/actividades/estudiante/${user.id}/pendientes`);
+        setActivities(data);
+      } catch (error) {
+        console.error("Error fetching activities:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="space-y-8 mt-16 animate-pulse">
+        <div className="h-8 w-48 bg-gray-200 rounded"></div>
+        <div className="space-y-4">
+          {[1, 2].map(i => <div key={i} className="h-24 bg-gray-100 rounded-2xl"></div>)}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <article className="space-y-8 mt-16">
       <h2 className="text-2xl font-bold font-headline text-primary">Compromisos pendientes</h2>
-      <div className="space-y-4">
-        {assignments.map((item, i) => (
-          <ActivityCard 
-            key={i}
-            initial={item.initial}
-            title={item.title}
-            subtitle={`${item.subject} • ${item.status}`}
-            time={item.time}
-            buttonText="Ver compromiso"
-            actionPath="#"
-          />
-        ))}
-      </div>
       
-      {/* Pagination Component */}
-      <Pagination />
+      {activities.length === 0 ? (
+        <div className="bg-surface-container-low/30 border border-dashed border-outline-variant/50 rounded-2xl p-8 text-center">
+          <span className="material-symbols-outlined text-gray-300 text-4xl mb-2">task</span>
+          <p className="text-gray-400 italic text-sm">No tienes actividades pendientes por el momento.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {activities.map((act) => (
+            <ActivityCard 
+              key={act.id}
+              initial={act.sesionMateria?.charAt(0) || 'A'}
+              title={act.recursoTitulo}
+              subtitle={`${act.sesionMateria} • ${act.estado}`}
+              time="Pendiente"
+              buttonText="Ir a actividad"
+              actionPath={act.recursoUrl}
+              isExternal={true}
+            />
+          ))}
+        </div>
+      )}
+      
+      {activities.length > 5 && <Pagination />}
     </article>
   );
 };
