@@ -1,11 +1,11 @@
 package com.tutorias.tutorias_backend.controllers;
 
+import com.tutorias.tutorias_backend.dto.ResenaCreateRequest;
 import com.tutorias.tutorias_backend.dto.ResenaDTO;
 import com.tutorias.tutorias_backend.services.ResenaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -15,12 +15,9 @@ public class ResenaController {
 
     private final ResenaService resenaService;
 
-    @PostMapping("/sesion/{sesionId}")
-    public ResponseEntity<ResenaDTO> crear(
-            @PathVariable Long sesionId,
-            @RequestParam BigDecimal puntuacion,
-            @RequestParam(required = false) String comentario) {
-        return ResponseEntity.ok(resenaService.crear(sesionId, puntuacion, comentario));
+    @PostMapping
+    public ResponseEntity<ResenaDTO> crear(@RequestBody ResenaCreateRequest request) {
+        return ResponseEntity.ok(resenaService.crear(request));
     }
 
     @GetMapping("/tutor/{id}")

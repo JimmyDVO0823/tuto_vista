@@ -17,8 +17,8 @@ public class Resena {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "sesion_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sesion_id", nullable = true)
     private SesionTutoria sesion;
 
     @ManyToOne(fetch = FetchType.LAZY)
