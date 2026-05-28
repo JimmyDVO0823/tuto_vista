@@ -196,9 +196,9 @@ public class TutorService {
                 .filter(t -> maxPrecio == null || t.getPrecioPorHora().compareTo(maxPrecio) <= 0)
                 .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
                 .filter(t -> materiaId == null || t.getTutorMaterias().stream()
-                        .anyMatch(tm -> tm.getMateria().getId().equals(materiaId)))
+                        .anyMatch(tm -> tm.getMateria().getId().equals(materiaId) && Boolean.TRUE.equals(tm.getActivo())))
                 .filter(t -> departamentoId == null || t.getTutorMaterias().stream()
-                        .anyMatch(tm -> tm.getMateria().getDepartamento().getId().equals(departamentoId)))
+                        .anyMatch(tm -> tm.getMateria().getDepartamento().getId().equals(departamentoId) && Boolean.TRUE.equals(tm.getActivo())))
                 .map(this::toDTO)
                 .toList();
     }
@@ -216,6 +216,7 @@ public class TutorService {
     public TutorDTO toDTO(Tutor t) {
         List<MateriaDTO> materiasDTO = t.getTutorMaterias() == null ? List.of() :
                 t.getTutorMaterias().stream()
+                        .filter(tm -> Boolean.TRUE.equals(tm.getActivo()))
                         .map(tm -> MateriaDTO.builder()
                                 .id(tm.getMateria().getId())
                                 .nombre(tm.getMateria().getNombre())
