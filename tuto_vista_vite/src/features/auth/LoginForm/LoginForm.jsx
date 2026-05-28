@@ -5,7 +5,7 @@
  * Designed with the 'Academic Editorial' philosophy, it balances security 
  * requirements with a low-friction user experience.
  */
-
+import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../../services/api';
@@ -91,19 +91,35 @@ const LoginForm = () => {
     setError(null);
 
     if (!recaptchaToken) {
-      setError('Por favor, completa el reCAPTCHA para continuar.');
+      Swal.fire({
+        title: 'Verificación requerida',
+        text: 'Por favor, completa el reCAPTCHA para continuar.',
+        icon: 'warning',
+        confirmButtonColor: '#002045'
+      });
       return;
     }
 
     setLoading(true);
     try {
+      // Enviamos el correo, password Y el token del recaptcha por si el back lo pide
       const response = await api.post('/auth/login', {
         correo: formData.email,
-        password: formData.password
+        password: formData.password,
+        recaptchaToken: recaptchaToken // 👈 Añadido por seguridad ante el Error 400
       });
 
       // Guardar sesión en el contexto
       login(response, response.token);
+
+      // Alerta de éxito opcional antes de pasar
+      Swal.fire({
+        title: '¡Bienvenido!',
+        text: 'Sesión iniciada correctamente.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
 
       // Redirigir según el rol
       const roleRedirects = {
@@ -114,7 +130,22 @@ const LoginForm = () => {
 
       navigate(roleRedirects[response.rol] || '/');
     } catch (err) {
-      setError(err.message || 'Error al iniciar sesión. Comprueba tus credenciales.');
+      console.error("Error capturado en el formulario:", err.message);
+
+      // ✨ ¡AQUÍ DISPARAMOS SWEETALERT2 PARA LA CUENTA DESACTIVADA!
+      Swal.fire({
+        title: '¡Acceso Denegado!',
+        text: err.message || 'Error al iniciar sesión. Comprueba tus credenciales.',
+        icon: 'error',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#002045',
+        customClass: {
+          popup: 'rounded-2xl'
+        }
+      });
+
+      // También lo dejamos en el estado por si usas el micro-sheet rojo
+      setError(err.message);
     } finally {
       setLoading(false);
     }

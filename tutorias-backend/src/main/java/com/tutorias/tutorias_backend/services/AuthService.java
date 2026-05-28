@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,9 +31,14 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public AuthResponse login(LoginRequest request) {
-        // ... (lógica de login existente)
         Perfil perfil = perfilRepository.findByCorreo(request.getCorreo())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // ✨ ¡NUEVA VALIDACIÓN!: Verificar si el usuario está activo
+        if (perfil.getEstaActivo() != null && !perfil.getEstaActivo()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Tu cuenta ha sido desactivada. Contacta al administrador.");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), perfil.getContrasenaHash())) {
             throw new RuntimeException("Credenciales inválidas");
@@ -76,7 +83,14 @@ public class AuthService {
         String email = jwtUtil.extractUsername(token);
         Perfil perfil = perfilRepository.findByCorreo(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        
+
+        // ✨ ¡NUEVA VALIDACIÓN TAMBIÉN AQUÍ!: Evita que refresquen sesión si los
+        // desactivaron
+        if (perfil.getEstaActivo() != null && !perfil.getEstaActivo()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Tu cuenta ha sido desactivada. Contacta al administrador.");
+        }
+
         return generateAuthResponse(perfil);
     }
 

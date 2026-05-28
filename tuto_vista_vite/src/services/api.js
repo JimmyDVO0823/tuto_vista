@@ -6,19 +6,36 @@ const handleApiError = async (response) => {
 
   try {
     const contentType = response.headers.get("content-type");
+
     if (contentType && contentType.includes("application/json")) {
       const errorData = await response.json();
-      errorMessage = errorData.message || errorMessage;
+
+      // 🌟 Buscamos el mensaje en cualquiera de las propiedades comunes de Spring Boot
+      let rawError = errorData.message || errorData.error || errorMessage;
+
+      // Si el backend metió el texto adentro de las comillas del status (como tu log de Network)
+      if (typeof rawError === 'string' && rawError.includes("Tu cuenta ha sido desactivada")) {
+        errorMessage = "Tu cuenta ha sido desactivada. Contacta al administrador.";
+      } else {
+        errorMessage = rawError;
+      }
+
     } else {
+      // Si viene como texto plano
       const textError = await response.text();
-      errorMessage = textError || errorMessage;
+
+      if (textError && textError.includes("Tu cuenta ha sido desactivada")) {
+        errorMessage = "Tu cuenta ha sido desactivada. Contacta al administrador.";
+      } else {
+        errorMessage = textError || errorMessage;
+      }
     }
   } catch (e) {
-    // Si falla el parseo del error, se queda con el mensaje por defecto
+    console.error("Fallo al procesar error de API", e);
   }
 
+  // Lógica existente para tokens expirados
   if (response.status === 401 || errorMessage.includes('JWT expired')) {
-    // No redirigir automáticamente, dejar que el contexto o componente maneje la expiración
     throw new Error('TOKEN_EXPIRED');
   }
 
