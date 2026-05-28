@@ -96,27 +96,48 @@ const SearchFilters = ({ departments, subjects, filters, onFilterChange }) => {
                 className="flex items-center gap-1 text-tertiary"
                 onMouseLeave={() => setHoverRating(0)}
               >
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    type="button"
-                    className="focus:outline-none transition-transform active:scale-90"
-                    onMouseEnter={() => setHoverRating(star)}
-                    onClick={() => handleRatingClick(star)}
-                  >
-                    <span
-                      className="material-symbols-outlined text-2xl"
-                      style={{ 
-                        fontVariationSettings: (hoverRating || filters.minRating) >= star ? "'FILL' 1" : "'FILL' 0" 
+                {[1, 2, 3, 4, 5].map((star) => {
+                  const isHalf = hoverRating ? (hoverRating === star - 0.5) : (filters.minRating === star - 0.5);
+                  const isFull = hoverRating ? (hoverRating >= star) : (filters.minRating >= star);
+                  
+                  return (
+                    <div
+                      key={star}
+                      className="relative cursor-pointer transition-transform active:scale-90 flex items-center"
+                      onMouseEnter={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        if (x < rect.width / 2) {
+                          setHoverRating(star - 0.5);
+                        } else {
+                          setHoverRating(star);
+                        }
                       }}
+                      onMouseMove={(e) => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        if (x < rect.width / 2) {
+                          setHoverRating(star - 0.5);
+                        } else {
+                          setHoverRating(star);
+                        }
+                      }}
+                      onClick={() => handleRatingClick(hoverRating)}
                     >
-                      star_rate
-                    </span>
-                  </button>
-                ))}
+                      <span
+                        className="material-symbols-outlined text-2xl select-none"
+                        style={{ 
+                          fontVariationSettings: isFull ? "'FILL' 1" : "'FILL' 0" 
+                        }}
+                      >
+                        {isFull ? 'star_rate' : (isHalf ? 'star_half' : 'star_rate')}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
               <span className="text-xs text-on-surface-variant font-medium ml-2">
-                {filters.minRating > 0 ? `${filters.minRating}.0+` : 'Cualquier calificación'}
+                {filters.minRating > 0 ? `${filters.minRating}${Number.isInteger(filters.minRating) ? '.0' : ''}+` : 'Cualquier calificación'}
               </span>
             </div>
           </section>

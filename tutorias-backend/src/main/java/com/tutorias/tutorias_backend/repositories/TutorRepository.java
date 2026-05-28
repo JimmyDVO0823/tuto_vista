@@ -16,5 +16,5 @@ public interface TutorRepository extends JpaRepository<Tutor, Long> {
         "insignias",
         "insignias.insignia"
     })
-    java.util.List<Tutor> findByEstaDisponibleTrue();
+    org.springframework.data.domain.Page<Tutor> findByEstaDisponibleTrue(org.springframework.data.domain.Pageable pageable);
 }

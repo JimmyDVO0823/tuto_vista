@@ -37,6 +37,7 @@ const EditChart = () => {
                         anios_experiencia: tutorData.anios_experiencia || 0,
                         precio_por_hora: tutorData.precio_por_hora || 0,
                         duracion_sesion_min: tutorData.duracion_sesion_min || 90,
+                        avatar: tutorData.url_avatar || user.avatar || '',
                         titulos: tutorData.titulos ? tutorData.titulos.join(', ') : '',
                         logros: tutorData.logros ? tutorData.logros.join(', ') : ''
                     }));
