@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import NotificationsWidget from "../features/dashboard/NotificationWidget/NotificationWidget";
 import SemesterProgressWidget from "../features/dashboard/SemesterProgressWidget/SemesterProgressWidget";
-import { BotonPagoMercadoPago } from "../components/ui/Button/BotonPagoMercadoPago";
+import { BotonPagoSimulado } from "../components/ui/Button/BotonPagoSimulado";
 import ActivityCard from "../features/dashboard/ActivityCard/ActivityCard";
 
 const DashboardStudent = () => {
@@ -214,7 +214,7 @@ const DashboardStudent = () => {
                           buttonText="Ver Detalles"
                           actionPath="#"
                           extraContent={
-                            <BotonPagoMercadoPago monto={montoTotal} solicitudId={soli.id} />
+                            <BotonPagoSimulado monto={montoTotal} solicitudId={soli.id} />
                           }
                         />
                       );
@@ -232,7 +232,7 @@ const DashboardStudent = () => {
             </article>
 
             <aside className="col-span-12 md:col-span-4 space-y-10">
-              <SemesterProgressWidget />
+              {/*<SemesterProgressWidget />*/}
               {/*<NotificationsWidget />*/}
             </aside>
           </section>
