@@ -13,6 +13,7 @@ import AcademicChat from "./pages/AcademicChat";
 import MyTutorsHistory from "./pages/MyTutorsHistory";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
+import Verified from "./pages/Verified";
 
 import { AuthProvider } from "./context/AuthContext";
 import SessionRenewalModal from "./components/ui/SessionRenewalModal";
@@ -49,6 +50,7 @@ function App() {
               </div>
             }
           />
+          <Route path="/verified" element={<Verified />} />
           <Route path="/tutors" element={<TutorsExplorer />} />
           <Route path="/tutors/:id" element={<TutorAgendaDetail />} />
 
