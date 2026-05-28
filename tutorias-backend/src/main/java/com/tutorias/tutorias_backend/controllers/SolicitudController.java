@@ -33,6 +33,14 @@ public class SolicitudController {
         return ResponseEntity.ok(solicitudService.getByEstudiante(id));
     }
 
+    @GetMapping("/estudiante/{id}/por-pagar")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.PagedResponseDTO<SolicitudDTO>> getPorPagarByEstudiante(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(solicitudService.getPorPagarByEstudiante(id, page, size));
+    }
+
     @GetMapping("/tutor/{id}")
     public ResponseEntity<List<SolicitudDTO>> getByTutor(@PathVariable Long id) {
         return ResponseEntity.ok(solicitudService.getByTutor(id));

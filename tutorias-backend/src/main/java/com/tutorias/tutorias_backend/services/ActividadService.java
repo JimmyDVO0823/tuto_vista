@@ -89,6 +89,20 @@ public class ActividadService {
                 .collect(Collectors.toList());
     }
 
+    public com.tutorias.tutorias_backend.dto.PagedResponseDTO<ActividadEstudianteDTO> obtenerPendientesEstudiantePaginado(Long estudianteId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending());
+        org.springframework.data.domain.Page<ActividadEstudiante> activityPage = actividadRepository.findByEstudianteIdAndEstado(
+                estudianteId, EstadoActividad.pendiente, pageable);
+
+        return com.tutorias.tutorias_backend.dto.PagedResponseDTO.<ActividadEstudianteDTO>builder()
+                .content(activityPage.getContent().stream().map(this::toDTO).toList())
+                .totalPages(activityPage.getTotalPages())
+                .totalElements(activityPage.getTotalElements())
+                .currentPage(activityPage.getNumber())
+                .size(activityPage.getSize())
+                .build();
+    }
+
     @Transactional
     public ActividadEstudianteDTO completarActividad(Long actividadId) {
         ActividadEstudiante actividad = actividadRepository.findById(actividadId)

@@ -81,12 +81,18 @@ export const api = {
     return parseResponse(response);
   },
 
-  async get(endpoint, token) {
+  async get(endpoint, params = {}, token) {
     const storedToken = token || localStorage.getItem('token');
     const headers = {};
     if (storedToken) headers['Authorization'] = `Bearer ${storedToken}`;
 
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    let url = `${BASE_URL}${endpoint}`;
+    if (params && Object.keys(params).length > 0) {
+      const queryString = new URLSearchParams(params).toString();
+      url += `?${queryString}`;
+    }
+
+    const response = await fetch(url, {
       method: 'GET',
       headers,
     });

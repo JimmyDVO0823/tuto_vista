@@ -24,6 +24,20 @@ public interface SesionTutoriaRepository extends JpaRepository<SesionTutoria, Lo
             @Param("endDate") java.time.OffsetDateTime endDate
     );
 
+    org.springframework.data.domain.Page<SesionTutoria> findByEstudianteIdAndEstadoAndProgramadaParaAfter(
+            Long estudianteId,
+            EstadoSesion estado,
+            java.time.OffsetDateTime after,
+            org.springframework.data.domain.Pageable pageable
+    );
+
+    org.springframework.data.domain.Page<SesionTutoria> findByTutorIdAndEstadoAndProgramadaParaAfter(
+            Long tutorId,
+            EstadoSesion estado,
+            java.time.OffsetDateTime after,
+            org.springframework.data.domain.Pageable pageable
+    );
+
     Long countByTutorIdAndMateriaIdAndEstadoAndProgramadaParaAfter(Long tutorId, Long materiaId, EstadoSesion estado, java.time.OffsetDateTime since);
 
     Long countByTutorIdAndMateriaIdAndEstadoInAndProgramadaParaAfter(Long tutorId, Long materiaId, List<EstadoSesion> estados, java.time.OffsetDateTime since);

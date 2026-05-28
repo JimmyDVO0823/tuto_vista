@@ -57,18 +57,16 @@ const TutorsExplorer = () => {
     try {
       setLoading(true);
 
-      // Construir query params dinámicos
-      const params = new URLSearchParams();
-      if (filters.minPrice) params.append('minPrecio', filters.minPrice);
-      if (filters.maxPrice) params.append('maxPrecio', filters.maxPrice);
-      if (filters.minRating) params.append('minCalificacion', filters.minRating);
-      if (filters.subjectId) params.append('materiaId', filters.subjectId);
-      if (filters.departmentId) params.append('departamentoId', filters.departmentId);
-      params.append('page', page);
-      params.append('size', 10);
+      const params = {};
+      if (filters.minPrice) params.minPrecio = filters.minPrice;
+      if (filters.maxPrice) params.maxPrecio = filters.maxPrice;
+      if (filters.minRating) params.minCalificacion = filters.minRating;
+      if (filters.subjectId) params.materiaId = filters.subjectId;
+      if (filters.departmentId) params.departamentoId = filters.departmentId;
+      params.page = page;
+      params.size = 10;
 
-      const queryString = params.toString();
-      const response = await api.get(`/tutores${queryString ? `?${queryString}` : ''}`);
+      const response = await api.get('/tutores', params);
       
       const data = response.content || [];
       setPaginationInfo({

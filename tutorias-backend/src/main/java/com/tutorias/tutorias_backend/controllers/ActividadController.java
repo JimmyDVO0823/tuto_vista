@@ -28,8 +28,16 @@ public class ActividadController {
     }
 
     @GetMapping("/estudiante/{id}/pendientes")
-    public ResponseEntity<List<ActividadEstudianteDTO>> getPendientes(@PathVariable Long id) {
+    public ResponseEntity<List<ActividadEstudianteDTO>> obtenerPendientes(@PathVariable Long id) {
         return ResponseEntity.ok(actividadService.obtenerPendientesEstudiante(id));
+    }
+
+    @GetMapping("/estudiante/{id}/pendientes/paginado")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.PagedResponseDTO<ActividadEstudianteDTO>> obtenerPendientesPaginado(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(actividadService.obtenerPendientesEstudiantePaginado(id, page, size));
     }
 
     @PatchMapping("/{id}/completar")

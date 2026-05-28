@@ -67,9 +67,37 @@ public class SesionTutoriaService {
                 .stream().map(this::toDTO).toList();
     }
 
+    public com.tutorias.tutorias_backend.dto.PagedResponseDTO<SesionTutoriaDTO> getProximasByTutor(Long tutorId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("programadaPara").ascending());
+        org.springframework.data.domain.Page<SesionTutoria> sessionPage = sesionTutoriaRepository.findByTutorIdAndEstadoAndProgramadaParaAfter(
+                tutorId, EstadoSesion.programada, OffsetDateTime.now(), pageable);
+
+        return com.tutorias.tutorias_backend.dto.PagedResponseDTO.<SesionTutoriaDTO>builder()
+                .content(sessionPage.getContent().stream().map(this::toDTO).toList())
+                .totalPages(sessionPage.getTotalPages())
+                .totalElements(sessionPage.getTotalElements())
+                .currentPage(sessionPage.getNumber())
+                .size(sessionPage.getSize())
+                .build();
+    }
+
     public List<SesionTutoriaDTO> getByEstudiante(Long estudianteId) {
         return sesionTutoriaRepository.findByEstudianteId(estudianteId)
                 .stream().map(this::toDTO).toList();
+    }
+
+    public com.tutorias.tutorias_backend.dto.PagedResponseDTO<SesionTutoriaDTO> getProximasByEstudiante(Long estudianteId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("programadaPara").ascending());
+        org.springframework.data.domain.Page<SesionTutoria> sessionPage = sesionTutoriaRepository.findByEstudianteIdAndEstadoAndProgramadaParaAfter(
+                estudianteId, EstadoSesion.programada, OffsetDateTime.now(), pageable);
+
+        return com.tutorias.tutorias_backend.dto.PagedResponseDTO.<SesionTutoriaDTO>builder()
+                .content(sessionPage.getContent().stream().map(this::toDTO).toList())
+                .totalPages(sessionPage.getTotalPages())
+                .totalElements(sessionPage.getTotalElements())
+                .currentPage(sessionPage.getNumber())
+                .size(sessionPage.getSize())
+                .build();
     }
 
     @Transactional
