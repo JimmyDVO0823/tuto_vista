@@ -2,6 +2,7 @@ package com.tutorias.tutorias_backend.controllers;
 
 import com.tutorias.tutorias_backend.dto.ConversacionDTO;
 import com.tutorias.tutorias_backend.dto.MensajeDTO;
+import com.tutorias.tutorias_backend.dto.MessageRequest;
 import com.tutorias.tutorias_backend.services.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,14 @@ public class ChatController {
     public ResponseEntity<MensajeDTO> enviar(
             @RequestParam Long convId, 
             @RequestParam Long remitenteId, 
-            @RequestBody String contenido) {
-        return ResponseEntity.ok(chatService.enviarMensaje(convId, remitenteId, contenido));
+            @RequestBody MessageRequest request) {
+        return ResponseEntity.ok(chatService.enviarMensaje(convId, remitenteId, request.getContent()));
+    }
+
+    @DeleteMapping("/conversacion/{convId}/{perfilId}")
+    public ResponseEntity<Void> abandonar(@PathVariable Long convId, @PathVariable Long perfilId) {
+        chatService.abandonarConversacion(convId, perfilId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/mensajes/{convId}")

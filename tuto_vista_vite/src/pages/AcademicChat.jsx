@@ -56,7 +56,8 @@ export default function AcademicChat() {
   const handleSendMessage = (text) => {
     if (!activeConversationId || !user?.id) return;
 
-    api.post(`/chat/mensaje?convId=${activeConversationId}&remitenteId=${user.id}`, text)
+    // Enviamos el objeto para que el backend lo reciba via @RequestBody MessageRequest (sin comillas)
+    api.post(`/chat/mensaje?convId=${activeConversationId}&remitenteId=${user.id}`, { content: text })
       .then(newMsg => {
         setMessages(prev => [...prev, newMsg]);
         // Actualizar último mensaje en la lista de conversaciones
@@ -70,9 +71,30 @@ export default function AcademicChat() {
       .catch(err => console.error('Error sending message:', err));
   };
 
+  const handleAbandonConversation = async () => {
+    if (!activeConversationId || !user?.id) return;
+    
+    if (window.confirm("¿Estás seguro de que deseas darte de baja de este chat? Ya no verás esta conversación en tu lista.")) {
+      try {
+        await api.delete(`/chat/conversacion/${activeConversationId}/${user.id}`);
+        // Limpiar estado local
+        setConversations(prev => prev.filter(c => c.id !== activeConversationId));
+        setActiveConversationId(null);
+        setMessages([]);
+      } catch (err) {
+        console.error("Error abandonando chat:", err);
+        alert("No se pudo abandonar el chat.");
+      }
+    }
+  };
+
   // 5. MANEJADOR: Acciones de cabecera (Llamar, vídeo, etc.)
   const handleHeaderAction = (actionType) => {
-    console.log(`Iniciando acción: ${actionType} con ${otherParticipant?.nombreCompleto}`);
+    if (actionType === 'more') {
+      handleAbandonConversation();
+    } else {
+      console.log(`Iniciando acción: ${actionType} con ${otherParticipant?.nombreCompleto}`);
+    }
   };
 
   // Mapear conversaciones para el ContactMenu

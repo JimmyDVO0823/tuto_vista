@@ -82,4 +82,16 @@ public class TutorController {
     public ResponseEntity<com.tutorias.tutorias_backend.dto.TutorIncomeReportDto> getIncomeReport(@PathVariable Long id) {
         return ResponseEntity.ok(tutorService.getIncomeReport(id));
     }
+
+    /**
+     * PATCH /tutores/{id}/disponibilidad
+     * Cambia el estado de disponibilidad global del tutor.
+     */
+    @PatchMapping("/{id}/disponibilidad")
+    public ResponseEntity<Void> actualizarDisponibilidad(
+            @PathVariable Long id,
+            @RequestParam boolean estado) {
+        tutorService.actualizarDisponibilidad(id, estado);
+        return ResponseEntity.noContent().build();
+    }
 }

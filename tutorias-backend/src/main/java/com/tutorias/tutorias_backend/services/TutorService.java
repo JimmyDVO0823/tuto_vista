@@ -11,6 +11,7 @@ import com.tutorias.tutorias_backend.enums.EstadoPago;
 import com.tutorias.tutorias_backend.repositories.TutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.temporal.TemporalAdjusters;
@@ -240,7 +241,14 @@ public class TutorService {
     /**
      * Mapeador de Tutor entidad a TutorDTO.
      */
-    private TutorDTO toDTO(Tutor t) {
+    @Transactional
+    public void actualizarDisponibilidad(Long tutorId, boolean estado) {
+        Tutor t = tutorRepository.findById(tutorId).orElseThrow();
+        t.setEstaDisponible(estado);
+        tutorRepository.save(t);
+    }
+
+    public TutorDTO toDTO(Tutor t) {
         List<MateriaDTO> materiasDTO = t.getMaterias() == null ? List.of() :
                 t.getMaterias().stream()
                         .map(m -> MateriaDTO.builder()

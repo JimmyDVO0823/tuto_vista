@@ -51,7 +51,7 @@ const DispoManagement = () => {
               status: disponible ? "Disponible" : "Bloqueado",
               time: `${startFmt} - ${endFmt}`,
             },
-            color: disponible ? "#00b4d8" : "#ef4444",
+            color: disponible ? "#002045" : "#ef4444",
             allDay: false
           };
         }
@@ -70,7 +70,7 @@ const DispoManagement = () => {
             status: "Activo",
             time: `${startFmt} - ${endFmt}`,
           },
-          color: "#aa3bff",
+          color: "#002045",
         };
       });
   }, []);

@@ -85,6 +85,14 @@ public class ChatService {
                 .stream().map(this::toConvDTO).toList();
     }
 
+    @Transactional
+    public void abandonarConversacion(Long convId, Long perfilId) {
+        Conversacion conv = conversacionRepository.findById(convId).orElseThrow();
+        Perfil perfil = perfilRepository.findById(perfilId).orElseThrow();
+        conv.getParticipantes().remove(perfil);
+        conversacionRepository.save(conv);
+    }
+
     private MensajeDTO toMsgDTO(Mensaje m) {
         return MensajeDTO.builder()
                 .id(m.getId())

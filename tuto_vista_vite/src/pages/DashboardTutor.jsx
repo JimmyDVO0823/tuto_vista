@@ -63,11 +63,31 @@ const DashboardTutor = () => {
                 Estado
               </p>
               <p className="text-sm font-semibold text-primary">
-                Disponible para clases
+                {tutorData?.esta_disponible ? "Disponible para clases" : "No disponible"}
               </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input defaultChecked className="sr-only peer" type="checkbox" />
+              <input 
+                checked={tutorData?.esta_disponible || false} 
+                onChange={async () => {
+                  const nuevoEstado = !tutorData.esta_disponible;
+                  const mensajeAlerta = nuevoEstado 
+                    ? "¿Deseas volver a estar disponible para recibir nuevas solicitudes?" 
+                    : "⚠️ Al desactivar tu disponibilidad, recuerda que debes cumplir con las tutorías ya agendadas o cancelarlas debidamente para evitar reportes. ¿Deseas continuar?";
+                  
+                  if (window.confirm(mensajeAlerta)) {
+                    try {
+                      await api.patch(`/tutores/${user.id}/disponibilidad?estado=${nuevoEstado}`);
+                      setTutorData(prev => ({ ...prev, esta_disponible: nuevoEstado }));
+                    } catch (err) {
+                      console.error("Error al cambiar disponibilidad:", err);
+                      alert("No se pudo cambiar el estado de disponibilidad.");
+                    }
+                  }
+                }}
+                className="sr-only peer" 
+                type="checkbox" 
+              />
               <div className="w-14 h-7 bg-gray-200 rounded-full peer peer-checked:bg-academic-gold after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:after:translate-x-full" />
             </label>
           </div>

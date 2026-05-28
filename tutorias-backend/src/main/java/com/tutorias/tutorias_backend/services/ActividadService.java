@@ -22,6 +22,7 @@ public class ActividadService {
     private final RecursoRepository recursoRepository;
     private final SesionTutoriaRepository sesionRepository;
     private final NotificacionService notificacionService;
+    private final ChatService chatService;
 
     @Transactional
     public ActividadEstudianteDTO asignarActividad(Long sesionId, String titulo, String url, String descripcion) {
@@ -50,11 +51,20 @@ public class ActividadService {
 
         actividad = actividadRepository.save(actividad);
 
-        // 3. Notificar al estudiante
+        // 3. Notificar al estudiante via notificaciones push/web
         notificacionService.enviar(sesion.getEstudiante().getId(), 
                 com.tutorias.tutorias_backend.enums.TipoNotificacion.NUEVA_ACTIVIDAD, 
                 "Nueva actividad asignada", 
                 "El tutor ha asignado una nueva actividad para la sesión de " + sesion.getMateria().getNombre());
+
+        // 4. Notificar via Chat automático
+        try {
+            com.tutorias.tutorias_backend.dto.ConversacionDTO conv = chatService.crearOObtenerConversacion(sesion.getTutor().getId(), sesion.getEstudiante().getId());
+            String chatMsg = String.format("📢 He asignado una nueva actividad: **%s**.\nPuedes revisarla aquí: %s", titulo, url);
+            chatService.enviarMensaje(conv.getId(), sesion.getTutor().getId(), chatMsg);
+        } catch (Exception e) {
+            System.err.println("Error enviando mensaje de chat automático: " + e.getMessage());
+        }
 
         return toDTO(actividad);
     }

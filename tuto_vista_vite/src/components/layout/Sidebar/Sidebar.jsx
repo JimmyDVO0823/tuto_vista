@@ -44,7 +44,6 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
       },
       { label: "Disponibilidad", path: "/dispo", icon: "schedule" },
       { label: "Mis Cursos", path: "/subjects", icon: "school" },
-      { label: "Ingresos", path: "#", icon: "payments" },
       { label: "Chat", path: "/chat", icon: "chat" },
     ],
     administrador: [
