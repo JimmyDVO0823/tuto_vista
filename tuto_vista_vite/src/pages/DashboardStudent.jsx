@@ -163,19 +163,7 @@ const DashboardStudent = () => {
               Mi Librería de Aprendizaje
             </h1>
           </div>
-          <div className="flex gap-4">
-            <div className="bg-white px-5 py-3 rounded-xl shadow-sm border border-gray-100 flex items-center gap-3">
-              <span className="material-symbols-outlined text-academic-gold">
-                military_tech
-              </span>
-              <span className="text-xs font-bold uppercase tracking-widest">
-                Scholar Level 4
-              </span>
-            </div>
-          </div>
-        </header>
-
-        {loading ? (
+        </header>        {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
