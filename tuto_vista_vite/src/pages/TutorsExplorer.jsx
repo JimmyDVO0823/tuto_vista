@@ -4,7 +4,7 @@ import TutorSearchHeader from '../features/tutors/TutorSearchHeader/TutorSearchH
 import SearchFilters from '../features/tutors/SearchFilters/SearchFilters';
 import TutorCard from '../features/tutors/TutorCard/TutorCard';
 import Pagination from '../components/ui/Pagination/Pagination';
-import { api } from '../services/api';
+import { api, getCached } from '../services/api';
 
 const TutorsExplorer = () => {
   const [tutors, setTutors] = useState([]);
@@ -21,7 +21,7 @@ const TutorsExplorer = () => {
     minRating: '',
   });
 
-  // Cargar metadata (departamentos y materias) al inicio
+  // Cargar metadata (departamentos y materias) al inicio — con caché
   useEffect(() => {
     fetchMetadata();
   }, []);
@@ -37,8 +37,8 @@ const TutorsExplorer = () => {
   const fetchMetadata = async () => {
     try {
       const [deptData, subjData] = await Promise.all([
-        api.get('/departamentos'),
-        api.get('/materias'),
+        getCached('/departamentos'),
+        getCached('/materias'),
       ]);
       setDepartments(deptData || []);
       setSubjects(subjData || []);
