@@ -14,5 +14,6 @@ public class AsignarActividadRequest {
     private Long recursoId;
     private String titulo;
     private String url;
+    private String urlArchivo;
     private String descripcion;
 }

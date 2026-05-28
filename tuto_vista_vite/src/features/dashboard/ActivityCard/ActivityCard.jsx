@@ -28,8 +28,11 @@ const ActivityCard = ({
   time, 
   buttonText = "Unirse a sesión", 
   actionPath = "#",
+  isExternal = false,
   extraContent = null
 }) => {
+  const isLinkExternal = isExternal || actionPath.startsWith('http://') || actionPath.startsWith('https://');
+
   return (
     <div className="group bg-white p-5 md:p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between border-l-4 border-primary shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <div className="flex items-center gap-4 md:gap-8">
@@ -47,12 +50,23 @@ const ActivityCard = ({
            <span>{time}</span>
         </div>
         {extraContent}
-        <Link 
-          to={actionPath}
-          className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all group-hover:px-8 text-center w-full md:w-auto"
-        >
-          {buttonText}
-        </Link>
+        {isLinkExternal ? (
+          <a 
+            href={actionPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all group-hover:px-8 text-center w-full md:w-auto"
+          >
+            {buttonText}
+          </a>
+        ) : (
+          <Link 
+            to={actionPath}
+            className="signature-gradient text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all group-hover:px-8 text-center w-full md:w-auto"
+          >
+            {buttonText}
+          </Link>
+        )}
       </div>
     </div>
   );

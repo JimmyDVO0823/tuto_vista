@@ -73,7 +73,7 @@ public class ActividadService {
             com.tutorias.tutorias_backend.dto.ConversacionDTO conv = chatService
                     .crearOObtenerConversacion(sesion.getTutor().getId(), sesion.getEstudiante().getId());
             String chatMsg = String.format("📢 He asignado una nueva actividad: **%s**.\nPuedes revisarla aquí: %s",
-                    titulo, url);
+                    recurso.getTitulo(), recurso.getUrlArchivo());
             chatService.enviarMensaje(conv.getId(), sesion.getTutor().getId(), chatMsg);
         } catch (Exception e) {
             System.err.println("Error enviando mensaje de chat automático: " + e.getMessage());

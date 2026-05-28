@@ -18,11 +18,12 @@ public class ActividadController {
 
     @PostMapping("/asignar")
     public ResponseEntity<ActividadEstudianteDTO> asignar(@RequestBody AsignarActividadRequest request) {
+        String urlFinal = request.getUrlArchivo() != null ? request.getUrlArchivo() : request.getUrl();
         return ResponseEntity.ok(actividadService.asignarActividad(
                 request.getSesionId(),
-                request.getRecursoId(), // 🌟 Se añade aquí el recursoId
+                request.getRecursoId(),
                 request.getTitulo(),
-                request.getUrl(),
+                urlFinal,
                 request.getDescripcion()));
     }
 

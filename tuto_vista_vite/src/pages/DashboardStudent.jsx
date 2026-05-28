@@ -58,8 +58,9 @@ const DashboardStudent = () => {
   }, [user]);
 
   useEffect(() => {
-    // 1. Formatear sesiones (Ya pagadas y programadas)
-    const formattedSessions = sessions.map((s) => {
+    // 1. Formatear sesiones (Ya pagadas y programadas, excluyendo canceladas o inasistencias)
+    const activeSessions = sessions.filter(s => s.estado !== 'cancelada' && s.estado !== 'no_asistio');
+    const formattedSessions = activeSessions.map((s) => {
       const fechaLocalString = s.programadaPara
         ? s.programadaPara.replace(/Z$|\+00:00$/, "")
         : "";
@@ -227,7 +228,7 @@ const DashboardStudent = () => {
                 </div>
               </div>
 
-              <NextSessions sessions={sessions.filter(s => s.programadaPara && new Date(s.programadaPara) >= new Date())} isTutor={false} />
+              <NextSessions sessions={sessions.filter(s => s.estado === 'programada' && s.programadaPara && new Date(s.programadaPara) >= new Date())} isTutor={false} />
               <PendingAssignments />
             </article>
 
