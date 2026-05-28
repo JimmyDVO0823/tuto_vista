@@ -27,4 +27,5 @@ public class SolicitudDTO {
     private EstadoSolicitud estado;
     private OffsetDateTime creadoEn;
     private BigDecimal precioPorHora;
+    private boolean pagada;
 }

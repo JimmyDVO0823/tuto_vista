@@ -72,7 +72,7 @@ const TutorAgendaDetail = () => {
         }));
 
       const solicitudesMapeadas = (solicitudesData || [])
-        .filter(s => s.estado?.toLowerCase() === 'aceptada' || s.estado?.toLowerCase() === 'accepted')
+        .filter(s => (s.estado?.toLowerCase() === 'aceptada' || s.estado?.toLowerCase() === 'accepted') && !s.pagada)
         .map(s => ({
           tipo: 'SOLICITUD_ACEPTADA',
           fecha: s.fechaPreferida,

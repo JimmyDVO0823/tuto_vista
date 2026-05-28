@@ -90,7 +90,7 @@ const DashboardStudent = () => {
     // 2. Filtrar y formatear solicitudes (Pendientes y Aceptadas)
     const calendarSolicitudes = solicitudes.filter((s) => {
       const estadoUpper = s.estado?.toUpperCase();
-      return estadoUpper === "PENDIENTE" || estadoUpper === "ACEPTADA";
+      return (estadoUpper === "PENDIENTE" || estadoUpper === "ACEPTADA") && !s.pagada;
     });
 
     const formattedCalendarSolicitudes = calendarSolicitudes.map((s) => {
@@ -139,7 +139,7 @@ const DashboardStudent = () => {
 
   // Helper para validar la vigencia de la sección inferior "Por Pagar" usando texto plano
   const filtrarPorPagarVigente = (s) => {
-    if (s.estado?.toUpperCase() !== "ACEPTADA") return false;
+    if (s.estado?.toUpperCase() !== "ACEPTADA" || s.pagada) return false;
 
     const hoyString = new Date().toISOString().split('T')[0];
     if (s.fechaPreferida > hoyString) return true;

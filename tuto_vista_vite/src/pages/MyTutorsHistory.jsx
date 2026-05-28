@@ -31,7 +31,7 @@ const MyTutorsHistory = () => {
 
       // Filtrar solicitudes activas (solo pendientes o aceptadas esperando pago)
       const solicitudesActivas = (solicitudesData || []).filter(
-        s => s.estado === 'pendiente' || s.estado === 'aceptada'
+        s => (s.estado === 'pendiente' || s.estado === 'aceptada') && !s.pagada
       );
       setSolicitudes(solicitudesActivas);
 

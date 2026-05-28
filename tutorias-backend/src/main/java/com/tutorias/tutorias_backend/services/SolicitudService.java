@@ -259,6 +259,7 @@ public class SolicitudService {
     }
 
     private SolicitudDTO toDTO(Solicitud s) {
+        boolean estaPagada = sesionTutoriaRepository.findBySolicitudId(s.getId()).isPresent();
         return SolicitudDTO.builder()
                 .id(s.getId())
                 .estudianteId(s.getEstudiante().getId())
@@ -274,6 +275,7 @@ public class SolicitudService {
                 .estado(s.getEstado())
                 .creadoEn(s.getCreadoEn())
                 .precioPorHora(s.getTutor().getPrecioPorHora())
+                .pagada(estaPagada)
                 .build();
     }
 }

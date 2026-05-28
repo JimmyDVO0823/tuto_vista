@@ -45,7 +45,7 @@ const GestionTutorias = () => {
       setSolicitudes(solicitudesData.filter(s => s.estado === 'pendiente'));
 
       // 2. Filtrar solicitudes aceptadas (esperando por el pago)
-      setAceptadas(solicitudesData.filter(s => s.estado === 'aceptada'));
+      setAceptadas(solicitudesData.filter(s => s.estado === 'aceptada' && !s.pagada));
 
       // 3. Filtrar tutorías activas (programadas o en progreso)
       setSesiones(sesionesData.filter(s => s.estado === 'programada' || s.estado === 'en_progreso'));

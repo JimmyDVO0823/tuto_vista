@@ -41,16 +41,15 @@ const AsignarActividadModal = ({ isOpen, onClose, sesion, onAsignada }) => {
     setSelectedRecursoId(id);
 
     if (id === '') {
-      // Opción de crear uno nuevo de cero
       setFormData({ titulo: '', url: '', descripcion: '' });
     } else {
-      // Buscar el recurso seleccionado en la lista local y autorrellenar
       const recursoSeleccionado = recursos.find(r => r.id.toString() === id);
       if (recursoSeleccionado) {
         setFormData({
           titulo: recursoSeleccionado.titulo || '',
-          url: recursoSeleccionado.url || '',
-          descripcion: recursoSeleccionado.descripcion || '' // Si tus recursos guardan descripción por defecto
+          // 🌟 CAMBIO AQUÍ: Mapeamos urlArchivo (del backend) a tu estado "url"
+          url: recursoSeleccionado.urlArchivo || '',
+          descripcion: recursoSeleccionado.descripcion || ''
         });
       }
     }
@@ -65,16 +64,18 @@ const AsignarActividadModal = ({ isOpen, onClose, sesion, onAsignada }) => {
 
     setIsSubmitting(true);
     try {
-      // Enviamos el sesionId, los datos del form, y opcionalmente el recursoId si fue seleccionado
       await api.post('/actividades/asignar', {
         sesionId: sesion.id,
         recursoId: selectedRecursoId ? parseInt(selectedRecursoId) : null,
-        ...formData
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        urlArchivo: formData.url // 🌟 CAMBIO AQUÍ: Enviamos "urlArchivo" para que coincida con tu backend
       });
+
       alert("¡Actividad asignada correctamente!");
       onAsignada();
       onClose();
-      // Resetear estados al cerrar con éxito
+
       setSelectedRecursoId('');
       setFormData({ titulo: '', url: '', descripcion: '' });
     } catch (error) {
