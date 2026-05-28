@@ -1,0 +1,1 @@
+import"./rolldown-runtime-Dw2cE7zH.js";import{o as e}from"./vendor-calendar-DfCtKeZU.js";import{t}from"./vendor-react-DAjMbUK-.js";import{t as n}from"./MainLayout-Bq3mUdJu.js";import{t as r}from"./EditChart-DVzhxgNy.js";e();var i=t(),a=()=>(0,i.jsx)(n,{children:(0,i.jsx)(`div`,{className:`py-8`,children:(0,i.jsx)(r,{})})});export{a as default};
