@@ -33,6 +33,19 @@ public class InsigniaService {
         return mapToDTO(insigniaRepository.save(insignia));
     }
 
+    public InsigniaDTO update(Long id, InsigniaDTO dto) {
+        Insignia insignia = insigniaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Insignia no encontrada"));
+        
+        insignia.setNombre(dto.getNombre());
+        insignia.setDescripcion(dto.getDescripcion());
+        insignia.setUrlIcono(dto.getUrlIcono());
+        insignia.setCondicionTipo(dto.getCondicionTipo());
+        insignia.setCondicionValor(dto.getCondicionValor());
+        
+        return mapToDTO(insigniaRepository.save(insignia));
+    }
+
     private InsigniaDTO mapToDTO(Insignia entity) {
         return InsigniaDTO.builder()
                 .id(entity.getId())

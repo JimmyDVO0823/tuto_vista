@@ -24,4 +24,9 @@ public class InsigniaController {
     public ResponseEntity<InsigniaDTO> createInsignia(@RequestBody InsigniaDTO dto) {
         return ResponseEntity.ok(insigniaService.create(dto));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<InsigniaDTO> updateInsignia(@PathVariable Long id, @RequestBody InsigniaDTO dto) {
+        return ResponseEntity.ok(insigniaService.update(id, dto));
+    }
 }

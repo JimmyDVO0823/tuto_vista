@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
+import BadgeIcon from '../components/common/BadgeIcon';
 
 const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState('usuarios'); // 'usuarios' | 'reportes' | 'insignias' | 'comision' | 'academic'
@@ -23,6 +24,7 @@ const DashboardAdmin = () => {
     condicionTipo: 'TOTAL_SESIONES',
     condicionValor: 5
   });
+  const [editingBadge, setEditingBadge] = useState(null); // id of the badge being edited
 
   const [nuevoDept, setNuevoDept] = useState('');
   const [nuevaMateria, setNuevaMateria] = useState({
@@ -107,22 +109,34 @@ const DashboardAdmin = () => {
     }
   };
 
-  // Action: Create badge
-  const handleCrearInsignia = async (e) => {
+  // Action: Create or Update badge
+  const handleGuardarInsignia = async (e) => {
     e.preventDefault();
     if (!nuevaInsignia.nombre || !nuevaInsignia.descripcion) {
       alert('Por favor completa todos los campos de la insignia.');
       return;
     }
     try {
-      await api.post('/insignias', {
-        nombre: nuevaInsignia.nombre,
-        descripcion: nuevaInsignia.descripcion,
-        urlIcono: nuevaInsignia.urlIcono,
-        condicionTipo: nuevaInsignia.condicionTipo,
-        condicionValor: parseInt(nuevaInsignia.condicionValor)
-      });
-      alert('Insignia creada exitosamente.');
+      if (editingBadge) {
+        await api.put(`/insignias/${editingBadge}`, {
+          nombre: nuevaInsignia.nombre,
+          descripcion: nuevaInsignia.descripcion,
+          urlIcono: nuevaInsignia.urlIcono,
+          condicionTipo: nuevaInsignia.condicionTipo,
+          condicionValor: parseInt(nuevaInsignia.condicionValor)
+        });
+        alert('Insignia actualizada exitosamente.');
+      } else {
+        await api.post('/insignias', {
+          nombre: nuevaInsignia.nombre,
+          descripcion: nuevaInsignia.descripcion,
+          urlIcono: nuevaInsignia.urlIcono,
+          condicionTipo: nuevaInsignia.condicionTipo,
+          condicionValor: parseInt(nuevaInsignia.condicionValor)
+        });
+        alert('Insignia creada exitosamente.');
+      }
+      
       setNuevaInsignia({
         nombre: '',
         descripcion: '',
@@ -130,10 +144,35 @@ const DashboardAdmin = () => {
         condicionTipo: 'TOTAL_SESIONES',
         condicionValor: 5
       });
+      setEditingBadge(null);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al crear la insignia.');
+      alert(err.message || 'Error al procesar la insignia.');
     }
+  };
+
+  const handleEditarInsignia = (badge) => {
+    setEditingBadge(badge.id);
+    setNuevaInsignia({
+      nombre: badge.nombre,
+      descripcion: badge.descripcion,
+      urlIcono: badge.urlIcono,
+      condicionTipo: badge.condicionTipo,
+      condicionValor: badge.condicionValor
+    });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelarEdicion = () => {
+    setEditingBadge(null);
+    setNuevaInsignia({
+      nombre: '',
+      descripcion: '',
+      urlIcono: 'emoji_events',
+      condicionTipo: 'TOTAL_SESIONES',
+      condicionValor: 5
+    });
   };
 
   // Action: Create department
@@ -332,10 +371,22 @@ const DashboardAdmin = () => {
             {/* TABS 3: INSIGNIAS */}
             {activeTab === 'insignias' && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Form to create */}
+                {/* Form to create / edit */}
                 <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-6 shadow-sm h-fit">
-                  <h3 className="text-lg font-bold text-primary font-display mb-4">Nueva Insignia</h3>
-                  <form onSubmit={handleCrearInsignia} className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-primary font-display">
+                      {editingBadge ? 'Editar Insignia' : 'Nueva Insignia'}
+                    </h3>
+                    {editingBadge && (
+                      <button 
+                        onClick={handleCancelarEdicion}
+                        className="text-[10px] font-bold text-red-500 uppercase hover:underline"
+                      >
+                        Cancelar
+                      </button>
+                    )}
+                  </div>
+                  <form onSubmit={handleGuardarInsignia} className="space-y-4">
                     <div>
                       <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Nombre</label>
                       <input
@@ -355,22 +406,19 @@ const DashboardAdmin = () => {
                         placeholder="Escribe de qué se trata la insignia..."
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                       <div>
-                        <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Ícono Material</label>
-                        <select
+                        <label className="text-xs font-bold text-elegant-gray uppercase block mb-1 flex justify-between">
+                          URL del Ícono / Identificador
+                          <span className="text-[10px] lowercase font-normal opacity-60">Soporta URL o Material Icon name</span>
+                        </label>
+                        <input
+                          type="text"
                           value={nuevaInsignia.urlIcono}
                           onChange={e => setNuevaInsignia({ ...nuevaInsignia, urlIcono: e.target.value })}
-                          className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary"
-                        >
-                          <option value="emoji_events">Copa</option>
-                          <option value="verified">Verificado</option>
-                          <option value="school">Escuela</option>
-                          <option value="workspace_premium">Medalla Premium</option>
-                          <option value="military_tech">Estrella Militar</option>
-                          <option value="local_fire_department">Fuego</option>
-                          <option value="grade">Estrella</option>
-                        </select>
+                          className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary font-mono placeholder:italic"
+                          placeholder="https://... o emoji_events"
+                        />
                       </div>
                       <div>
                         <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Tipo de Regla</label>
@@ -397,9 +445,9 @@ const DashboardAdmin = () => {
                     </div>
                     <button
                       type="submit"
-                      className="w-full signature-gradient text-white font-bold py-2.5 rounded-md text-xs shadow hover:shadow-lg transition-all"
+                      className={`w-full font-bold py-2.5 rounded-md text-xs shadow hover:shadow-lg transition-all ${editingBadge ? 'bg-primary text-white' : 'signature-gradient text-white'}`}
                     >
-                      Guardar Insignia
+                      {editingBadge ? 'Actualizar Insignia' : 'Guardar Insignia'}
                     </button>
                   </form>
                 </div>
@@ -412,17 +460,23 @@ const DashboardAdmin = () => {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {insignias.map(badge => (
-                        <div key={badge.id} className="p-4 border border-outline-variant/10 rounded-xl bg-surface-container-low flex gap-3 items-center">
-                          <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center text-primary border border-primary/10 shrink-0">
-                            <span className="material-symbols-outlined text-2xl">{badge.urlIcono}</span>
+                        <div key={badge.id} className="p-4 border border-outline-variant/10 rounded-xl bg-surface-container-low flex justify-between items-center group/item hover:border-academic-gold/30 transition-all">
+                          <div className="flex gap-3 items-center">
+                            <BadgeIcon insignia={badge} size="md" />
+                            <div>
+                              <h4 className="font-bold text-primary text-sm flex items-center gap-1.5">{badge.nombre}</h4>
+                              <p className="text-xs text-gray-500 line-clamp-1 mb-1">{badge.descripcion}</p>
+                              <span className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary px-2 py-0.5 rounded tracking-wide">
+                                {badge.condicionTipo}: {badge.condicionValor}
+                              </span>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-bold text-primary text-sm flex items-center gap-1.5">{badge.nombre}</h4>
-                            <p className="text-xs text-gray-500 line-clamp-1 mb-1">{badge.descripcion}</p>
-                            <span className="text-[10px] font-extrabold uppercase bg-primary/10 text-primary px-2 py-0.5 rounded tracking-wide">
-                              {badge.condicionTipo}: {badge.condicionValor}
-                            </span>
-                          </div>
+                          <button 
+                            onClick={() => handleEditarInsignia(badge)}
+                            className="p-2 text-academic-gold opacity-0 group-hover/item:opacity-100 transition-all hover:bg-academic-gold/5 rounded-full"
+                          >
+                            <span className="material-symbols-outlined text-base">edit</span>
+                          </button>
                         </div>
                       ))}
                     </div>
