@@ -17,6 +17,7 @@ public class EmailService {
      * Envía un correo electrónico en formato HTML para verificación de cuenta.
      */
     public void enviarCorreoVerificacion(String correoDestino, String nombreUsuario, String tokenVerificacion) {
+        System.out.println("🚀 Iniciando proceso de envío de correo a: " + correoDestino);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             // True indica que el correo contendrá elementos multimedia/HTML
@@ -45,7 +46,7 @@ public class EmailService {
             helper.setText(contenidoHtml, true); // El 'true' activa el renderizado de HTML
 
             mailSender.send(message);
-            System.out.println("📧 Correo de verificación enviado con éxito a: " + correoDestino);
+            System.out.println("✅ Correo enviado con éxito mediante JavaMail a: " + correoDestino);
 
         } catch (MessagingException e) {
             System.err.println("❌ Falló el envío del correo electrónico: " + e.getMessage());
