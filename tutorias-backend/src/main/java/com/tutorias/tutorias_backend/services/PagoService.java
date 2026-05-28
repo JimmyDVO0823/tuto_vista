@@ -37,6 +37,12 @@ public class PagoService {
         SesionTutoria sesion = sesionTutoriaRepository.findById(sesionDto.getId())
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada después de crear"));
 
+        // Idempotencia: Si ya existe un pago para esta sesión, lo retornamos para evitar errores de clave duplicada
+        java.util.Optional<Pago> pagoExistente = pagoRepository.findBySesionId(sesion.getId());
+        if (pagoExistente.isPresent()) {
+            return toDTO(pagoExistente.get());
+        }
+
         Pago pago = new Pago();
         pago.setSesion(sesion);
         pago.setEstudiante(sesion.getEstudiante());

@@ -24,6 +24,12 @@ public class SesionTutoriaService {
 
     @Transactional
     public SesionTutoriaDTO crearDesdeSolicitud(Long solicitudId) {
+        // Idempotencia: Si ya existe una sesión para esta solicitud, retornamos esa en lugar de crear una nueva
+        java.util.Optional<SesionTutoria> existente = sesionTutoriaRepository.findBySolicitudId(solicitudId);
+        if (existente.isPresent()) {
+            return toDTO(existente.get());
+        }
+
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
 

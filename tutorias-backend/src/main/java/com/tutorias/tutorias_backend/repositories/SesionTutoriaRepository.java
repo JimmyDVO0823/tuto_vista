@@ -13,6 +13,7 @@ public interface SesionTutoriaRepository extends JpaRepository<SesionTutoria, Lo
     List<SesionTutoria> findByTutorIdAndEstado(Long tutorId, EstadoSesion estado);
     List<SesionTutoria> findByEstudianteIdAndEstado(Long estudianteId, EstadoSesion estado);
     List<SesionTutoria> findByTutorIdAndEstadoIn(Long tutorId, List<EstadoSesion> estados);
+    java.util.Optional<SesionTutoria> findBySolicitudId(Long solicitudId);
 
     @org.springframework.data.jpa.repository.Query("SELECT s FROM SesionTutoria s WHERE s.estudiante.id = :studentId AND s.programadaPara >= :startDate AND s.programadaPara <= :endDate")
     List<SesionTutoria> findSessionsByStudentInDateRange(
