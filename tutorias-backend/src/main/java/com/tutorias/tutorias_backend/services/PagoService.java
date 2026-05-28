@@ -42,6 +42,8 @@ public class PagoService {
         pago.setEstudiante(sesion.getEstudiante());
         pago.setTutor(sesion.getTutor());
         pago.setMonto(sesion.getPrecio());
+        pago.setMoneda("COP");
+        pago.setTipo("sesion");
 
         // Comisión dinámica obtenida de configuración
         BigDecimal tasaComision = configuracionService.obtenerComision();

@@ -66,6 +66,7 @@ public class SecurityConfig {
                                 AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
                                 AntPathRequestMatcher.antMatcher("/swagger-ui.html"))
                         .permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/pagos/**")).permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter,

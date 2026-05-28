@@ -23,17 +23,28 @@ public class PagoController {
      * Marca una solicitud como pagada y crea la sesión automáticamente.
      */
     @PostMapping("/simular")
-    public ResponseEntity<PagoDTO> simularPago(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> simularPago(@RequestBody Map<String, Object> payload) {
         try {
+            if (!payload.containsKey("solicitudId")) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Falta el campo solicitudId"));
+            }
             String solicitudIdStr = payload.get("solicitudId").toString();
             Long solicitudId = Long.parseLong(solicitudIdStr);
             
+            System.out.println("DEBUG: Iniciando simulación de pago para solicitudId: " + solicitudId);
+            
             // Usamos la lógica existente para registrar pago y crear sesión
             PagoDTO response = pagoService.registrarPagoYCrearSesion(solicitudId);
+            
+            System.out.println("DEBUG: Pago simulado exitoso para solicitudId: " + solicitudId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("ERROR en simularPago: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body(Map.of(
+                "error", "Internal Server Error",
+                "message", e.getMessage() != null ? e.getMessage() : "Excepción desconocida"
+            ));
         }
     }
 
