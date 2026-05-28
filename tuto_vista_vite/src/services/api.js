@@ -1,4 +1,8 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
+// ── In-memory cache for reference data (departments, subjects, etc.) ──
+const _cache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
 
 // Manejador de errores mejorado para soportar tanto JSON como respuestas de texto plano
 const handleApiError = async (response) => {
@@ -148,3 +152,18 @@ export const api = {
     return parseResponse(response);
   },
 };
+/**
+ * Cached GET — returns data from in-memory cache if it's fresh (< CACHE_TTL),
+ * otherwise fetches from the server and stores the result.
+ * Ideal for reference data that rarely changes (departments, subjects).
+ */
+export function getCached(endpoint, token) {
+  const cached = _cache.get(endpoint);
+  if (cached && Date.now() - cached.ts < CACHE_TTL) {
+    return Promise.resolve(cached.data);
+  }
+  return api.get(endpoint, token).then(data => {
+    _cache.set(endpoint, { data, ts: Date.now() });
+    return data;
+  });
+}
