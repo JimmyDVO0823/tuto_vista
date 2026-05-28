@@ -5,15 +5,16 @@ import { api } from "../services/api";
 import IncomeChart from "../features/dashboard/IncomeChart/IncomeChart";
 import StatCard from "../components/ui/StatCard/StatCard"; // Importación del nuevo componente
 import EditChart from "../features/dashboard/Perfil/EditChart";
+import BadgeIcon from "../components/common/BadgeIcon";
 
 const DashboardTutor = () => {
   const { user } = useAuth();
   const [sessions, setSessions] = useState([]);
   const [stats, setStats] = useState({
     hoursThisMonth: 0,
-    averageRating: 0,
     incomeLastMonth: 0,
   });
+  const [tutorData, setTutorData] = useState(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -28,6 +29,12 @@ const DashboardTutor = () => {
         .get(`/tutores/${user.id}/stats`)
         .then((data) => setStats(data))
         .catch((err) => console.error("Error cargando estadísticas:", err));
+
+      // Cargar data completa del tutor (incluye insignias)
+      api
+        .get(`/tutores/${user.id}`)
+        .then((data) => setTutorData(data))
+        .catch((err) => console.error("Error cargando data del tutor:", err));
     }
   }, [user]);
 
@@ -158,6 +165,32 @@ const DashboardTutor = () => {
               <button className="bg-primary text-white py-2 px-6 rounded-md text-xs font-bold uppercase tracking-wider">
                 Revisar Biblioteca
               </button>
+            </div>
+
+            {/* Nueva Sección de Insignias */}
+            <div className="bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/10 shadow-sm space-y-6">
+              <div className="flex justify-between items-center">
+                <h3 className="font-headline font-bold text-xl text-primary tracking-tight">Mis Logros</h3>
+                <span className="material-symbols-outlined text-academic-gold" style={{ fontVariationSettings: "'FILL' 1" }}>workspace_premium</span>
+              </div>
+              
+              {tutorData?.insignias?.length > 0 ? (
+                <div className="grid grid-cols-3 gap-4">
+                  {tutorData.insignias.map(insignia => (
+                    <div key={insignia.id} className="flex flex-col items-center gap-2">
+                      <BadgeIcon insignia={insignia} size="md" />
+                      <span className="text-[10px] font-bold text-center uppercase tracking-tighter text-elegant-gray line-clamp-1 w-full">
+                        {insignia.nombre}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 border-2 border-dashed border-outline-variant/10 rounded-xl">
+                  <p className="text-sm text-elegant-gray mb-1">Aún no tienes insignias.</p>
+                  <p className="text-[10px] text-gray-400">¡Sigue dictando clases para obtenerlas!</p>
+                </div>
+              )}
             </div>
           </aside>
         </div>

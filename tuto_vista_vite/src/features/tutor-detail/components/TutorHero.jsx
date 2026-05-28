@@ -1,10 +1,20 @@
 import React from 'react';
+import BadgeIcon from '../../../components/common/BadgeIcon';
 
 const TutorHero = ({ tutor }) => {
   return (
     <header className="mb-8 md:mb-16 flex flex-col md:flex-row items-start justify-between gap-6">
       <div className="max-w-2xl">
-        <span className="text-xs font-bold text-academic-gold uppercase tracking-[0.2em] mb-4 block">Perfil del Tutor</span>
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xs font-bold text-academic-gold uppercase tracking-[0.2em] block">Perfil del Tutor</span>
+          {tutor.insignias?.length > 0 && (
+            <div className="flex gap-1.5 border-l border-outline-variant/20 pl-3">
+              {tutor.insignias.map(insignia => (
+                <BadgeIcon key={insignia.id} insignia={insignia} size="sm" />
+              ))}
+            </div>
+          )}
+        </div>
         <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight font-headline mb-6 leading-tight">
           {tutor.nombre_completo}
         </h1>

@@ -1,5 +1,6 @@
 package com.tutorias.tutorias_backend.services;
 
+import com.tutorias.tutorias_backend.dto.InsigniaDTO;
 import com.tutorias.tutorias_backend.dto.MateriaDTO;
 import com.tutorias.tutorias_backend.dto.TutorDTO;
 import com.tutorias.tutorias_backend.dto.IngresoDto;
@@ -250,6 +251,19 @@ public class TutorService {
                                 .build())
                         .toList();
 
+        List<InsigniaDTO> insigniasDTO = t.getInsignias() == null ? List.of() :
+                t.getInsignias().stream()
+                        .map(ti -> InsigniaDTO.builder()
+                                .id(ti.getInsignia().getId())
+                                .nombre(ti.getInsignia().getNombre())
+                                .descripcion(ti.getInsignia().getDescripcion())
+                                .urlIcono(ti.getInsignia().getUrlIcono())
+                                .condicionTipo(ti.getInsignia().getCondicionTipo())
+                                .condicionValor(ti.getInsignia().getCondicionValor())
+                                .creadoEn(ti.getInsignia().getCreadoEn())
+                                .build())
+                        .toList();
+
         return TutorDTO.builder()
                 .id(t.getId())
                 .nombre_completo(t.getPerfil().getNombreCompleto())
@@ -264,6 +278,7 @@ public class TutorService {
                 .titulos(t.getTitulos())
                 .logros(t.getLogros())
                 .materias(materiasDTO)
+                .insignias(insigniasDTO)
                 .build();
     }
 }

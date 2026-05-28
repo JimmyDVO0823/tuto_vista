@@ -75,4 +75,7 @@ public class Tutor {
 
     @OneToMany(mappedBy = "tutor")
     private List<Solicitud> solicitudes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TutorInsignia> insignias = new ArrayList<>();
 }

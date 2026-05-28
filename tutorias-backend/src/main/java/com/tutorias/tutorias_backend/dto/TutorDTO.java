@@ -23,4 +23,5 @@ public class TutorDTO {
     private String[] titulos;
     private String[] logros;
     private List<MateriaDTO> materias;
+    private List<InsigniaDTO> insignias;
 }

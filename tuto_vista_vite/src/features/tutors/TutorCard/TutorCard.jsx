@@ -25,7 +25,7 @@ import { Link } from 'react-router-dom';
  * badge and signature ring styling.
  * @component
  */
-const TutorCard = ({ id, name, image, subject, price, rating, reviews, quote, isTopRated }) => {
+const TutorCard = ({ id, name, image, subject, price, rating, reviews, quote, isTopRated, insignias }) => {
   return (
     <div className="bg-surface-container-lowest rounded-xl p-8 flex flex-col gap-6 hover:shadow-[0_8px_40px_rgba(25,28,30,0.04)] transition-all group">
       <div className="flex items-start justify-between">
@@ -41,10 +41,28 @@ const TutorCard = ({ id, name, image, subject, price, rating, reviews, quote, is
             </div>
           )}
         </div>
-        <div className="text-right">
+        <div className="flex flex-col items-end gap-2">
           <span className="block text-2xl font-bold text-primary font-headline">
             ${price}<span className="text-xs font-medium text-on-surface-variant">/h</span>
           </span>
+          {insignias?.length > 0 && (
+            <div className="flex gap-1">
+              {insignias.slice(0, 3).map(insignia => (
+                <div 
+                  key={insignia.id} 
+                  className="w-6 h-6 rounded-full bg-academic-gold/10 flex items-center justify-center border border-academic-gold/20"
+                  title={insignia.nombre}
+                >
+                  <span className="material-symbols-outlined text-[14px] text-academic-gold" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    workspace_premium
+                  </span>
+                </div>
+              ))}
+              {insignias.length > 3 && (
+                <span className="text-[10px] font-bold text-academic-gold">+{insignias.length - 3}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div>
