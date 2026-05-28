@@ -29,6 +29,7 @@ public class AuthService {
     private final TutorRepository tutorRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
 
     public AuthResponse login(LoginRequest request) {
         Perfil perfil = perfilRepository.findByCorreo(request.getCorreo())
@@ -60,6 +61,7 @@ public class AuthService {
         nuevoPerfil.setCorreo(request.getCorreo());
         nuevoPerfil.setContrasenaHash(passwordEncoder.encode(request.getPassword()));
         nuevoPerfil.setRol(request.getRol());
+        nuevoPerfil.setEstaActivo(false); // 🔥 Registrar como inactivo hasta verificar correo
 
         // 3. Guardar Perfil en DB
         Perfil perfilGuardado = perfilRepository.save(nuevoPerfil);
@@ -75,8 +77,26 @@ public class AuthService {
             tutorRepository.save(tutor);
         }
 
-        // 5. Devolver respuesta con Token
-        return generateAuthResponse(perfilGuardado);
+        // 5. Enviar Correo de Verificación
+        String verificationToken = jwtUtil.generateVerificationToken(perfilGuardado.getCorreo());
+        emailService.enviarCorreoVerificacion(perfilGuardado.getCorreo(), perfilGuardado.getNombreCompleto(), verificationToken);
+
+        // 6. Devolver respuesta informativa (sin token de sesión)
+        return null; 
+    }
+
+    @Transactional
+    public void verifyAccount(String token) {
+        String email = jwtUtil.extractUsername(token);
+        Perfil perfil = perfilRepository.findByCorreo(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (perfil.getEstaActivo() != null && perfil.getEstaActivo()) {
+            throw new RuntimeException("La cuenta ya está activada");
+        }
+
+        perfil.setEstaActivo(true);
+        perfilRepository.save(perfil);
     }
 
     public AuthResponse refreshToken(String token) {
