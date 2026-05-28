@@ -158,16 +158,6 @@ const Support = () => {
                 support_agent
               </span>
             </div>
-            
-            <footer className="mt-16 pt-8 border-t border-black/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-              <p>© 2026 THE ACADEMIC EDITORIAL. ALL RIGHTS RESERVED.</p>
-              <div className="flex gap-6">
-                <a href="#" className="hover:text-primary transition-colors">PRIVACY POLICY</a>
-                <a href="#" className="hover:text-primary transition-colors">TERMS OF SERVICE</a>
-                <a href="#" className="hover:text-primary transition-colors">ACCESSIBILITY</a>
-                <a href="#" className="hover:text-primary transition-colors">CONTACT</a>
-              </div>
-            </footer>
           </div>
         </div>
       </div>
