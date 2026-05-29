@@ -8,7 +8,7 @@ const InsigniasComponent = ({ insignias, handleEditarInsignia }) => {
       {insignias.length === 0 ? (
         <p className="text-gray-500 text-sm">No hay insignias creadas todavía.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {insignias.map(badge => (
             <div key={badge.id} className="p-4 border border-outline-variant/10 rounded-xl bg-surface-container-low flex justify-between items-center group/item hover:border-academic-gold/30 transition-all">
               <div className="flex gap-3 items-center">

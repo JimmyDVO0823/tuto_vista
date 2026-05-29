@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UserTableComponent = ({ usuarios, handleToggleUsuario }) => {
+const UserTableComponent = ({ usuarios, handleToggleUsuario, totalElements }) => {
   return (
     <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl shadow-sm overflow-hidden">
       <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center bg-mini-gray">
@@ -8,7 +8,7 @@ const UserTableComponent = ({ usuarios, handleToggleUsuario }) => {
           <span className="material-symbols-outlined text-primary">group</span>
           Listado de Usuarios Registrados
         </h3>
-        <span className="text-xs text-gray-500 font-semibold bg-surface-container-low px-3 py-1 rounded">Total: {usuarios.length}</span>
+        <span className="text-xs text-gray-500 font-semibold bg-surface-container-low px-3 py-1 rounded">Total: {totalElements || usuarios.length}</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">

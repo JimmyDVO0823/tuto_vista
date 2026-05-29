@@ -1,13 +1,16 @@
 import React from 'react';
 
-const ReportsComponent = ({ reportes, handleResolverReporte }) => {
+const ReportsComponent = ({ reportes, handleResolverReporte, totalElements }) => {
   return (
     <div className="space-y-6">
       <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-bold text-primary font-display mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">gavel</span>
-          Reportes Pendientes de Revisión
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-bold text-primary font-display flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary">gavel</span>
+            Reportes Pendientes de Revisión
+          </h3>
+          <span className="text-xs text-gray-500 font-semibold bg-surface-container-low px-3 py-1 rounded">Total: {totalElements || reportes.length}</span>
+        </div>
         {reportes.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <span className="material-symbols-outlined text-gray-300 text-5xl mb-2">assignment_turned_in</span>

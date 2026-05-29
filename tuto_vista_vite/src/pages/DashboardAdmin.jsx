@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
 
@@ -14,6 +14,7 @@ import FAQCategoryFormComponent from '../components/admin/FAQCategoryFormCompone
 import FAQQuestionFormComponent from '../components/admin/FAQQuestionFormComponent';
 import FAQCategoryItemComponent from '../components/admin/FAQCategoryItemComponent';
 import FAQQuestionItemComponent from '../components/admin/FAQQuestionItemComponent';
+import Pagination from '../components/ui/Pagination/Pagination';
 
 const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState('usuarios'); // 'usuarios' | 'reportes' | 'insignias' | 'comision' | 'academic'
@@ -28,6 +29,21 @@ const DashboardAdmin = () => {
   const [departamentos, setDepartamentos] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [faqCategorias, setFaqCategorias] = useState([]);
+
+  // Pagination states
+  const [userPage, setUserPage] = useState(0);
+  const [userTotalPages, setUserTotalPages] = useState(0);
+  const [userTotalElements, setUserTotalElements] = useState(0);
+
+  const [reportPage, setReportPage] = useState(0);
+  const [reportTotalPages, setReportTotalPages] = useState(0);
+  const [reportTotalElements, setReportTotalElements] = useState(0);
+
+  const pageSize = 20;
+
+  // Hybrid pagination flags (if backend returns raw list, we slice on client)
+  const [isUserServerSide, setIsUserServerSide] = useState(true);
+  const [isReportServerSide, setIsReportServerSide] = useState(true);
 
   // Form states
   const [nuevaInsignia, setNuevaInsignia] = useState({
@@ -48,16 +64,57 @@ const DashboardAdmin = () => {
   const [nuevaFaqCat, setNuevaFaqCat] = useState({ nombre: '', icono: 'help' });
   const [nuevaPregunta, setNuevaPregunta] = useState({ tipoId: '', pregunta: '', respuesta: '' });
 
+  // Fetch users
+  const fetchUsers = useCallback(async (page = 0) => {
+    try {
+      const response = await api.get('/admin/usuarios', { page, size: pageSize });
+      if (response && response.content) {
+        setUsuarios(response.content);
+        setUserTotalPages(response.totalPages);
+        setUserTotalElements(response.totalElements);
+        setIsUserServerSide(true);
+      } else {
+        const list = response || [];
+        setUsuarios(list);
+        setUserTotalElements(list.length);
+        setUserTotalPages(Math.ceil(list.length / pageSize));
+        setIsUserServerSide(false);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
+  }, []);
+
+  // Fetch reports
+  const fetchReports = useCallback(async (page = 0) => {
+    try {
+      const response = await api.get('/reportes', { page, size: pageSize });
+      if (response && response.content) {
+        setReportes(response.content);
+        setReportTotalPages(response.totalPages);
+        setReportTotalElements(response.totalElements);
+        setIsReportServerSide(true);
+      } else {
+        const list = response || [];
+        setReportes(list);
+        setReportTotalElements(list.length);
+        setReportTotalPages(Math.ceil(list.length / pageSize));
+        setIsReportServerSide(false);
+      }
+    } catch (err) {
+      console.error('Error fetching reports:', err);
+    }
+  }, []);
+
   // Fetch initial data
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Load data in parallel depending on activeTab or load all
       const [usersData, reportsData, badgesData, commissionData, deptsData, subjectsData, faqData] = await Promise.all([
-        api.get('/admin/usuarios').catch(() => []),
-        api.get('/reportes').catch(() => []),
+        api.get('/admin/usuarios', { page: userPage, size: pageSize }).catch(() => ({ content: [], totalPages: 0 })),
+        api.get('/reportes', { page: reportPage, size: pageSize }).catch(() => ({ content: [], totalPages: 0 })),
         api.get('/insignias').catch(() => []),
         api.get('/configuracion/comision').catch(() => ({ comision: 0.10 })),
         api.get('/departamentos').catch(() => []),
@@ -65,8 +122,32 @@ const DashboardAdmin = () => {
         api.get('/faq').catch(() => [])
       ]);
 
-      setUsuarios(usersData || []);
-      setReportes(reportsData || []);
+      if (usersData?.content) {
+        setUsuarios(usersData.content);
+        setUserTotalPages(usersData.totalPages);
+        setUserTotalElements(usersData.totalElements);
+        setIsUserServerSide(true);
+      } else {
+        const list = usersData || [];
+        setUsuarios(list);
+        setUserTotalPages(Math.ceil(list.length / pageSize));
+        setUserTotalElements(list.length);
+        setIsUserServerSide(false);
+      }
+
+      if (reportsData?.content) {
+        setReportes(reportsData.content);
+        setReportTotalPages(reportsData.totalPages);
+        setReportTotalElements(reportsData.totalElements);
+        setIsReportServerSide(true);
+      } else {
+        const list = reportsData || [];
+        setReportes(list);
+        setReportTotalPages(Math.ceil(list.length / pageSize));
+        setReportTotalElements(list.length);
+        setIsReportServerSide(false);
+      }
+
       setInsignias(badgesData || []);
       setComision(Math.round((commissionData?.comision || 0.10) * 100));
       setDepartamentos(deptsData || []);
@@ -86,11 +167,24 @@ const DashboardAdmin = () => {
     } finally {
       setLoading(false);
     }
-  }, [nuevaMateria.departamentoId]);
+  }, [nuevaMateria.departamentoId, userPage, reportPage]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Derived data for hybrid pagination
+  const paginatedUsers = useMemo(() => {
+    if (isUserServerSide) return usuarios;
+    const start = userPage * pageSize;
+    return usuarios.slice(start, start + pageSize);
+  }, [usuarios, userPage, isUserServerSide]);
+
+  const paginatedReports = useMemo(() => {
+    if (isReportServerSide) return reportes;
+    const start = reportPage * pageSize;
+    return reportes.slice(start, start + pageSize);
+  }, [reportes, reportPage, isReportServerSide]);
 
   // Action: Toggle user status
   const handleToggleUsuario = async (userId, currentStatus) => {
@@ -98,7 +192,7 @@ const DashboardAdmin = () => {
       const nextStatus = !currentStatus;
       await api.patch(`/admin/usuarios/${userId}/estado?activo=${nextStatus}`);
       alert(`Usuario ${nextStatus ? 'activado' : 'desactivado'} con éxito.`);
-      fetchData();
+      fetchUsers(userPage);
     } catch (err) {
       alert(err.message || 'Error al cambiar el estado del usuario.');
     }
@@ -109,7 +203,7 @@ const DashboardAdmin = () => {
     try {
       await api.patch(`/reportes/${reportId}/estado?estado=RESUELTO`);
       alert('Reporte marcado como RESUELTO.');
-      fetchData();
+      fetchReports(reportPage);
     } catch (err) {
       alert(err.message || 'Error al actualizar el estado del reporte.');
     }
@@ -119,7 +213,6 @@ const DashboardAdmin = () => {
   const handleGuardarComision = async (e) => {
     e.preventDefault();
     try {
-      // Forzamos a que sea un número flotante válido para el backend (ej: 0.15)
       const porcentajeNumerico = parseInt(comision) || 0;
       const decValue = porcentajeNumerico / 100;
 
@@ -182,7 +275,6 @@ const DashboardAdmin = () => {
       condicionTipo: badge.condicionTipo,
       condicionValor: badge.condicionValor
     });
-    // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -279,17 +371,31 @@ const DashboardAdmin = () => {
     }
   };
 
+  const handleUserPageChange = (page) => {
+    setUserPage(page);
+    if (isUserServerSide) {
+      fetchUsers(page);
+    }
+  };
+
+  const handleReportPageChange = (page) => {
+    setReportPage(page);
+    if (isReportServerSide) {
+      fetchReports(page);
+    }
+  };
+
   return (
     <MainLayout>
-      <main className="p-4 md:p-10 max-w-7xl mx-auto min-h-screen">
-        <header className="mb-8">
+      <main className="p-4 md:p-8 w-full min-h-screen bg-surface">
+        <header className="mb-8 px-2">
           <span className="text-xs font-bold text-academic-gold uppercase tracking-widest mb-2 block">Administración</span>
           <h1 className="text-3xl md:text-5xl font-extrabold text-primary tracking-tight font-display my-2">Panel de Control</h1>
           <p className="text-gray-500 text-sm">Gestiona insignias, reportes, usuarios, comisiones y la oferta académica.</p>
         </header>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-outline-variant/10 mb-8 overflow-x-auto whitespace-nowrap">
+        <div className="flex border-b border-outline-variant/10 mb-8 overflow-x-auto whitespace-nowrap px-2">
           {[
             { id: 'usuarios', label: 'Usuarios', icon: 'group' },
             { id: 'reportes', label: 'Reportes', icon: 'gavel' },
@@ -319,22 +425,44 @@ const DashboardAdmin = () => {
         )}
 
         {error && (
-          <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-xl mb-8 flex items-center gap-3">
+          <div className="bg-red-50 text-red-700 border border-red-200 p-4 rounded-xl mb-8 flex items-center gap-3 mx-2">
             <span className="material-symbols-outlined">error</span>
             <p className="text-sm font-semibold">{error}</p>
           </div>
         )}
 
         {!loading && !error && (
-          <section className="mt-4">
+          <section className="mt-4 px-2">
             {/* TABS 1: USUARIOS */}
             {activeTab === 'usuarios' && (
-              <UserTableComponent usuarios={usuarios} handleToggleUsuario={handleToggleUsuario} />
+              <div className="space-y-4">
+                <UserTableComponent 
+                  usuarios={paginatedUsers} 
+                  handleToggleUsuario={handleToggleUsuario} 
+                  totalElements={userTotalElements}
+                />
+                <Pagination 
+                  currentPage={userPage} 
+                  totalPages={userTotalPages} 
+                  onPageChange={handleUserPageChange} 
+                />
+              </div>
             )}
 
             {/* TABS 2: REPORTES */}
             {activeTab === 'reportes' && (
-              <ReportsComponent reportes={reportes} handleResolverReporte={handleResolverReporte} />
+              <div className="space-y-4">
+                <ReportsComponent 
+                  reportes={paginatedReports} 
+                  handleResolverReporte={handleResolverReporte} 
+                  totalElements={reportTotalElements}
+                />
+                <Pagination 
+                  currentPage={reportPage} 
+                  totalPages={reportTotalPages} 
+                  onPageChange={handleReportPageChange} 
+                />
+              </div>
             )}
 
             {/* TABS 3: INSIGNIAS */}
