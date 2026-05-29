@@ -26,14 +26,7 @@ public class EmailService {
     @Value("${brevo.sender.name}")
     private String senderName;
 
-    private final RestTemplate restTemplate;
-
-    public EmailService() {
-        org.springframework.http.client.SimpleClientHttpRequestFactory factory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(5000); // 5 segundos
-        factory.setReadTimeout(5000);    // 5 segundos
-        this.restTemplate = new RestTemplate(factory);
-    }
+    private final RestTemplate restTemplate = new RestTemplate();
 
     /**
      * Envía un correo electrónico en formato HTML para verificación de cuenta usando la API REST de Brevo.

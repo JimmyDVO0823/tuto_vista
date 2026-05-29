@@ -3,7 +3,6 @@ package com.tutorias.tutorias_backend.controllers;
 import com.tutorias.tutorias_backend.dto.AuthResponse;
 import com.tutorias.tutorias_backend.dto.LoginRequest;
 import com.tutorias.tutorias_backend.dto.RegisterRequest;
-import com.tutorias.tutorias_backend.repositories.PerfilRepository;
 import com.tutorias.tutorias_backend.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,20 +22,10 @@ public class AuthController {
 
     private final AuthService authService;
 
-    private final PerfilRepository perfilRepository;
-
     @GetMapping("/test")
-    @Operation(summary = "Endpoint de salud del sistema")
-    public ResponseEntity<Map<String, Object>> test() {
-        Map<String, Object> status = new HashMap<>();
-        status.put("backend", "online");
-        try {
-            long count = perfilRepository.count();
-            status.put("database", "online (users: " + count + ")");
-        } catch (Exception e) {
-            status.put("database", "ERROR: " + e.getMessage());
-        }
-        return ResponseEntity.ok(status);
+    @Operation(summary = "Endpoint de prueba para verificar conexión")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Conexión exitosa con el backend");
     }
 
     @PostMapping("/login")
