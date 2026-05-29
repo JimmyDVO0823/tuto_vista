@@ -105,7 +105,7 @@ const MyTutorsHistory = () => {
 
   return (
     <MainLayout>
-      <main className="p-4 md:p-10 max-w-7xl mx-auto min-h-screen">
+      <main className="p-4 md:p-10 min-h-screen">
         <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="max-w-2xl">
             <span className="text-xs font-bold text-academic-gold uppercase tracking-widest mb-2 block">Académico</span>

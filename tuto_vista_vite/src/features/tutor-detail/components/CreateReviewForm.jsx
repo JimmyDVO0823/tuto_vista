@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 
 const CreateReviewForm = ({ tutorId, estudianteId, onCancel, onSuccess }) => {
   const [puntuacion, setPuntuacion] = useState(5);
+  const [hoverValue, setHoverValue] = useState(null);
   const [comentario, setComentario] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,26 +51,45 @@ const CreateReviewForm = ({ tutorId, estudianteId, onCancel, onSuccess }) => {
           Puntuación
         </label>
         <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              type="button"
-              onClick={() => setPuntuacion(star)}
-              className={`text-2xl transition-all ${star <= puntuacion ? "text-academic-gold scale-110" : "text-gray-300 hover:text-academic-gold/50"}`}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{
-                  fontVariationSettings:
-                    star <= puntuacion ? "'FILL' 1" : "'FILL' 0",
-                }}
+          {[1, 2, 3, 4, 5].map((star) => {
+            const displayValue = hoverValue ?? puntuacion;
+            const isFull = star <= displayValue;
+            const isHalf = star - 0.5 === displayValue;
+
+            return (
+              <div 
+                key={star} 
+                className="relative w-8 h-8 flex items-center justify-center transition-transform hover:scale-110"
               >
-                star
-              </span>
-            </button>
-          ))}
-          <span className="ml-4 text-xl font-black text-primary font-display">
-            {puntuacion}.0
+                {/* Zonas de clic para media estrella */}
+                <div 
+                  className="absolute left-0 top-0 w-1/2 h-full z-20 cursor-pointer"
+                  onClick={() => setPuntuacion(star - 0.5)}
+                  onMouseEnter={() => setHoverValue(star - 0.5)}
+                  onMouseLeave={() => setHoverValue(null)}
+                />
+                <div 
+                  className="absolute right-0 top-0 w-1/2 h-full z-20 cursor-pointer"
+                  onClick={() => setPuntuacion(star)}
+                  onMouseEnter={() => setHoverValue(star)}
+                  onMouseLeave={() => setHoverValue(null)}
+                />
+
+                <span
+                  className={`material-symbols-outlined text-3xl select-none transition-colors ${
+                    isFull || isHalf ? "text-academic-gold" : "text-gray-300"
+                  }`}
+                  style={{
+                    fontVariationSettings: isFull ? "'FILL' 1" : "'FILL' 0",
+                  }}
+                >
+                  {isFull ? "star" : isHalf ? "star_half" : "star"}
+                </span>
+              </div>
+            );
+          })}
+          <span className="ml-4 text-xl font-black text-primary font-display min-w-[3rem]">
+            {puntuacion.toFixed(1)}
           </span>
         </div>
       </div>

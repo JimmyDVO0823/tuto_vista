@@ -43,7 +43,7 @@ const Support = () => {
 
   return (
     <MainLayout>
-      <div className="w-full max-w-7xl mx-auto p-6 animate-in fade-in duration-700">
+      <div className="w-full p-6 animate-in fade-in duration-700">
         
         {/* Header Area */}
         <header className="mb-16 flex flex-col md:flex-row justify-between items-center gap-8">

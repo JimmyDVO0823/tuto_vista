@@ -332,7 +332,7 @@ const TutorAgendaDetail = () => {
 
   return (
     <MainLayout>
-      <main className="flex-1 p-4 md:p-12 min-h-screen max-w-7xl mx-auto">
+      <main className="flex-1 p-4 md:p-12 min-h-screen">
         <TutorHero tutor={tutor} />
 
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
