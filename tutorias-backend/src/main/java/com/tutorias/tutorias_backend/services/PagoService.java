@@ -1,5 +1,9 @@
 package com.tutorias.tutorias_backend.services;
 
+import com.mercadopago.client.preference.PreferenceClient;
+import com.mercadopago.client.preference.PreferenceItemRequest;
+import com.mercadopago.client.preference.PreferenceRequest;
+import com.mercadopago.resources.preference.Preference;
 import com.tutorias.tutorias_backend.dto.PagoDTO;
 import com.tutorias.tutorias_backend.entities.*;
 import com.tutorias.tutorias_backend.enums.EstadoPago;
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -106,6 +111,40 @@ public class PagoService {
                 msg2);
 
         return toDTO(guardadoPago);
+    }
+
+    @Transactional
+    public String crearPreferencia(Long solicitudId) {
+        Solicitud solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
+
+        if (solicitud.getEstado() != com.tutorias.tutorias_backend.enums.EstadoSolicitud.aceptada) {
+            throw new RuntimeException("La solicitud no está aceptada por el tutor.");
+        }
+
+        try {
+            PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
+                    .id(solicitud.getId().toString())
+                    .title("Tutoría de " + solicitud.getMateria().getNombre())
+                    .description("Sesión de tutoría programada")
+                    .quantity(1)
+                    .currencyId("COP")
+                    .unitPrice(BigDecimal.valueOf(Math.round((solicitud.getDuracionMin() / 60.0) * solicitud.getTutor().getPrecioPorHora().doubleValue())))
+                    .build();
+
+            PreferenceRequest preferenceRequest = PreferenceRequest.builder()
+                    .items(Collections.singletonList(itemRequest))
+                    .notificationUrl("https://webhook.site/placeholder") // Para futuro uso
+                    .backUrls(null) // Opcional: configurar URLs de retorno
+                    .build();
+
+            PreferenceClient client = new PreferenceClient();
+            Preference preference = client.create(preferenceRequest);
+
+            return preference.getInitPoint();
+        } catch (Exception e) {
+            throw new RuntimeException("Error al crear la preferencia de Mercado Pago: " + e.getMessage());
+        }
     }
 
     public List<PagoDTO> getByTutor(Long tutorId) {

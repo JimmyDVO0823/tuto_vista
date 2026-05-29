@@ -6,24 +6,27 @@ export const BotonPagoSimulado = ({ monto, solicitudId, onPagoExitoso }) => {
 
   const handlePagar = async () => {
     setLoading(true);
-    console.log(`Iniciando pago SIMULADO para solicitud ${solicitudId} por $${monto}`);
+    console.log(`Iniciando checkout de Mercado Pago para solicitud ${solicitudId} por $${monto}`);
     
     try {
-      // Llamamos al nuevo endpoint de simulación
-      await api.post('/pagos/simular', { solicitudId });
+      // Obtenemos la preferencia desde el backend
+      const response = await api.get(`/pagos/preferencia/${solicitudId}`);
       
-      console.log("Pago simulado completado con éxito");
-      
-      if (onPagoExitoso) {
-        onPagoExitoso();
+      if (response && response.init_point) {
+        console.log("Preferencia creada con éxito, redirigiendo a Mercado Pago...");
+        // Abrir Mercado Pago en una nueva pestaña
+        window.open(response.init_point, '_blank');
+        
+        // Opcional: Podrías llamar a onPagoExitoso si el flujo fuera puramente simulado, 
+        // pero aquí el usuario quiere la pestaña de Mercado Pago.
+        // onPagoExitoso(); 
       } else {
-        // Recargar para ver cambios si no hay callback
-        window.location.reload();
+        throw new Error("No se recibió el punto de inicio de Mercado Pago.");
       }
       
     } catch (error) {
-      console.error("Error en el pago simulado:", error);
-      alert("Error al procesar el pago simulado.");
+      console.error("Error al iniciar el pago con Mercado Pago:", error);
+      alert("Error al procesar el pago con Mercado Pago. Por favor intente de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -37,10 +40,10 @@ export const BotonPagoSimulado = ({ monto, solicitudId, onPagoExitoso }) => {
         className="w-full signature-gradient text-white px-4 py-3.5 rounded-md font-bold text-sm shadow-md hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
       >
         <span className="material-symbols-outlined text-lg">payments</span>
-        {loading ? 'Procesando simulación...' : `Pagar Tutoría ($${Math.round(monto).toLocaleString()})`}
+        {loading ? 'Preparando pago...' : `Pagar con Mercado Pago ($${Math.round(monto).toLocaleString()})`}
       </button>
       <p className="text-[10px] text-primary/60 text-center italic font-medium">
-        Modo de Prueba: Simulación de pago instantánea habilitada.
+        Serás redirigido a la pestaña de pago seguro de Mercado Pago.
       </p>
     </div>
   );
