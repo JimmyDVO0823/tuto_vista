@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/error").permitAll()
                         // Endpoints públicos según backend.md regla 11
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/tutores/**", "/materias/**", "/departamentos/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/tutores/**", "/materias/**", "/departamentos/**", "/faq").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/pagos/**").permitAll()
                         .anyRequest().authenticated())

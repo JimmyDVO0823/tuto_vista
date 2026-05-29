@@ -15,6 +15,7 @@ const DashboardAdmin = () => {
   const [comision, setComision] = useState(10); // percentage representation (e.g., 10%)
   const [departamentos, setDepartamentos] = useState([]);
   const [materias, setMaterias] = useState([]);
+  const [faqCategorias, setFaqCategorias] = useState([]);
 
   // Form states
   const [nuevaInsignia, setNuevaInsignia] = useState({
@@ -32,6 +33,9 @@ const DashboardAdmin = () => {
     departamentoId: ''
   });
 
+  const [nuevaFaqCat, setNuevaFaqCat] = useState({ nombre: '', icono: 'help' });
+  const [nuevaPregunta, setNuevaPregunta] = useState({ tipoId: '', pregunta: '', respuesta: '' });
+
   // Fetch initial data
   const fetchData = useCallback(async () => {
     try {
@@ -45,7 +49,8 @@ const DashboardAdmin = () => {
         api.get('/insignias').catch(() => []),
         api.get('/configuracion/comision').catch(() => ({ comision: 0.10 })),
         api.get('/departamentos').catch(() => []),
-        api.get('/materias').catch(() => [])
+        api.get('/materias').catch(() => []),
+        api.get('/faq').catch(() => [])
       ]);
 
       setUsuarios(usersData || []);
@@ -54,6 +59,11 @@ const DashboardAdmin = () => {
       setComision(Math.round((commissionData?.comision || 0.10) * 100));
       setDepartamentos(deptsData || []);
       setMaterias(subjectsData || []);
+      setFaqCategorias(faqData || []);
+
+      if (faqData && faqData.length > 0 && !nuevaPregunta.tipoId) {
+        setNuevaPregunta(prev => ({ ...prev, tipoId: faqData[0].id }));
+      }
 
       if (deptsData && deptsData.length > 0 && !nuevaMateria.departamentoId) {
         setNuevaMateria(prev => ({ ...prev, departamentoId: deptsData[0].id }));
@@ -175,34 +185,54 @@ const DashboardAdmin = () => {
     });
   };
 
-  // Action: Create department
-  const handleCrearDepartamento = async (e) => {
+  // Action: Create FAQ Category
+  const handleCrearFaqCat = async (e) => {
     e.preventDefault();
-    if (!nuevoDept.trim()) return;
+    if (!nuevaFaqCat.nombre.trim()) return;
     try {
-      await api.post('/departamentos', { nombre: nuevoDept });
-      alert('Departamento agregado correctamente.');
-      setNuevoDept('');
+      await api.post('/faq/tipos', nuevaFaqCat);
+      alert('Categoría de FAQ creada.');
+      setNuevaFaqCat({ nombre: '', icono: 'help' });
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al crear el departamento.');
+      alert('Error al crear categoría.');
     }
   };
 
-  // Action: Create subject
-  const handleCrearMateria = async (e) => {
-    e.preventDefault();
-    if (!nuevaMateria.nombre.trim() || !nuevaMateria.departamentoId) return;
+  const handleEliminarFaqCat = async (id) => {
+    if (!window.confirm('¿Eliminar esta categoría y todas sus preguntas?')) return;
     try {
-      await api.post('/materias', {
-        nombre: nuevaMateria.nombre,
-        departamento_id: parseInt(nuevaMateria.departamentoId)
-      });
-      alert('Materia agregada correctamente.');
-      setNuevaMateria(prev => ({ ...prev, nombre: '' }));
+      await api.delete(`/faq/tipos/${id}`);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al crear la materia.');
+      alert('Error al eliminar categoría.');
+    }
+  };
+
+  // Action: Create FAQ Question
+  const handleCrearPregunta = async (e) => {
+    e.preventDefault();
+    if (!nuevaPregunta.pregunta.trim() || !nuevaPregunta.respuesta.trim() || !nuevaPregunta.tipoId) return;
+    try {
+      await api.post('/faq/preguntas', {
+        ...nuevaPregunta,
+        tipoId: parseInt(nuevaPregunta.tipoId)
+      });
+      alert('Pregunta agregada.');
+      setNuevaPregunta(prev => ({ ...prev, pregunta: '', respuesta: '' }));
+      fetchData();
+    } catch (err) {
+      alert('Error al crear pregunta.');
+    }
+  };
+
+  const handleEliminarPregunta = async (id) => {
+    if (!window.confirm('¿Eliminar esta pregunta?')) return;
+    try {
+      await api.delete(`/faq/preguntas/${id}`);
+      fetchData();
+    } catch (err) {
+      alert('Error al eliminar pregunta.');
     }
   };
 
@@ -222,7 +252,8 @@ const DashboardAdmin = () => {
             { id: 'reportes', label: 'Reportes', icon: 'gavel' },
             { id: 'insignias', label: 'Insignias', icon: 'verified' },
             { id: 'comision', label: 'Comisión Plataforma', icon: 'percent' },
-            { id: 'academic', label: 'Departamentos y Materias', icon: 'auto_stories' }
+            { id: 'academic', label: 'Departamentos y Materias', icon: 'auto_stories' },
+            { id: 'faq', label: 'Preguntas Frecuentes', icon: 'quiz' }
           ].map(tab => (
             <button
               key={tab.id}
@@ -615,6 +646,118 @@ const DashboardAdmin = () => {
                   </div>
                 </div>
 
+              </div>
+            )}
+
+            {/* TABS 6: FAQ */}
+            {activeTab === 'faq' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Categorías FAQ */}
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-6 shadow-sm flex flex-col">
+                  <h3 className="text-lg font-bold text-primary font-display mb-4">Categorías de FAQ</h3>
+                  
+                  <form onSubmit={handleCrearFaqCat} className="space-y-4 mb-8">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Nombre</label>
+                        <input
+                          type="text"
+                          value={nuevaFaqCat.nombre}
+                          onChange={e => setNuevaFaqCat({ ...nuevaFaqCat, nombre: e.target.value })}
+                          className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary"
+                          placeholder="Ej. Pagos y seguridad"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Icono (Material)</label>
+                        <input
+                          type="text"
+                          value={nuevaFaqCat.icono}
+                          onChange={e => setNuevaFaqCat({ ...nuevaFaqCat, icono: e.target.value })}
+                          className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary"
+                          placeholder="Ej. shield_lock"
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" className="w-full py-2.5 signature-gradient text-white rounded text-xs font-bold shadow transition-all">
+                      Crear Categoría
+                    </button>
+                  </form>
+
+                  <div className="space-y-3 max-h-96 overflow-y-auto no-scrollbar">
+                    {faqCategorias.map(cat => (
+                      <div key={cat.id} className="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border border-outline-variant/5 transition-all hover:border-academic-gold/20">
+                        <div className="flex items-center gap-3">
+                          <span className="material-symbols-outlined text-academic-gold">{cat.icono || 'help'}</span>
+                          <span className="font-bold text-sm text-primary">{cat.nombre}</span>
+                        </div>
+                        <button onClick={() => handleEliminarFaqCat(cat.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-all">
+                          <span className="material-symbols-outlined text-base">delete</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Preguntas */}
+                <div className="bg-surface-container-lowest border border-outline-variant/10 rounded-2xl p-6 shadow-sm flex flex-col">
+                  <h3 className="text-lg font-bold text-primary font-display mb-4">Preguntas y Respuestas</h3>
+
+                  <form onSubmit={handleCrearPregunta} className="space-y-4 mb-8">
+                    <div>
+                      <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Categoría</label>
+                      <select
+                        value={nuevaPregunta.tipoId}
+                        onChange={e => setNuevaPregunta({ ...nuevaPregunta, tipoId: e.target.value })}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary"
+                      >
+                        <option value="">Selecciona una categoría</option>
+                        {faqCategorias.map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Pregunta</label>
+                      <input
+                        type="text"
+                        value={nuevaPregunta.pregunta}
+                        onChange={e => setNuevaPregunta({ ...nuevaPregunta, pregunta: e.target.value })}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary"
+                        placeholder="Ej. ¿Cómo cambio mi contraseña?"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-elegant-gray uppercase block mb-1">Respuesta</label>
+                      <textarea
+                        value={nuevaPregunta.respuesta}
+                        onChange={e => setNuevaPregunta({ ...nuevaPregunta, respuesta: e.target.value })}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded border border-outline-variant/30 text-sm text-primary h-24"
+                        placeholder="Escribe la respuesta detallada..."
+                      />
+                    </div>
+                    <button type="submit" className="w-full py-2.5 signature-gradient text-white rounded text-xs font-bold shadow transition-all">
+                      Añadir Pregunta
+                    </button>
+                  </form>
+
+                  <div className="space-y-4 max-h-96 overflow-y-auto no-scrollbar">
+                    {faqCategorias.flatMap(cat => (cat.preguntas || []).map(p => (
+                      <div key={p.id} className="p-4 border border-outline-variant/10 rounded-xl bg-surface-container-low/50 group hover:border-primary/20 transition-all">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-[10px] font-bold text-academic-gold uppercase border border-academic-gold/20 px-2 py-0.5 rounded">
+                            {cat.nombre}
+                          </span>
+                          <button onClick={() => handleEliminarPregunta(p.id)} className="opacity-0 group-hover:opacity-100 text-red-500 transition-all p-1 hover:bg-red-50 rounded">
+                            <span className="material-symbols-outlined text-base">delete</span>
+                          </button>
+                        </div>
+                        <h4 className="font-bold text-sm text-primary mb-1">{p.pregunta}</h4>
+                        <p className="text-xs text-on-surface-variant opacity-70 line-clamp-2">{p.respuesta}</p>
+                      </div>
+                    )))}
+                  </div>
+                </div>
               </div>
             )}
 
