@@ -40,13 +40,14 @@ public class SecurityConfig {
                                         "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
                                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
                                         "img-src 'self' data:; " +
-                                        "connect-src 'self'; " +
+                                        "connect-src 'self' ws: wss:; " +
                                         "frame-src 'self'; " +
                                         "object-src 'none'; " +
                                         "base-uri 'self'; " +
                                         "form-action 'self';")))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/error").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         // Endpoints públicos según backend.md regla 11
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/tutores/**", "/materias/**", "/departamentos/**", "/faq").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
