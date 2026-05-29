@@ -43,7 +43,7 @@ const DashboardAdmin = () => {
       setError(null);
 
       // Load data in parallel depending on activeTab or load all
-      const [usersData, reportsData, badgesData, commissionData, deptsData, subjectsData] = await Promise.all([
+      const [usersData, reportsData, badgesData, commissionData, deptsData, subjectsData, faqData] = await Promise.all([
         api.get('/admin/usuarios').catch(() => []),
         api.get('/reportes').catch(() => []),
         api.get('/insignias').catch(() => []),
