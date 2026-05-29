@@ -6,12 +6,16 @@
  * 'Academic Editorial' brand identity.
  */
 
+import { useNavigate } from "react-router-dom";
+
 /**
  * HeroSection Component.
  * 
  * @component
  */
 export default function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-[870px] flex items-center pt-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -28,11 +32,17 @@ export default function HeroSection() {
             Accede a tutorías de élite con expertos académicos. Diseñado para estudiantes que buscan profundidad, claridad y resultados excepcionales.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="signature-gradient text-white px-8 py-4 rounded-md font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-95">
+            <button 
+              onClick={() => navigate('/loginform')}
+              className="signature-gradient text-white px-8 py-4 rounded-md font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
+            >
               Empezar ahora
             </button>
-            <button className="px-8 py-4 text-primary font-bold text-lg flex items-center gap-2 hover:bg-surface-container-low rounded-md transition-colors">
-              Ver metodología <span className="material-symbols-outlined">arrow_forward</span>
+            <button 
+              onClick={() => navigate('/tutors')}
+              className="px-8 py-4 text-primary font-bold text-lg flex items-center gap-2 hover:bg-surface-container-low rounded-md transition-colors"
+            >
+              Ver tutores <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
         </div>

@@ -5,6 +5,8 @@
  * large-scale imagery and tonal overlays to create a 'gallery' feel.
  */
 
+import { Link } from "react-router-dom";
+
 /**
  * CategoriesSection Component.
  * 
@@ -19,7 +21,12 @@ export default function CategoriesSection() {
             <span className="text-[0.75rem] font-medium tracking-[0.05em] uppercase text-tertiary font-label">Especialidades</span>
             <h2 className="text-4xl font-extrabold font-headline text-primary mt-2">Áreas de Enfoque</h2>
           </div>
-          <a className="text-primary font-bold border-b-2 border-primary pb-1 hover:text-tertiary hover:border-tertiary transition-colors" href="#">Ver todas las materias</a>
+          <Link 
+            className="text-primary font-bold border-b-2 border-primary pb-1 hover:text-tertiary hover:border-tertiary transition-colors" 
+            to="/tutors"
+          >
+            Ver todas las materias
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-6 h-[600px]">
           {/* Math */}

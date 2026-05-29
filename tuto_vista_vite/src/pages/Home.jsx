@@ -14,7 +14,7 @@ const Home = () => {
         <HeroSection />
         <CategoriesSection />
         <HowItWorksSection />
-        <TestimonialsSection />
+        {/*<TestimonialsSection />*/}
         <CTASection />
       </div>
     </MainLayout>
