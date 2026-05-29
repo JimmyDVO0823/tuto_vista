@@ -57,7 +57,7 @@ const Support = () => {
             </p>
           </div>
           <div className="hidden md:flex flex-shrink-0 w-48 h-48 bg-surface-container-high rounded-full items-center justify-center">
-             <span className="material-symbols-outlined !text-[80px] text-primary">menu_book</span>
+             <span className="material-symbols-outlined !text-[80px] text-primary">question_mark</span>
           </div>
         </header>
 
