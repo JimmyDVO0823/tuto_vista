@@ -24,6 +24,7 @@ public class TutorController {
      */
     @GetMapping
     public ResponseEntity<com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO> getTutores(
+            @RequestParam(required = false) String nombre,
             @RequestParam(required = false) BigDecimal minPrecio,
             @RequestParam(required = false) BigDecimal maxPrecio,
             @RequestParam(required = false) BigDecimal minCalificacion,
@@ -32,7 +33,7 @@ public class TutorController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(
-                tutorService.getTutoresDisponibles(minPrecio, maxPrecio, minCalificacion, materiaId, departamentoId, page, size)
+                tutorService.getTutoresDisponibles(nombre, minPrecio, maxPrecio, minCalificacion, materiaId, departamentoId, page, size)
         );
     }
 

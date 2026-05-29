@@ -58,6 +58,7 @@ const TutorsExplorer = () => {
       setLoading(true);
 
       const params = {};
+      if (searchQuery) params.nombre = searchQuery;
       if (filters.minPrice) params.minPrecio = filters.minPrice;
       if (filters.maxPrice) params.maxPrecio = filters.maxPrice;
       if (filters.minRating) params.minCalificacion = filters.minRating;
@@ -75,14 +76,7 @@ const TutorsExplorer = () => {
         size: response.size || 10
       });
 
-      // Filtrar por nombre en el cliente (búsqueda rápida)
-      const filtered = searchQuery
-        ? data.filter(t =>
-          t.nombre_completo?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        : data;
-
-      const mappedTutors = filtered.map(t => ({
+      const mappedTutors = data.map(t => ({
         id: t.id,
         name: t.nombre_completo || 'Tutor Anónimo',
         image: t.url_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.nombre_completo || 'T')}&background=002045&color=fff`,
