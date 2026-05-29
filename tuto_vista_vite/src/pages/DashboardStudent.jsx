@@ -65,21 +65,27 @@ const DashboardStudent = () => {
     const activeSessions = sessions.filter(s => s.estado !== 'cancelada' && s.estado !== 'no_asistio');
     
     const formattedSessions = activeSessions.map((s) => {
-      const fechaLocalString = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, "") : "";
-      const fechaBase = new Date(fechaLocalString);
+      // Usamos el string original y eliminamos UTC/Z para tratarlo como local
+      const startStr = s.programadaPara ? s.programadaPara.replace(/Z$|\+00:00$/, "") : "";
+      const startDate = new Date(startStr);
+      
+      // Calculamos fin basado en duración
+      const endDate = new Date(startDate.getTime() + (s.duracionMin || 90) * 60000);
+      
+      // Formateamos horas para el tooltip/vista
+      const horaInicio = startDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      const horaFin = endDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-      const endBase = new Date(fechaBase.getTime() + (s.duracionMin || 60) * 60000);
-      const horaInicio = fechaBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-      const horaFin = endBase.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-
-      const pad = (num) => String(num).padStart(2, '0');
-      const endLocalString = `${endBase.getFullYear()}-${pad(endBase.getMonth() + 1)}-${pad(endBase.getDate())}T${pad(endBase.getHours())}:${pad(endBase.getMinutes())}:${pad(endBase.getSeconds())}`;
+      // IMPORTANTE: Para evitar que FullCalendar estire el block si cruza la medianoche en vista mes,
+      // formateamos el ISO local manualmente sin milisegundos si es posible
+      const pad = (n) => String(n).padStart(2, '0');
+      const toLocalISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
       return {
         id: `session-${s.id}`,
         title: `Tutoría: ${s.materiaNombre}`,
-        start: fechaLocalString,
-        end: endLocalString,
+        start: toLocalISO(startDate),
+        end: toLocalISO(endDate),
         extendedProps: {
           ...s,
           type: "Sesión",
@@ -98,26 +104,30 @@ const DashboardStudent = () => {
 
     const formattedCalendarSolicitudes = calendarSolicitudes.map((s) => {
       try {
-        const fecha = s.fechaPreferida;
-        const [hh, mm] = s.horaPreferida.split(':');
-        const horaInicioShort = `${hh.padStart(2, '0')}:${mm.padStart(2, '0')}`;
-        const startISO = `${fecha}T${horaInicioShort}:00`;
-        const hrsFinStr = String(Math.floor((parseInt(hh, 10) * 60 + parseInt(mm, 10) + (s.duracionMin || 60)) / 60)).padStart(2, '0');
-        const minsFinStr = String((parseInt(hh, 10) * 60 + parseInt(mm, 10) + (s.duracionMin || 60)) % 60).padStart(2, '0');
-        const endISO = `${fecha}T${hrsFinStr}:${minsFinStr}:00`;
+        const [yy, mm, dd] = s.fechaPreferida.split('-');
+        const [hh, min] = s.horaPreferida.split(':');
+        
+        const startDate = new Date(yy, mm - 1, dd, hh, min);
+        const endDate = new Date(startDate.getTime() + (s.duracionMin || 90) * 60000);
+
+        const pad = (n) => String(n).padStart(2, '0');
+        const toLocalISO = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+
+        const horaInicioShort = `${pad(hh)}:${pad(min)}`;
+        const horaFinShort = `${pad(endDate.getHours())}:${pad(endDate.getMinutes())}`;
 
         return {
           id: `solicitud-${s.id}`,
           title: s.estado?.toUpperCase() === "ACEPTADA" ? `⚠️ Pagar: ${s.materiaNombre}` : `Solicitud: ${s.materiaNombre}`,
-          start: startISO,
-          end: endISO,
+          start: toLocalISO(startDate),
+          end: toLocalISO(endDate),
           extendedProps: { 
             ...s, 
             type: "Solicitud", 
             category: s.materiaNombre, 
             status: s.estado, 
             statusLabel: s.estado?.toUpperCase() === "ACEPTADA" ? "Aceptada (Por Pagar)" : s.estado, 
-            time: `${horaInicioShort} - ${hrsFinStr}:${minsFinStr}`, 
+            time: `${horaInicioShort} - ${horaFinShort}`, 
             colorType: "academic-gold" 
           },
         };
