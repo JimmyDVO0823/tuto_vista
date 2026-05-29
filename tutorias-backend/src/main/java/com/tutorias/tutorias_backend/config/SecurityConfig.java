@@ -38,8 +38,8 @@ public class SecurityConfig {
                                 .policyDirectives(
                                         "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
                                         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; " +
-                                        "img-src 'self' data:; " +
-                                        "connect-src 'self' https://tutovista-production.up.railway.app https://api.brevo.com; " +
+                                        "img-src 'self' data: https:; " +
+                                        "connect-src *; " +
                                         "frame-src 'self'; " +
                                         "object-src 'none'; " +
                                         "base-uri 'self'; " +
@@ -79,13 +79,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
+        configuration.setAllowedOriginPatterns(Arrays.asList(
             "https://jimmydvo0823.github.io",
-            "http://localhost:5173",
-            "http://127.0.0.1:5173"
+            "http://localhost:[*]",
+            "http://127.0.0.1:[*]"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
