@@ -27,7 +27,7 @@ const PendingAssignments = ({ userId }) => {
   const fetchAssignments = async (page = 0) => {
     try {
       setLoading(true);
-      const response = await api.get(`/actividades/estudiante/${userId}/pendientes/paginado`, { page, size: 5 });
+      const response = await api.get(`/actividades/estudiante/${userId}/pendientes/paginado`, { page, size: 4 });
       setAssignmentsData(response);
     } catch (error) {
       console.error("Error fetching assignments:", error);

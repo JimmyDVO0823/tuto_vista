@@ -22,7 +22,7 @@ const PendingPayments = ({ userId, onSelectPayment }) => {
   const fetchPayments = async (page = 0) => {
     try {
       setLoading(true);
-      const response = await api.get(`/solicitudes/estudiante/${userId}/por-pagar`, { page, size: 5 });
+      const response = await api.get(`/solicitudes/estudiante/${userId}/por-pagar`, { page, size: 4 });
       setPaymentsData(response);
     } catch (error) {
       console.error("Error fetching payments:", error);

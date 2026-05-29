@@ -23,7 +23,7 @@ const NextSessions = ({ userId, isTutor = false }) => {
         ? `/sesiones/tutor/${userId}/proximas` 
         : `/sesiones/estudiante/${userId}/proximas`;
       
-      const response = await api.get(endpoint, { page, size: 5 });
+      const response = await api.get(endpoint, { page, size: 4 });
       setSessionsData(response);
     } catch (error) {
       console.error("Error fetching sessions:", error);
