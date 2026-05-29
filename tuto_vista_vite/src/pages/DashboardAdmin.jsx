@@ -185,6 +185,37 @@ const DashboardAdmin = () => {
     });
   };
 
+  // Action: Create department
+  const handleCrearDepartamento = async (e) => {
+    e.preventDefault();
+    if (!nuevoDept.trim()) return;
+    try {
+      await api.post('/departamentos', { nombre: nuevoDept });
+      alert('Departamento agregado correctamente.');
+      setNuevoDept('');
+      fetchData();
+    } catch (err) {
+      alert(err.message || 'Error al crear el departamento.');
+    }
+  };
+
+  // Action: Create subject
+  const handleCrearMateria = async (e) => {
+    e.preventDefault();
+    if (!nuevaMateria.nombre.trim() || !nuevaMateria.departamentoId) return;
+    try {
+      await api.post('/materias', {
+        nombre: nuevaMateria.nombre,
+        departamento_id: parseInt(nuevaMateria.departamentoId)
+      });
+      alert('Materia agregada correctamente.');
+      setNuevaMateria(prev => ({ ...prev, nombre: '' }));
+      fetchData();
+    } catch (err) {
+      alert(err.message || 'Error al crear la materia.');
+    }
+  };
+
   // Action: Create FAQ Category
   const handleCrearFaqCat = async (e) => {
     e.preventDefault();
