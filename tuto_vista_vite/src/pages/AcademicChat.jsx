@@ -12,18 +12,20 @@ import { api } from '../services/api';
 
 export default function AcademicChat() {
   const { user } = useAuth();
-  
+
   // 2. ESTADOS DE CONTROL
+  const [isLoadingConversations, setIsLoadingConversations] = useState(true);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [activeConversationId, setActiveConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   const messagesEndRef = useRef(null);
 
-  // Obtener conversaciones del usuario
   useEffect(() => {
     if (user?.id) {
+      setIsLoadingConversations(true);
       api.get(`/chat/conversaciones/${user.id}`)
         .then(data => {
           setConversations(data || []);
@@ -31,16 +33,19 @@ export default function AcademicChat() {
             setActiveConversationId(data[0].id);
           }
         })
-        .catch(err => console.error('Error fetching conversations:', err));
+        .catch(err => console.error('Error fetching conversations:', err))
+        .finally(() => setIsLoadingConversations(false)); // Apagar loading
     }
   }, [user]);
 
-  // Obtener mensajes de la conversación activa
+  // Obtener mensajes
   useEffect(() => {
     if (activeConversationId) {
+      setIsLoadingMessages(true);
       api.get(`/chat/mensajes/${activeConversationId}`)
         .then(data => setMessages(data || []))
-        .catch(err => console.error('Error fetching messages:', err));
+        .catch(err => console.error('Error fetching messages:', err))
+        .finally(() => setIsLoadingMessages(false)); // Apagar loading
     }
   }, [activeConversationId]);
 
@@ -73,7 +78,7 @@ export default function AcademicChat() {
 
   const handleAbandonConversation = async () => {
     if (!activeConversationId || !user?.id) return;
-    
+
     if (window.confirm("¿Estás seguro de que deseas darte de baja de este chat? Ya no verás esta conversación en tu lista.")) {
       try {
         await api.delete(`/chat/conversacion/${activeConversationId}/${user.id}`);
@@ -103,7 +108,7 @@ export default function AcademicChat() {
     return {
       id: c.id,
       name: otherP?.nombreCompleto || 'Unknown',
-      avatarUrl: otherP?.urlAvatar || 'https://via.placeholder.com/150',
+      avatarUrl: otherP?.urlAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(otherP?.nombreCompleto || 'U')}&background=random&color=fff`,
       isOnline: true, // Placeholder
       lastMessageTime: c.ultimoMensaje ? new Date(c.ultimoMensaje.creadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
       lastMessageText: c.ultimoMensaje?.contenido || 'No messages yet'
@@ -115,73 +120,83 @@ export default function AcademicChat() {
   );
 
   return (
-  <MainLayout>            
-    <main className="flex-1 flex h-screen overflow-hidden">
-      
-      {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
-      <section className="hidden md:flex md:w-80 lg:w-96 h-full bg-surface flex-col z-10 flex-shrink-0">
-        <header className="p-8 pb-4">
-          <h2 className="font-headline font-extrabold text-2xl tracking-tight mb-6">Messages</h2>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
-            <input 
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-container-low border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-container" 
-              placeholder="Search contacts..." 
+    <MainLayout>
+      <main className="flex-1 flex h-full overflow-hidden">
+
+        {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
+        <section className="hidden md:flex md:w-80 lg:w-96 h-full bg-surface flex-col z-10 flex-shrink-0">
+          <header className="p-8 pb-4">
+            <h2 className="font-headline font-extrabold text-2xl tracking-tight mb-6">Messages</h2>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-surface-container-low border-none rounded-xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-container"
+                placeholder="Search contacts..."
+              />
+            </div>
+          </header>
+
+          {/* Menú de Contactos */}
+          <div className="flex-1 overflow-y-auto pb-8">
+            <ContactMenu
+              contacts={filteredContacts}
+              activeContactId={activeConversationId}
+              onContactSelect={(id) => setActiveConversationId(id)}
             />
           </div>
-        </header>
+        </section>
 
-        {/* Menú de Contactos */}
-        <div className="flex-1 overflow-y-auto pb-8">
-          <ContactMenu 
-            contacts={filteredContacts} 
-            activeContactId={activeConversationId} 
-            onContactSelect={(id) => setActiveConversationId(id)} 
-          />
-        </div>
-      </section>
+        {/* SECCIÓN C: FLUJO Y CONTENEDOR DE CHAT EN VIVO */}
+        <section className="flex-1 h-full bg-surface-container-low flex flex-col relative">
 
-      {/* SECCIÓN C: FLUJO Y CONTENEDOR DE CHAT EN VIVO */}
-      <section className="flex-1 h-full bg-surface-container-low flex flex-col relative">
-        
-        {/* Cabecera del Chat Activo */}
-        {otherParticipant ? (
-          <ChatHeader 
-            name={otherParticipant.nombreCompleto}
-            specialty={otherParticipant.rol}
-            avatarUrl={otherParticipant.urlAvatar}
-            isOnline={true}
-            onAction={handleHeaderAction}
-          />
-        ) : (
-          <div className="h-24 px-4 md:px-10 flex items-center bg-surface-container-lowest">
-            <p className="text-gray-400 italic">Select a conversation</p>
-          </div>
-        )}
-
-        {/* Caja de Flujo de Mensajes */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6">
-          {messages.map((msg) => (
-            <MessageBubble 
-              key={msg.id}
-              text={msg.contenido}
-              timestamp={new Date(msg.creadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              isSent={msg.remitenteId === user?.id}
-              isRead={msg.leido}
+          {/* Cabecera del Chat Activo */}
+          {isLoadingConversations ? (
+            // Mantén la altura fija para que no salte (ej: h-24)
+            <div className="h-24 px-4 md:px-10 flex items-center bg-surface-container-lowest">
+              <p className="text-gray-400 italic animate-pulse">Cargando chat...</p>
+            </div>
+          ) : otherParticipant ? (
+            <ChatHeader
+              name={otherParticipant.nombreCompleto}
+              specialty={otherParticipant.rol}
+              avatarUrl={otherParticipant.urlAvatar}
+              isOnline={true}
+              onAction={handleHeaderAction}
             />
-          ))}
-          
-          <div ref={messagesEndRef} />
-        </div>
+          ) : (
+            <div className="h-24 px-4 md:px-10 flex items-center bg-surface-container-lowest">
+              <p className="text-gray-400 italic">Select a conversation</p>
+            </div>
+          )}
 
-        {/* Barra de Escribir Mensaje */}
-        <MessageInputBar onSendMessage={handleSendMessage} />
+          {/* Caja de Flujo de Mensajes */}
+          <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6">
+            {isLoadingMessages ? (
+              <div className="flex justify-center items-center h-full">
+                <p className="text-gray-500">Cargando mensajes...</p>
+              </div>
+            ) : (
+              messages.map((msg) => (
+                <MessageBubble
+                  key={msg.id}
+                  text={msg.contenido}
+                  timestamp={new Date(msg.creadoEn).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  isSent={msg.remitenteId === user?.id}
+                  isRead={msg.leido}
+                />
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </div>
 
-      </section>
-    </main>
-  </MainLayout>
-);
+          {/* Barra de Escribir Mensaje */}
+          <MessageInputBar onSendMessage={handleSendMessage} />
+
+        </section>
+      </main>
+    </MainLayout>
+  );
 }
