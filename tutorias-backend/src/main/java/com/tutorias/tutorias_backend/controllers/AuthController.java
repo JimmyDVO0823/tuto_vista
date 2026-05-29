@@ -18,6 +18,13 @@ import java.util.Map;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Autenticación", description = "Endpoints para Login y gestión de sesiones")
+// 🛠️ FIX DE CORS: Le indicamos explícitamente a Spring que permita conexiones desde estos dominios.
+// Nota: Cuando allowCredentials es true, NO se puede usar "*" en origins, se deben listar detalladamente.
+@CrossOrigin(
+    origins = { "https://jimmydvo0823.github.io", "http://localhost:5173", "http://127.0.0.1:5173" }, 
+    allowedHeaders = "*", 
+    allowCredentials = "true"
+)
 public class AuthController {
 
     private final AuthService authService;
