@@ -12,12 +12,17 @@ import java.util.List;
  * Controlador para operaciones relacionadas con el estudiante.
  */
 @RestController
-@RequestMapping("/api/v1/students")
+@RequestMapping("/estudiantes")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class StudentController {
 
     private final StudentService studentService;
+
+    @GetMapping("/{id}/dashboard-stats")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.StudentStatsDTO> getDashboardStats(@PathVariable Long id) {
+        return ResponseEntity.ok(studentService.getDashboardStats(id));
+    }
 
     @GetMapping("/{id}/sessions-progress")
     public ResponseEntity<SemesterProgressResponseDTO> getSessionsProgress(@PathVariable Long id) {

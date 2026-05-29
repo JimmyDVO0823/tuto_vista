@@ -30,7 +30,7 @@ const SubjectsManagement = () => {
           setSubjects(data || []);
         } else {
           // Obtener materias reales del estudiante
-          const data = await api.get(`/api/v1/students/${user.id}/materias`);
+          const data = await api.get(`/estudiantes/${user.id}/materias`);
           setSubjects(data || []);
         }
       } catch (err) {

@@ -12,6 +12,7 @@ import com.tutorias.tutorias_backend.repositories.SesionTutoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import com.tutorias.tutorias_backend.dto.StudentStatsDTO;
 import java.time.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +26,35 @@ public class StudentService {
 
     private final SesionTutoriaRepository sesionTutoriaRepository;
     private final ActividadEstudianteRepository actividadEstudianteRepository;
+
+    public StudentStatsDTO getDashboardStats(Long studentId) {
+        OffsetDateTime now = OffsetDateTime.now();
+        List<SesionTutoria> allSessions = sesionTutoriaRepository.findByEstudianteId(studentId);
+
+        int upcomingSessionsCount = (int) allSessions.stream()
+                .filter(s -> s.getEstado() == EstadoSesion.programada && s.getProgramadaPara().isAfter(now))
+                .count();
+
+        // Cursos activos (materias únicas con sesiones no canceladas)
+        int activeCoursesCount = (int) allSessions.stream()
+                .filter(s -> s.getEstado() != EstadoSesion.cancelada)
+                .map(s -> s.getMateria().getId())
+                .distinct()
+                .count();
+
+        // Progreso semestral (usamos el de sesiones por defecto)
+        SemesterProgressResponseDTO progress = getSessionsProgress(studentId);
+        double progressPercentage = progress.getTotalCount() > 0 
+                ? (progress.getCompletedCount() * 100.0 / progress.getTotalCount()) 
+                : 0.0;
+
+        return StudentStatsDTO.builder()
+                .upcomingSessionsCount(upcomingSessionsCount)
+                .activeCoursesCount(activeCoursesCount)
+                .notificationCount(0) // TODO: Integrar con NotificacionRepository
+                .semesterProgress(progressPercentage)
+                .build();
+    }
 
     public SemesterProgressResponseDTO getSessionsProgress(Long studentId) {
         OffsetDateTime[] range = getSemesterRange();

@@ -6,7 +6,6 @@ import PendingPayments from "../features/dashboard/PendingPayments/PendingPaymen
 import AcademicCalendar from "../features/dashboard/AcademicCalendar/AcademicCalendar";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
-import NotificationWidget from "../features/dashboard/NotificationWidget/NotificationWidget";
 import SemesterProgressWidget from "../features/dashboard/SemesterProgressWidget/SemesterProgressWidget";
 
 const DashboardStudent = () => {
@@ -169,12 +168,12 @@ const DashboardStudent = () => {
             <SemesterProgressWidget 
               title="Tutorías del Semestre"
               metricLabel="Sesiones Tomadas"
-              endpoint="/students/{id}/sessions-progress"
+              endpoint="/estudiantes/{id}/sessions-progress"
             />
             <SemesterProgressWidget 
               title="Tareas y Actividades"
               metricLabel="Actividades Completadas"
-              endpoint="/students/{id}/activities-progress"
+              endpoint="/estudiantes/{id}/activities-progress"
             />
           </aside>
         </section>
