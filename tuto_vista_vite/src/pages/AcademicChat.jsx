@@ -9,6 +9,7 @@ import MainLayout from '../components/layout/MainLayout/MainLayout';
 
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import WebSocketService from '../services/WebSocketService';
 
 export default function AcademicChat() {
   const { user } = useAuth();
@@ -22,6 +23,39 @@ export default function AcademicChat() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const messagesEndRef = useRef(null);
+
+  // WebSocket Connection
+  useEffect(() => {
+    WebSocketService.connect(() => {
+      // If we already have an active conversation, subscribe immediately
+      if (activeConversationId) {
+        subscribeToActiveConversation(activeConversationId);
+      }
+    });
+
+    return () => {
+      WebSocketService.disconnect();
+    };
+  }, []);
+
+  const subscribeToActiveConversation = (id) => {
+    WebSocketService.subscribeToConversation(id, (newMsg) => {
+      setMessages(prev => {
+        // Prevent duplicate messages if the sender also appends it manually
+        // (Though in our new logic, the sender only appends via WS)
+        if (prev.some(m => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
+
+      // Update last message in the contact list
+      setConversations(prev => prev.map(c => {
+        if (c.id === id) {
+          return { ...c, ultimoMensaje: newMsg };
+        }
+        return c;
+      }));
+    });
+  };
 
   useEffect(() => {
     if (user?.id) {
@@ -38,14 +72,12 @@ export default function AcademicChat() {
     }
   }, [user]);
 
-  // Obtener mensajes
+  // Obtener mensajes de la conversación activa
   useEffect(() => {
     if (activeConversationId) {
-      setIsLoadingMessages(true);
       api.get(`/chat/mensajes/${activeConversationId}`)
         .then(data => setMessages(data || []))
-        .catch(err => console.error('Error fetching messages:', err))
-        .finally(() => setIsLoadingMessages(false)); // Apagar loading
+        .catch(err => console.error('Error fetching messages:', err));
     }
   }, [activeConversationId]);
 
@@ -57,23 +89,15 @@ export default function AcademicChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 4. MANEJADOR: Enviar nuevo mensaje
+  // 4. MANEJADOR: Enviar nuevo mensaje vía WebSocket
   const handleSendMessage = (text) => {
     if (!activeConversationId || !user?.id) return;
 
-    // Enviamos el objeto para que el backend lo reciba via @RequestBody MessageRequest (sin comillas)
-    api.post(`/chat/mensaje?convId=${activeConversationId}&remitenteId=${user.id}`, { content: text })
-      .then(newMsg => {
-        setMessages(prev => [...prev, newMsg]);
-        // Actualizar último mensaje en la lista de conversaciones
-        setConversations(prev => prev.map(c => {
-          if (c.id === activeConversationId) {
-            return { ...c, ultimoMensaje: newMsg };
-          }
-          return c;
-        }));
-      })
-      .catch(err => console.error('Error sending message:', err));
+    // We send via WebSocket. The backend will persist it and broadcast it back to us and the recipient.
+    WebSocketService.sendMessage(activeConversationId, {
+      remitenteId: user.id,
+      contenido: text
+    });
   };
 
   const handleAbandonConversation = async () => {
