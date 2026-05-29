@@ -19,6 +19,16 @@ public class StudentController {
 
     private final StudentService studentService;
 
+    @GetMapping("/{id}/sessions-progress")
+    public ResponseEntity<SemesterProgressResponseDTO> getSessionsProgress(@PathVariable Long id) {
+        return ResponseEntity.ok(studentService.getSessionsProgress(id));
+    }
+
+    @GetMapping("/{id}/activities-progress")
+    public ResponseEntity<SemesterProgressResponseDTO> getActivitiesProgress(@PathVariable Long id) {
+        return ResponseEntity.ok(studentService.getActivitiesProgress(id));
+    }
+
     @GetMapping("/{id}/semester-progress")
     public ResponseEntity<SemesterProgressResponseDTO> getSemesterProgress(@PathVariable Long id) {
         return ResponseEntity.ok(studentService.getSemesterProgress(id));

@@ -166,11 +166,16 @@ const DashboardStudent = () => {
           </article>
 
           <aside className="col-span-12 md:col-span-4 space-y-10">
-            <SemesterProgressWidget progress={stats.semesterProgress} />
-            {/*<NotificationWidget
-              userId={user?.id}
-              unreadCount={stats.notificationCount}
-            />*/}
+            <SemesterProgressWidget 
+              title="Tutorías del Semestre"
+              metricLabel="Sesiones Tomadas"
+              endpoint="/students/{id}/sessions-progress"
+            />
+            <SemesterProgressWidget 
+              title="Tareas y Actividades"
+              metricLabel="Actividades Completadas"
+              endpoint="/students/{id}/activities-progress"
+            />
           </aside>
         </section>
       </main>

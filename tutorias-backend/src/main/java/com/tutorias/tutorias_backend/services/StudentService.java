@@ -26,33 +26,25 @@ public class StudentService {
     private final SesionTutoriaRepository sesionTutoriaRepository;
     private final ActividadEstudianteRepository actividadEstudianteRepository;
 
-    public SemesterProgressResponseDTO getSemesterProgress(Long studentId) {
-        LocalDate today = LocalDate.now();
-        int year = today.getYear();
-        int month = today.getMonthValue();
+    public SemesterProgressResponseDTO getSessionsProgress(Long studentId) {
+        OffsetDateTime[] range = getSemesterRange();
+        List<SesionTutoria> sessions = sesionTutoriaRepository.findSessionsByStudentInDateRange(studentId, range[0], range[1]);
 
-        OffsetDateTime start;
-        OffsetDateTime end;
+        // Filtrar según lo solicitado: programadas, en progreso o completadas (excluye canceladas y no asistio)
+        List<SesionTutoria> relevantSessions = sessions.stream()
+                .filter(s -> s.getEstado() == EstadoSesion.programada || 
+                            s.getEstado() == EstadoSesion.en_progreso || 
+                            s.getEstado() == EstadoSesion.completada)
+                .collect(Collectors.toList());
 
-        // Lógica de segmentación de semestres
-        if (month <= 6) {
-            start = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 1, 1), LocalTime.MIN), ZoneOffset.UTC);
-            end = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 6, 30), LocalTime.MAX), ZoneOffset.UTC);
-        } else {
-            start = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 7, 1), LocalTime.MIN), ZoneOffset.UTC);
-            end = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX), ZoneOffset.UTC);
-        }
-
-        List<SesionTutoria> sessions = sesionTutoriaRepository.findSessionsByStudentInDateRange(studentId, start, end);
-
-        int totalCount = sessions.size();
-        int completedCount = (int) sessions.stream()
+        int totalCount = relevantSessions.size();
+        int completedCount = (int) relevantSessions.stream()
                 .filter(s -> s.getEstado() == EstadoSesion.completada)
                 .count();
 
-        List<ActivityDTO> activities = sessions.stream()
+        List<ActivityDTO> activities = relevantSessions.stream()
                 .map(s -> ActivityDTO.builder()
-                        .label(s.getMateria().getNombre() + " - " + s.getTutor().getPerfil().getNombreCompleto())
+                        .label("Tutoria: " + s.getMateria().getNombre())
                         .completed(s.getEstado() == EstadoSesion.completada)
                         .build())
                 .collect(Collectors.toList());
@@ -62,6 +54,50 @@ public class StudentService {
                 .completedCount(completedCount)
                 .activities(activities)
                 .build();
+    }
+
+    public SemesterProgressResponseDTO getActivitiesProgress(Long studentId) {
+        // Obtenemos todas las actividades del estudiante
+        List<ActividadEstudiante> activities = actividadEstudianteRepository.findByEstudianteId(studentId);
+
+        int totalCount = activities.size();
+        int completedCount = (int) activities.stream()
+                .filter(a -> a.getEstado() == EstadoActividad.completado)
+                .count();
+
+        List<ActivityDTO> activityDTOs = activities.stream()
+                .map(a -> ActivityDTO.builder()
+                        .label(a.getSesion().getMateria().getNombre() + ": " + a.getComentarioTutor())
+                        .completed(a.getEstado() == EstadoActividad.completado)
+                        .build())
+                .collect(Collectors.toList());
+
+        return SemesterProgressResponseDTO.builder()
+                .totalCount(totalCount)
+                .completedCount(completedCount)
+                .activities(activityDTOs)
+                .build();
+    }
+
+    private OffsetDateTime[] getSemesterRange() {
+        LocalDate today = LocalDate.now();
+        int year = today.getYear();
+        int month = today.getMonthValue();
+        OffsetDateTime start, end;
+
+        if (month <= 6) {
+            start = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 1, 1), LocalTime.MIN), ZoneOffset.UTC);
+            end = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 6, 30), LocalTime.MAX), ZoneOffset.UTC);
+        } else {
+            start = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 7, 1), LocalTime.MIN), ZoneOffset.UTC);
+            end = OffsetDateTime.of(LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX), ZoneOffset.UTC);
+        }
+        return new OffsetDateTime[]{start, end};
+    }
+
+    public SemesterProgressResponseDTO getSemesterProgress(Long studentId) {
+        // Redirigir al nuevo método de sesiones por defecto para compatibilidad
+        return getSessionsProgress(studentId);
     }
 
     public List<StudentMateriaDTO> getStudentMaterias(Long studentId) {
