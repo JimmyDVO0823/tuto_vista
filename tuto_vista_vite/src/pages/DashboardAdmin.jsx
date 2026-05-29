@@ -15,6 +15,8 @@ import FAQQuestionFormComponent from '../components/admin/FAQQuestionFormCompone
 import FAQCategoryItemComponent from '../components/admin/FAQCategoryItemComponent';
 import FAQQuestionItemComponent from '../components/admin/FAQQuestionItemComponent';
 import Pagination from '../components/ui/Pagination/Pagination';
+import AdminTabsComponent from '../components/admin/AdminTabsComponent';
+import Searcher from '../components/ui/Searcher/Searcher';
 
 const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState('usuarios'); // 'usuarios' | 'reportes' | 'insignias' | 'comision' | 'academic'
@@ -29,6 +31,9 @@ const DashboardAdmin = () => {
   const [departamentos, setDepartamentos] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [faqCategorias, setFaqCategorias] = useState([]);
+
+  // Search state
+  const [userSearchQuery, setUserSearchQuery] = useState('');
 
   // Pagination states
   const [userPage, setUserPage] = useState(0);
@@ -173,18 +178,42 @@ const DashboardAdmin = () => {
     fetchData();
   }, [fetchData]);
 
-  // Derived data for hybrid pagination
+  // Derived data for hybrid pagination and search
   const paginatedUsers = useMemo(() => {
-    if (isUserServerSide) return usuarios;
+    // Apply search filter first
+    const filtered = userSearchQuery.trim() === '' 
+      ? usuarios 
+      : usuarios.filter(u => 
+          u.nombreCompleto?.toLowerCase().includes(userSearchQuery.toLowerCase()) || 
+          u.correo?.toLowerCase().includes(userSearchQuery.toLowerCase())
+        );
+
+    if (isUserServerSide && userSearchQuery.trim() === '') return usuarios;
+    
+    // If searching or not server-side, we manually paginate the results
     const start = userPage * pageSize;
-    return usuarios.slice(start, start + pageSize);
-  }, [usuarios, userPage, isUserServerSide]);
+    return filtered.slice(start, start + pageSize);
+  }, [usuarios, userPage, isUserServerSide, userSearchQuery]);
 
   const paginatedReports = useMemo(() => {
     if (isReportServerSide) return reportes;
     const start = reportPage * pageSize;
     return reportes.slice(start, start + pageSize);
   }, [reportes, reportPage, isReportServerSide]);
+
+  // Update total pages/elements when searching client-side
+  const effectiveUserTotalElements = useMemo(() => {
+    if (userSearchQuery.trim() === '') return userTotalElements;
+    return usuarios.filter(u => 
+      u.nombreCompleto?.toLowerCase().includes(userSearchQuery.toLowerCase()) || 
+      u.correo?.toLowerCase().includes(userSearchQuery.toLowerCase())
+    ).length;
+  }, [usuarios, userSearchQuery, userTotalElements]);
+
+  const effectiveUserTotalPages = useMemo(() => {
+    if (userSearchQuery.trim() === '') return userTotalPages;
+    return Math.ceil(effectiveUserTotalElements / pageSize);
+  }, [effectiveUserTotalElements, userSearchQuery, userTotalPages]);
 
   // Action: Toggle user status
   const handleToggleUsuario = async (userId, currentStatus) => {
@@ -373,7 +402,7 @@ const DashboardAdmin = () => {
 
   const handleUserPageChange = (page) => {
     setUserPage(page);
-    if (isUserServerSide) {
+    if (isUserServerSide && userSearchQuery.trim() === '') {
       fetchUsers(page);
     }
   };
@@ -394,29 +423,7 @@ const DashboardAdmin = () => {
           <p className="text-gray-500 text-sm">Gestiona insignias, reportes, usuarios, comisiones y la oferta académica.</p>
         </header>
 
-        {/* Tab Navigation */}
-        <div className="flex border-b border-outline-variant/10 mb-8 overflow-x-auto whitespace-nowrap px-2">
-          {[
-            { id: 'usuarios', label: 'Usuarios', icon: 'group' },
-            { id: 'reportes', label: 'Reportes', icon: 'gavel' },
-            { id: 'insignias', label: 'Insignias', icon: 'verified' },
-            { id: 'comision', label: 'Comisión Plataforma', icon: 'percent' },
-            { id: 'academic', label: 'Departamentos y Materias', icon: 'auto_stories' },
-            { id: 'faq', label: 'Preguntas Frecuentes', icon: 'quiz' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`py-3 px-6 font-bold text-sm border-b-2 flex items-center gap-2 transition-all ${activeTab === tab.id
-                  ? 'border-academic-gold text-academic-gold font-extrabold'
-                  : 'border-transparent text-elegant-gray hover:text-primary'
-                }`}
-            >
-              <span className="material-symbols-outlined text-base">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <AdminTabsComponent activeTab={activeTab} setActiveTab={setActiveTab} />
 
         {loading && (
           <div className="flex justify-center items-center py-20">
@@ -435,17 +442,27 @@ const DashboardAdmin = () => {
           <section className="mt-4 px-2">
             {/* TABS 1: USUARIOS */}
             {activeTab === 'usuarios' && (
-              <div className="space-y-4">
-                <UserTableComponent 
-                  usuarios={paginatedUsers} 
-                  handleToggleUsuario={handleToggleUsuario} 
-                  totalElements={userTotalElements}
-                />
-                <Pagination 
-                  currentPage={userPage} 
-                  totalPages={userTotalPages} 
-                  onPageChange={handleUserPageChange} 
-                />
+              <div className="space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <Searcher 
+                    value={userSearchQuery} 
+                    onChange={setUserSearchQuery} 
+                    placeholder="Buscar por nombre o correo..."
+                    className="max-w-md w-full"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <UserTableComponent 
+                    usuarios={paginatedUsers} 
+                    handleToggleUsuario={handleToggleUsuario} 
+                    totalElements={effectiveUserTotalElements}
+                  />
+                  <Pagination 
+                    currentPage={userPage} 
+                    totalPages={effectiveUserTotalPages} 
+                    onPageChange={handleUserPageChange} 
+                  />
+                </div>
               </div>
             )}
 
