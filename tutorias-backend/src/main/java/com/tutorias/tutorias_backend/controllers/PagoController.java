@@ -48,6 +48,16 @@ public class PagoController {
         }
     }
 
+    @GetMapping("/preferencia/{solicitudId}")
+    public ResponseEntity<?> getPreferencia(@PathVariable Long solicitudId) {
+        try {
+            String initPoint = pagoService.crearPreferencia(solicitudId);
+            return ResponseEntity.ok(Map.of("init_point", initPoint));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping("/confirmar")
     public ResponseEntity<PagoDTO> confirmarPago(@RequestBody Map<String, Object> payload) {
         String solicitudIdStr = payload.get("solicitudId").toString();

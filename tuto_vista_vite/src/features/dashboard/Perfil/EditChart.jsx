@@ -105,7 +105,7 @@ const EditChart = () => {
     );
 
     return (
-        <div className="w-full max-w-7xl mx-auto p-6 animate-in fade-in duration-700">
+        <div className="w-full p-6 animate-in fade-in duration-700">
             {/* Header */}
             <header className="mb-12">
                 <h1 className="font-display text-5xl font-extrabold text-primary leading-tight tracking-tighter max-w-xl">
