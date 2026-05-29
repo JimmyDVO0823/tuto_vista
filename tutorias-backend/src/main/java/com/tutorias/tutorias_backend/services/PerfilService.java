@@ -35,13 +35,13 @@ public class PerfilService {
     @org.springframework.transaction.annotation.Transactional
     public Tutor actualizarTutor(Long id, com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto) {
         Tutor t = tutorRepository.findById(id).orElseThrow(() -> new RuntimeException("Tutor no encontrado"));
-        t.setBiografia(updateDto.getBiografia());
-        t.setFrasePersonal(updateDto.getFrase_personal());
-        t.setPrecioPorHora(updateDto.getPrecio_por_hora());
-        t.setAniosExperiencia(updateDto.getAnios_experiencia());
-        t.setDuracionSesionMin(updateDto.getDuracion_sesion_min());
-        t.setTitulos(updateDto.getTitulos());
-        t.setLogros(updateDto.getLogros());
+        if (updateDto.getBiografia() != null) t.setBiografia(updateDto.getBiografia());
+        if (updateDto.getFrase_personal() != null) t.setFrasePersonal(updateDto.getFrase_personal());
+        if (updateDto.getPrecio_por_hora() != null) t.setPrecioPorHora(updateDto.getPrecio_por_hora());
+        if (updateDto.getAnios_experiencia() != null) t.setAniosExperiencia(updateDto.getAnios_experiencia());
+        if (updateDto.getDuracion_sesion_min() != null) t.setDuracionSesionMin(updateDto.getDuracion_sesion_min());
+        if (updateDto.getTitulos() != null) t.setTitulos(updateDto.getTitulos());
+        if (updateDto.getLogros() != null) t.setLogros(updateDto.getLogros());
         return tutorRepository.save(t);
     }
 }

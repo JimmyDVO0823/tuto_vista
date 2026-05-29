@@ -30,9 +30,11 @@ const ReportTutorButton = ({ tutorId, tutorName }) => {
     setError(null);
     try {
       await api.post('/reportes', {
-        reportado_a: tutorId,
+        reportadoPorId: user.id,
+        reportadoAId: tutorId,
         motivo,
-        descripcion
+        descripcion,
+        estado: 'PENDIENTE'
       });
       setSuccess(true);
       setTimeout(() => {

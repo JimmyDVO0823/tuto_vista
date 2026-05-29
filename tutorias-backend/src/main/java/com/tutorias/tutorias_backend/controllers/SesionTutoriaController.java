@@ -25,9 +25,25 @@ public class SesionTutoriaController {
         return ResponseEntity.ok(sesionTutoriaService.getByTutor(id));
     }
 
+    @GetMapping("/tutor/{id}/proximas")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.PagedResponseDTO<SesionTutoriaDTO>> getProximasByTutor(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(sesionTutoriaService.getProximasByTutor(id, page, size));
+    }
+
     @GetMapping("/estudiante/{id}")
     public ResponseEntity<List<SesionTutoriaDTO>> getByEstudiante(@PathVariable Long id) {
         return ResponseEntity.ok(sesionTutoriaService.getByEstudiante(id));
+    }
+
+    @GetMapping("/estudiante/{id}/proximas")
+    public ResponseEntity<com.tutorias.tutorias_backend.dto.PagedResponseDTO<SesionTutoriaDTO>> getProximasByEstudiante(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        return ResponseEntity.ok(sesionTutoriaService.getProximasByEstudiante(id, page, size));
     }
 
     @PatchMapping("/{id}/estado")

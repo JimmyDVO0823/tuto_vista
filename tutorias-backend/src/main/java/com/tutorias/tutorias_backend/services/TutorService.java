@@ -182,25 +182,72 @@ public class TutorService {
     }
 
     /**
-     * Obtiene todos los tutores disponibles con filtros opcionales.
+     * Obtiene todos los tutores disponibles con filtros opcionales y paginación.
      */
-    public List<TutorDTO> getTutoresDisponibles(
+    public com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO getTutoresDisponibles(
+            String nombre,
             BigDecimal minPrecio,
             BigDecimal maxPrecio,
             BigDecimal minCalificacion,
             Long materiaId,
-            Long departamentoId
+            Long departamentoId,
+            int page,
+            int size
     ) {
-        return tutorRepository.findByEstaDisponibleTrue().stream()
-                .filter(t -> minPrecio == null || t.getPrecioPorHora().compareTo(minPrecio) >= 0)
-                .filter(t -> maxPrecio == null || t.getPrecioPorHora().compareTo(maxPrecio) <= 0)
-                .filter(t -> minCalificacion == null || t.getCalificacionPromedio().compareTo(minCalificacion) >= 0)
-                .filter(t -> materiaId == null || t.getTutorMaterias().stream()
-                        .anyMatch(tm -> tm.getMateria().getId().equals(materiaId) && Boolean.TRUE.equals(tm.getActivo())))
-                .filter(t -> departamentoId == null || t.getTutorMaterias().stream()
-                        .anyMatch(tm -> tm.getMateria().getDepartamento().getId().equals(departamentoId) && Boolean.TRUE.equals(tm.getActivo())))
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").ascending());
+
+        org.springframework.data.jpa.domain.Specification<Tutor> spec = (root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+            
+            // Siempre deben estar disponibles
+            predicates.add(cb.isTrue(root.get("estaDisponible")));
+
+            if (nombre != null && !nombre.isBlank()) {
+                String pattern = "%" + nombre.toLowerCase() + "%";
+                predicates.add(cb.like(cb.lower(root.get("perfil").get("nombreCompleto")), pattern));
+            }
+
+            if (minPrecio != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("precioPorHora"), minPrecio));
+            }
+            if (maxPrecio != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("precioPorHora"), maxPrecio));
+            }
+            if (minCalificacion != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("calificacionPromedio"), minCalificacion));
+            }
+
+            if (materiaId != null || departamentoId != null) {
+                jakarta.persistence.criteria.Join<Tutor, com.tutorias.tutorias_backend.entities.TutorMateria> materiasJoin = root.join("tutorMaterias");
+                predicates.add(cb.isTrue(materiasJoin.get("activo")));
+
+                if (materiaId != null) {
+                    predicates.add(cb.equal(materiasJoin.get("materia").get("id"), materiaId));
+                }
+                if (departamentoId != null) {
+                    predicates.add(cb.equal(materiasJoin.get("materia").get("departamento").get("id"), departamentoId));
+                }
+                
+                // Evitar duplicados por los joins
+                query.distinct(true);
+            }
+
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        org.springframework.data.domain.Page<Tutor> tutorPage = tutorRepository.findAll(spec, pageable);
+
+        List<TutorDTO> content = tutorPage.getContent().stream()
                 .map(this::toDTO)
                 .toList();
+
+        return com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO.builder()
+                .content(content)
+                .totalPages(tutorPage.getTotalPages())
+                .totalElements(tutorPage.getTotalElements())
+                .currentPage(tutorPage.getNumber())
+                .size(tutorPage.getSize())
+                .build();
     }
 
     /**

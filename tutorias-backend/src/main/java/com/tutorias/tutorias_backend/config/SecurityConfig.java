@@ -13,7 +13,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -47,29 +46,14 @@ public class SecurityConfig {
                                         "base-uri 'self'; " +
                                         "form-action 'self';")))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/error")).permitAll()
+                        .requestMatchers("/auth/**", "/error").permitAll()
                         // Endpoints públicos según backend.md regla 11
-                        .requestMatchers(
-                                AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/tutores"))
-                        .permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET,
-                                "/tutores/**"))
-                        .permitAll()
-                        .requestMatchers(
-                                AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET, "/materias"))
-                        .permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher(org.springframework.http.HttpMethod.GET,
-                                "/departamentos"))
-                        .permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),
-                                AntPathRequestMatcher.antMatcher("/swagger-ui/**"),
-                                AntPathRequestMatcher.antMatcher("/swagger-ui.html"))
-                        .permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/pagos/**")).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/tutores/**", "/materias/**", "/departamentos/**", "/faq").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/pagos/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthFilter,
+                .addFilterBefore(jwtAuthFilter, 
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -77,7 +61,7 @@ public class SecurityConfig {
 
     @Bean
     public org.springframework.security.authentication.AuthenticationProvider authenticationProvider() {
-        org.springframework.security.authentication.dao.DaoAuthenticationProvider authProvider = new org.springframework.security.authentication.dao.DaoAuthenticationProvider();
+        var authProvider = new org.springframework.security.authentication.dao.DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;

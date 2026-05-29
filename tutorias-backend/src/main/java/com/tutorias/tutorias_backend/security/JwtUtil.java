@@ -43,6 +43,18 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateVerificationToken(String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("purpose", "verification");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 24 horas
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public boolean isTokenValid(String token, String userEmail) {
         final String username = extractUsername(token);
         return (username.equals(userEmail)) && !isTokenExpired(token);

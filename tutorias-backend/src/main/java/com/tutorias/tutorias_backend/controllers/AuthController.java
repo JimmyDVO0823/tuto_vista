@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -33,8 +36,20 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Registrar un nuevo perfil (estudiante, tutor o admin)")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {
+        authService.register(request);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Usuario registrado exitosamente. Por favor, verifica tu correo electrónico para activar tu cuenta.");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/verify")
+    @Operation(summary = "Verificar correo electrónico")
+    public ResponseEntity<Map<String, String>> verify(@RequestParam String token) {
+        authService.verifyAccount(token);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Cuenta activada con éxito. Ya puedes iniciar sesión.");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/refresh")

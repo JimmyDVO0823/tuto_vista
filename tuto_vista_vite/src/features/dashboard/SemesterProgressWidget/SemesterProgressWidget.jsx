@@ -7,7 +7,16 @@ import { api } from "../../../services/api";
  * Muestra el progreso en formato de fracción (completadas/totales) con una lista
  * expandible de actividades y scrollbar interno.
  */
-const SemesterProgressWidget = () => {
+/**
+ * SemesterProgressWidget Component.
+ * Muestra el progreso en formato de fracción (completadas/totales) con una lista
+ * expandible de actividades y scrollbar interno.
+ */
+const SemesterProgressWidget = ({ 
+  title = "Progreso Semestral", 
+  metricLabel = "Actividades Completadas", 
+  endpoint 
+}) => {
   const { user: authUser } = useAuth();
   const [progressData, setProgressData] = useState({
     completedCount: 0,
@@ -18,18 +27,21 @@ const SemesterProgressWidget = () => {
   const [visibleCount, setVisibleCount] = useState(2);
 
   useEffect(() => {
-    if (authUser?.id) {
-      api.get(`/students/${authUser.id}/semester-progress`)
+    if (authUser?.id && endpoint) {
+      // Reemplaza {id} en el endpoint si existe
+      const fetchUrl = endpoint.replace("{id}", authUser.id);
+      
+      api.get(fetchUrl)
         .then(data => {
           setProgressData(data || { completedCount: 0, totalCount: 0, activities: [] });
           setLoading(false);
         })
         .catch(err => {
-          console.error("Error cargando progreso semestral:", err);
+          console.error(`Error cargando ${title}:`, err);
           setLoading(false);
         });
     }
-  }, [authUser]);
+  }, [authUser, endpoint, title]);
 
   const { completedCount, totalCount, activities } = progressData;
 
@@ -38,7 +50,7 @@ const SemesterProgressWidget = () => {
     totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   // Filtramos la lista según el número visible actual
-  const displayedActivities = activities.slice(0, visibleCount);
+  const displayedActivities = (activities || []).slice(0, visibleCount);
 
   // Manejador para cargar más actividades
   const handleLoadMore = () => {
@@ -49,7 +61,7 @@ const SemesterProgressWidget = () => {
     return (
       <div className="bg-[#f2f4f6] p-8 rounded-2xl flex flex-col items-center justify-center min-h-[200px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest text-center">Calculando Progreso...</p>
+        <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-widest text-center">Calculando {title}...</p>
       </div>
     );
   }
@@ -59,14 +71,14 @@ const SemesterProgressWidget = () => {
       <div>
         {/* Encabezado */}
         <h3 className="text-xl font-bold text-primary border-b border-gray-200 pb-4">
-          Progreso Semestral
+          {title}
         </h3>
 
         {/* Sección de Métrica y Barra de Progreso */}
         <div className="space-y-4 mt-6">
           <div className="flex justify-between items-end">
             <span className="text-xs font-bold uppercase text-gray-500 tracking-wider">
-              Actividades Completadas
+              {metricLabel}
             </span>
             {/* Formato en Fracción */}
             <span className="text-2xl font-black text-primary">
@@ -90,8 +102,8 @@ const SemesterProgressWidget = () => {
             maxHeight: visibleCount > 3 ? "160px" : "auto",
           }}
         >
-          {activities.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4 italic">No hay actividades registradas en este semestre.</p>
+          {(!activities || activities.length === 0) ? (
+            <p className="text-sm text-gray-400 text-center py-4 italic">No hay registros en este semestre.</p>
           ) : (
             displayedActivities.map((activity, i) => (
               <div

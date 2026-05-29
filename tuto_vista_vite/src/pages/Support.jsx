@@ -1,49 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
-
-const faqData = [
-  {
-    category: "Para Estudiantes",
-    icon: "school",
-    items: [
-      {
-        question: "¿Cómo selecciono al tutor ideal?",
-        answer: "Puedes buscar tutores por materia, revisar sus credenciales, años de experiencia y leer las reseñas de otros estudiantes para tomar una decisión informada."
-      },
-      {
-        question: "¿Qué pasa si necesito cancelar una sesión?",
-        answer: "Puedes cancelar hasta 24 horas antes sin penalización. Si cancelas con menos tiempo, podría aplicarse un cargo según la política de cancelación del tutor."
-      }
-    ]
-  },
-  {
-    category: "Para Tutores",
-    icon: "person_play",
-    items: [
-      {
-        question: "¿Cómo puedo postularme como tutor verificado?",
-        answer: "Para ser un tutor verificado, debes completar tu perfil con tu experiencia, subir tus títulos y pasar nuestro proceso de validación académica."
-      }
-    ]
-  },
-  {
-    category: "Pagos y Seguridad",
-    icon: "shield_lock",
-    items: [
-      {
-        question: "¿Cómo se procesan los pagos de forma segura?",
-        answer: "Utilizamos pasarelas de pago certificadas internacionalmente. Tus datos financieros están encriptados y no se almacenan en nuestros servidores."
-      }
-    ]
-  }
-];
+import { api } from '../services/api';
 
 const Support = () => {
-  const [activeCategory, setActiveCategory] = useState("Para Tutores");
+  const [faqData, setFaqData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("");
   const [openItems, setOpenItems] = useState({});
 
-  const toggleItem = (catIndex, itemIndex) => {
-    const key = `${catIndex}-${itemIndex}`;
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const data = await api.get('/faq');
+        setFaqData(data || []);
+        if (data && data.length > 0) {
+          setActiveCategory(data[0].nombre);
+        }
+      } catch (err) {
+        console.error('Error fetching FAQs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFaqs();
+  }, []);
+
+  const toggleItem = (catId, preguntaId) => {
+    const key = `${catId}-${preguntaId}`;
     setOpenItems(prev => ({
       ...prev,
       [key]: !prev[key]
@@ -86,15 +69,15 @@ const Support = () => {
             <nav className="flex flex-col gap-2">
               {faqData.map((category) => (
                 <button
-                  key={category.category}
-                  onClick={() => scrollToCategory(category.category)}
+                  key={category.id}
+                  onClick={() => scrollToCategory(category.nombre)}
                   className={`flex items-center gap-4 px-6 py-4 rounded-xl text-sm font-bold transition-all duration-300 w-full text-left
-                    ${activeCategory === category.category 
+                    ${activeCategory === category.nombre 
                       ? 'bg-surface-container-lowest text-primary shadow-[0_8px_40px_-12px_rgba(0,0,0,0.08)]' 
                       : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary'}`}
                 >
-                  <span className="material-symbols-outlined text-xl">{category.icon}</span>
-                  {category.category}
+                  <span className="material-symbols-outlined text-xl">{category.icono || 'help'}</span>
+                  {category.nombre}
                 </button>
               ))}
             </nav>
@@ -102,37 +85,46 @@ const Support = () => {
 
           {/* FAQ Sections */}
           <div className="lg:col-span-9 space-y-16">
-            {faqData.map((cat, catIndex) => (
-              <section key={cat.category} id={cat.category.replace(/\s+/g, '-').toLowerCase()} className="scroll-mt-24">
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : faqData.length === 0 ? (
+              <div className="text-center py-20 opacity-50">
+                <span className="material-symbols-outlined text-6xl mb-4">search_off</span>
+                <p>No hay preguntas frecuentes disponibles en este momento.</p>
+              </div>
+            ) : faqData.map((cat) => (
+              <section key={cat.id} id={cat.nombre.replace(/\s+/g, '-').toLowerCase()} className="scroll-mt-24">
                 <div className="flex items-center gap-4 mb-8">
-                  <h2 className="font-headline text-2xl font-bold text-primary">{cat.category}</h2>
+                  <h2 className="font-headline text-2xl font-bold text-primary">{cat.nombre}</h2>
                   <div className="flex-1 h-px bg-primary/10"></div>
                   <div className="w-8 h-0.5 bg-tertiary"></div>
                 </div>
 
                 <div className="space-y-4">
-                  {cat.items.map((item, itemIndex) => {
-                    const isOpen = openItems[`${catIndex}-${itemIndex}`];
+                  {(cat.preguntas || []).map((item) => {
+                    const isOpen = openItems[`${cat.id}-${item.id}`];
                     return (
                       <div 
-                        key={itemIndex} 
+                        key={item.id} 
                         className="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] overflow-hidden transition-all duration-300"
                       >
                         <button 
-                          onClick={() => toggleItem(catIndex, itemIndex)}
+                          onClick={() => toggleItem(cat.id, item.id)}
                           className="w-full flex items-center justify-between p-6 text-left hover:bg-surface/50 transition-colors"
                         >
-                          <span className="font-body font-bold text-primary text-base pr-8">{item.question}</span>
+                          <span className="font-body font-bold text-primary text-base pr-8">{item.pregunta}</span>
                           <span className="material-symbols-outlined text-primary/50 transition-transform duration-300" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                             expand_more
                           </span>
                         </button>
                         <div 
                           className={`transition-all duration-300 ease-in-out overflow-hidden`}
-                          style={{ maxHeight: isOpen ? '300px' : '0px', opacity: isOpen ? 1 : 0 }}
+                          style={{ maxHeight: isOpen ? '500px' : '0px', opacity: isOpen ? 1 : 0 }}
                         >
                           <div className="p-6 pt-0 text-on-surface-variant font-body leading-relaxed opacity-80 border-t border-black/5 mx-6 mt-4">
-                            {item.answer}
+                            {item.respuesta}
                           </div>
                         </div>
                       </div>
@@ -158,16 +150,6 @@ const Support = () => {
                 support_agent
               </span>
             </div>
-            
-            <footer className="mt-16 pt-8 border-t border-black/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-              <p>© 2026 THE ACADEMIC EDITORIAL. ALL RIGHTS RESERVED.</p>
-              <div className="flex gap-6">
-                <a href="#" className="hover:text-primary transition-colors">PRIVACY POLICY</a>
-                <a href="#" className="hover:text-primary transition-colors">TERMS OF SERVICE</a>
-                <a href="#" className="hover:text-primary transition-colors">ACCESSIBILITY</a>
-                <a href="#" className="hover:text-primary transition-colors">CONTACT</a>
-              </div>
-            </footer>
           </div>
         </div>
       </div>

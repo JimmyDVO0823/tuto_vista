@@ -258,6 +258,20 @@ public class SolicitudService {
                 .stream().map(this::toDTO).toList();
     }
 
+    public com.tutorias.tutorias_backend.dto.PagedResponseDTO<SolicitudDTO> getPorPagarByEstudiante(Long estudianteId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("fechaPreferida").ascending());
+        org.springframework.data.domain.Page<Solicitud> requestPage = solicitudRepository.findByEstudianteIdAndEstadoAndNotPagada(
+                estudianteId, EstadoSolicitud.aceptada, pageable);
+
+        return com.tutorias.tutorias_backend.dto.PagedResponseDTO.<SolicitudDTO>builder()
+                .content(requestPage.getContent().stream().map(this::toDTO).toList())
+                .totalPages(requestPage.getTotalPages())
+                .totalElements(requestPage.getTotalElements())
+                .currentPage(requestPage.getNumber())
+                .size(requestPage.getSize())
+                .build();
+    }
+
     private SolicitudDTO toDTO(Solicitud s) {
         boolean estaPagada = sesionTutoriaRepository.findBySolicitudId(s.getId()).isPresent();
         return SolicitudDTO.builder()

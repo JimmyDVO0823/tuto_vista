@@ -4,7 +4,7 @@ import TutorSearchHeader from '../features/tutors/TutorSearchHeader/TutorSearchH
 import SearchFilters from '../features/tutors/SearchFilters/SearchFilters';
 import TutorCard from '../features/tutors/TutorCard/TutorCard';
 import Pagination from '../components/ui/Pagination/Pagination';
-import { api } from '../services/api';
+import { api, getCached } from '../services/api';
 
 const TutorsExplorer = () => {
   const [tutors, setTutors] = useState([]);
@@ -13,6 +13,12 @@ const TutorsExplorer = () => {
   const [departments, setDepartments] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [paginationInfo, setPaginationInfo] = useState({
+    totalPages: 0,
+    totalElements: 0,
+    size: 10
+  });
   const [filters, setFilters] = useState({
     departmentId: '',
     subjectId: '',
@@ -21,7 +27,7 @@ const TutorsExplorer = () => {
     minRating: '',
   });
 
-  // Cargar metadata (departamentos y materias) al inicio
+  // Cargar metadata (departamentos y materias) al inicio — con caché
   useEffect(() => {
     fetchMetadata();
   }, []);
@@ -29,16 +35,16 @@ const TutorsExplorer = () => {
   // Buscar tutores con debounce
   useEffect(() => {
     const timer = setTimeout(() => {
-      fetchTutors();
+      fetchTutors(currentPage);
     }, 300);
     return () => clearTimeout(timer);
-  }, [filters, searchQuery]);
+  }, [filters, searchQuery, currentPage]);
 
   const fetchMetadata = async () => {
     try {
       const [deptData, subjData] = await Promise.all([
-        api.get('/departamentos'),
-        api.get('/materias'),
+        getCached('/departamentos'),
+        getCached('/materias'),
       ]);
       setDepartments(deptData || []);
       setSubjects(subjData || []);
@@ -47,29 +53,30 @@ const TutorsExplorer = () => {
     }
   };
 
-  const fetchTutors = async () => {
+  const fetchTutors = async (page = 0) => {
     try {
       setLoading(true);
 
-      // Construir query params dinámicos
-      const params = new URLSearchParams();
-      if (filters.minPrice) params.append('minPrecio', filters.minPrice);
-      if (filters.maxPrice) params.append('maxPrecio', filters.maxPrice);
-      if (filters.minRating) params.append('minCalificacion', filters.minRating);
-      if (filters.subjectId) params.append('materiaId', filters.subjectId);
-      if (filters.departmentId) params.append('departamentoId', filters.departmentId);
+      const params = {};
+      if (searchQuery) params.nombre = searchQuery;
+      if (filters.minPrice) params.minPrecio = filters.minPrice;
+      if (filters.maxPrice) params.maxPrecio = filters.maxPrice;
+      if (filters.minRating) params.minCalificacion = filters.minRating;
+      if (filters.subjectId) params.materiaId = filters.subjectId;
+      if (filters.departmentId) params.departamentoId = filters.departmentId;
+      params.page = page;
+      params.size = 10;
 
-      const queryString = params.toString();
-      const data = await api.get(`/tutores${queryString ? `?${queryString}` : ''}`);
+      const response = await api.get('/tutores', params);
+      
+      const data = response.content || [];
+      setPaginationInfo({
+        totalPages: response.totalPages || 0,
+        totalElements: response.totalElements || 0,
+        size: response.size || 10
+      });
 
-      // Filtrar por nombre en el cliente (búsqueda rápida)
-      const filtered = searchQuery
-        ? data.filter(t =>
-          t.nombre_completo?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        : data;
-
-      const mappedTutors = filtered.map(t => ({
+      const mappedTutors = data.map(t => ({
         id: t.id,
         name: t.nombre_completo || 'Tutor Anónimo',
         image: t.url_avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.nombre_completo || 'T')}&background=002045&color=fff`,
@@ -92,6 +99,12 @@ const TutorsExplorer = () => {
 
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
+    setCurrentPage(0); // Reset a primera página al filtrar
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -137,7 +150,11 @@ const TutorsExplorer = () => {
 
             {!loading && !error && tutors.length > 0 && (
               <div className="pt-10 border-t border-gray-100 flex justify-center">
-                <Pagination />
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={paginationInfo.totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             )}
           </section>

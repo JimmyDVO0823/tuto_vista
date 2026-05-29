@@ -13,23 +13,41 @@ import React from 'react';
  * 
  * @component
  */
-const Pagination = () => {
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+  if (totalPages <= 1) return null;
+
+  const pages = Array.from({ length: totalPages }, (_, i) => i);
+
   return (
     <div className="mt-10 md:mt-20 flex justify-center">
       <nav className="flex items-center gap-2 p-1 bg-surface-container-low rounded-xl">
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors">
+        <button 
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 0}
+          className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
           <span className="material-symbols-outlined">chevron_left</span>
         </button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold shadow-sm">
-          1
-        </button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors">
-          2
-        </button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors">
-          3
-        </button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors">
+        
+        {pages.map((page) => (
+          <button
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all font-bold ${
+              currentPage === page 
+                ? "bg-primary text-white shadow-sm" 
+                : "hover:bg-surface-container-high text-on-surface-variant"
+            }`}
+          >
+            {page + 1}
+          </button>
+        ))}
+
+        <button 
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage >= totalPages - 1}
+          className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
           <span className="material-symbols-outlined">chevron_right</span>
         </button>
       </nav>

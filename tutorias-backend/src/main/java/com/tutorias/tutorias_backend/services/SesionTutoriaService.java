@@ -21,6 +21,9 @@ public class SesionTutoriaService {
     private final SolicitudRepository solicitudRepository;
     private final ChatService chatService;
     private final NotificacionService notificacionService;
+    private final com.tutorias.tutorias_backend.repositories.TutorRepository tutorRepository;
+    private final com.tutorias.tutorias_backend.repositories.InsigniaRepository insigniaRepository;
+    private final com.tutorias.tutorias_backend.repositories.TutorInsigniaRepository tutorInsigniaRepository;
 
     @Transactional
     public SesionTutoriaDTO crearDesdeSolicitud(Long solicitudId) {
@@ -67,15 +70,45 @@ public class SesionTutoriaService {
                 .stream().map(this::toDTO).toList();
     }
 
+    public com.tutorias.tutorias_backend.dto.PagedResponseDTO<SesionTutoriaDTO> getProximasByTutor(Long tutorId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("programadaPara").ascending());
+        org.springframework.data.domain.Page<SesionTutoria> sessionPage = sesionTutoriaRepository.findByTutorIdAndEstadoAndProgramadaParaAfter(
+                tutorId, EstadoSesion.programada, OffsetDateTime.now(), pageable);
+
+        return com.tutorias.tutorias_backend.dto.PagedResponseDTO.<SesionTutoriaDTO>builder()
+                .content(sessionPage.getContent().stream().map(this::toDTO).toList())
+                .totalPages(sessionPage.getTotalPages())
+                .totalElements(sessionPage.getTotalElements())
+                .currentPage(sessionPage.getNumber())
+                .size(sessionPage.getSize())
+                .build();
+    }
+
     public List<SesionTutoriaDTO> getByEstudiante(Long estudianteId) {
         return sesionTutoriaRepository.findByEstudianteId(estudianteId)
                 .stream().map(this::toDTO).toList();
+    }
+
+    public com.tutorias.tutorias_backend.dto.PagedResponseDTO<SesionTutoriaDTO> getProximasByEstudiante(Long estudianteId, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("programadaPara").ascending());
+        org.springframework.data.domain.Page<SesionTutoria> sessionPage = sesionTutoriaRepository.findByEstudianteIdAndEstadoAndProgramadaParaAfter(
+                estudianteId, EstadoSesion.programada, OffsetDateTime.now(), pageable);
+
+        return com.tutorias.tutorias_backend.dto.PagedResponseDTO.<SesionTutoriaDTO>builder()
+                .content(sessionPage.getContent().stream().map(this::toDTO).toList())
+                .totalPages(sessionPage.getTotalPages())
+                .totalElements(sessionPage.getTotalElements())
+                .currentPage(sessionPage.getNumber())
+                .size(sessionPage.getSize())
+                .build();
     }
 
     @Transactional
     public SesionTutoriaDTO actualizarEstado(Long id, EstadoSesion estado, String motivo) {
         SesionTutoria sesion = sesionTutoriaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sesión no encontrada"));
+
+        boolean yaCompletada = sesion.getEstado() == EstadoSesion.completada;
 
         sesion.setEstado(estado);
 
@@ -91,6 +124,15 @@ public class SesionTutoriaService {
         }
 
         SesionTutoria guardada = sesionTutoriaRepository.save(sesion);
+
+        if (estado == EstadoSesion.completada && !yaCompletada) {
+            Tutor tutor = guardada.getTutor();
+            if (tutor != null) {
+                tutor.setTotalSesiones(tutor.getTotalSesiones() + 1);
+                tutorRepository.save(tutor);
+                checkAndAssignInsignias(tutor);
+            }
+        }
         
         // Notificar si se cancela
         if (estado == EstadoSesion.cancelada) {
@@ -107,6 +149,25 @@ public class SesionTutoriaService {
         }
         
         return toDTO(guardada);
+    }
+
+    private void checkAndAssignInsignias(Tutor tutor) {
+        List<Insignia> insigniasDisponibles = insigniaRepository.findAll();
+        for (Insignia insignia : insigniasDisponibles) {
+            if (insignia.getCondicionTipo() == com.tutorias.tutorias_backend.enums.TipoCondicionInsignia.TOTAL_SESIONES) {
+                if (tutor.getTotalSesiones() >= insignia.getCondicionValor()) {
+                    TutorInsigniaId linkId = new TutorInsigniaId(tutor.getId(), insignia.getId());
+                    if (!tutorInsigniaRepository.existsById(linkId)) {
+                        TutorInsignia tutorInsignia = TutorInsignia.builder()
+                                .id(linkId)
+                                .tutor(tutor)
+                                .insignia(insignia)
+                                .build();
+                        tutorInsigniaRepository.save(tutorInsignia);
+                    }
+                }
+            }
+        }
     }
 
     @Transactional

@@ -107,21 +107,22 @@ export default function AcademicCalendar({
         datesSet={(arg) => setCurrentView(arg.view.type)}
         eventClassNames={(arg) => {
           const status = arg.event.extendedProps?.status?.toLowerCase() || '';
+          const colorType = arg.event.extendedProps.colorType;
 
-          // 💡 ESTILIZADO DE SOLICITUD ACEPTADA (POR PAGAR) - Corregido con .includes
+          // 💡 ESTILIZADO DE SOLICITUD ACEPTADA (POR PAGAR)
           if (status.includes('aceptada') || status.includes('accepted')) {
             return `rounded-md font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer bg-amber-100 text-amber-800 border-2 border-dashed border-amber-400 animate-pulse-slow`;
           }
 
-          if (arg.event.backgroundColor) return `rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer`;
-
-          const colorType = arg.event.extendedProps.colorType;
-          let colorClass = 'bg-primary';
+          let colorClass = 'bg-primary text-white';
           if (colorType === 'academic-gold') {
             colorClass = 'bg-academic-gold text-white';
           } else if (colorType === 'academic-blue') {
             colorClass = 'bg-primary text-white';
           }
+
+          // Si el evento tiene un color de fondo explícito en el objeto (no extendedProps), lo respetamos
+          // pero si no, forzamos nuestra clase de color para evitar el azul default de FullCalendar
           return `rounded-md border-none font-body text-xs shadow-sm px-2 py-0.5 cursor-pointer ${colorClass}`;
         }}
         eventMouseEnter={handleMouseEnter}

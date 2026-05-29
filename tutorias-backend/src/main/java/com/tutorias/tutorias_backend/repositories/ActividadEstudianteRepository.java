@@ -11,4 +11,10 @@ public interface ActividadEstudianteRepository extends JpaRepository<ActividadEs
     List<ActividadEstudiante> findByEstudianteId(Long estudianteId);
     List<ActividadEstudiante> findBySesionId(Long sesionId);
     List<ActividadEstudiante> findByEstudianteIdAndEstado(Long estudianteId, EstadoActividad estado);
+
+    org.springframework.data.domain.Page<ActividadEstudiante> findByEstudianteIdAndEstado(
+            Long estudianteId,
+            EstadoActividad estado,
+            org.springframework.data.domain.Pageable pageable
+    );
 }

@@ -91,19 +91,19 @@ const RegisterForm = () => {
       });
 
       try {
-        const token = response?.token || response?.data?.token || response?.accessToken || null;
-        login(response, token);
+        // Al registrarse ya no iniciamos sesión automáticamente porque la cuenta está INACTIVA
+        // Solo mostramos el mensaje de éxito y pedimos revisar el correo
       } catch (loginErr) {
         console.warn('Login post-registro falló silenciosamente:', loginErr);
       }
 
-      setSuccess('¡Registro exitoso! Redirigiendo...');
+      setSuccess('¡Registro exitoso! Por favor, revisa tu correo para activar tu cuenta.');
       setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'estudiante' });
       setPasswordError('');
 
       setTimeout(() => {
-        navigate('/');
-      }, 1500);
+        navigate('/loginform');
+      }, 4000);
 
     } catch (err) {
       setError(err.message || 'Error al registrar usuario.');

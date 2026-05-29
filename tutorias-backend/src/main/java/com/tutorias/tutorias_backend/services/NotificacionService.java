@@ -57,4 +57,11 @@ public class NotificacionService {
         n.setLeida(true);
         notificacionRepository.save(n);
     }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void marcarTodasComoLeidas(Long perfilId) {
+        List<Notificacion> unread = notificacionRepository.findByPerfilIdAndLeidaFalse(perfilId);
+        unread.forEach(n -> n.setLeida(true));
+        notificacionRepository.saveAll(unread);
+    }
 }

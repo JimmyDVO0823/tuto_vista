@@ -29,10 +29,9 @@ const SubjectsManagement = () => {
           const data = await api.get(`/tutores/${user.id}/materias`);
           setSubjects(data || []);
         } else {
-          // Mock para estudiantes (hasta que exista el endpoint)
-          setSubjects([
-            { materiaId: 1, nombre: 'Cálculo Diferencial', departamento: 'Matemáticas', activo: true, sem: 'Semestre A', tutor: 'Dr. Roberto Gómez', proximaSesion: '2024-06-01T10:00:00Z', sesionesDictadas: 3, sesionesPendientes: 2, progreso: 60 },
-          ]);
+          // Obtener materias reales del estudiante
+          const data = await api.get(`/estudiantes/${user.id}/materias`);
+          setSubjects(data || []);
         }
       } catch (err) {
         console.error('Error cargando materias:', err);
