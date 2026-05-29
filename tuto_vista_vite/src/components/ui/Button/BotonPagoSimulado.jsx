@@ -6,27 +6,36 @@ export const BotonPagoSimulado = ({ monto, solicitudId, onPagoExitoso }) => {
 
   const handlePagar = async () => {
     setLoading(true);
-    console.log(`Iniciando checkout de Mercado Pago para solicitud ${solicitudId} por $${monto}`);
+    console.log(`[Modo Demo] Procesando simulación y abriendo Mercado Pago para solicitud ${solicitudId}`);
     
     try {
-      // Obtenemos la preferencia desde el backend
-      const response = await api.get(`/pagos/preferencia/${solicitudId}`);
+      // 1. Lógica interna: Registramos el pago simulado en el backend para cambiar estados en BD
+      await api.post('/pagos/simular', { solicitudId });
+      console.log("✅ Lógica de pago simulado completada con éxito en el backend.");
+
+      // 2. Impacto Visual: Solicitamos la preferencia de Mercado Pago para abrir la pasarela real
+      try {
+        const response = await api.get(`/pagos/preferencia/${solicitudId}`);
+        if (response && response.init_point) {
+          console.log("🔗 Redirigiendo visualmente a Mercado Pago...");
+          // Abrir Mercado Pago en una nueva pestaña para demostración
+          window.open(response.init_point, '_blank');
+        }
+      } catch (mpError) {
+        // Si Mercado Pago llega a fallar por red o credenciales, el flujo de la app NO se detiene
+        console.warn("⚠️ No se pudo cargar la pestaña de Mercado Pago, pero el pago ya fue simulado.", mpError);
+      }
       
-      if (response && response.init_point) {
-        console.log("Preferencia creada con éxito, redirigiendo a Mercado Pago...");
-        // Abrir Mercado Pago en una nueva pestaña
-        window.open(response.init_point, '_blank');
-        
-        // Opcional: Podrías llamar a onPagoExitoso si el flujo fuera puramente simulado, 
-        // pero aquí el usuario quiere la pestaña de Mercado Pago.
-        // onPagoExitoso(); 
+      // 3. Notificar al flujo de React que el pago ya fue exitoso (para actualizar la UI)
+      if (onPagoExitoso) {
+        onPagoExitoso();
       } else {
-        throw new Error("No se recibió el punto de inicio de Mercado Pago.");
+        window.location.reload();
       }
       
     } catch (error) {
-      console.error("Error al iniciar el pago con Mercado Pago:", error);
-      alert("Error al procesar el pago con Mercado Pago. Por favor intente de nuevo.");
+      console.error("❌ Error general en el proceso de pago:", error);
+      alert("Error al procesar el pago. Por favor intente de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -40,10 +49,10 @@ export const BotonPagoSimulado = ({ monto, solicitudId, onPagoExitoso }) => {
         className="w-full signature-gradient text-white px-4 py-3.5 rounded-md font-bold text-sm shadow-md hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
       >
         <span className="material-symbols-outlined text-lg">payments</span>
-        {loading ? 'Preparando pago...' : `Pagar con Mercado Pago ($${Math.round(monto).toLocaleString()})`}
+        {loading ? 'Procesando Pago Seguro...' : `Pagar con Mercado Pago ($${Math.round(monto).toLocaleString()})`}
       </button>
       <p className="text-[10px] text-primary/60 text-center italic font-medium">
-        Serás redirigido a la pestaña de pago seguro de Mercado Pago.
+        Entorno de Evaluación: Se simulará el éxito del pago y se abrirá la pasarela de Mercado Pago.
       </p>
     </div>
   );
