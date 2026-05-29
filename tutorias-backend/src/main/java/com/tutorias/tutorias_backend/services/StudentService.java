@@ -97,7 +97,8 @@ public class StudentService {
 
         List<ActivityDTO> activityDTOs = activities.stream()
                 .map(a -> ActivityDTO.builder()
-                        .label(a.getSesion().getMateria().getNombre() + ": " + a.getComentarioTutor())
+                        .label(a.getSesion().getMateria().getNombre() + ": " + 
+                                (a.getRecurso() != null ? a.getRecurso().getTitulo() : "Sin título"))
                         .completed(a.getEstado() == EstadoActividad.completado)
                         .build())
                 .collect(Collectors.toList());
