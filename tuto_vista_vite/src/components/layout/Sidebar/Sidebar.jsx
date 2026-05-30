@@ -65,7 +65,7 @@ const Sidebar = ({ isCollapsed, onMouseEnter, onMouseLeave, onToggle }) => {
     ? {
       name: user.name,
       role: user.role === "tutor" ? "Tutor Académico" : user.role === "administrador" ? "Administrador" : "Estudiante",
-      avatar: user.user_metadata?.avatar_url || "",
+      avatar: user.urlAvatar || "",
       email: user.email,
     }
     : null;

@@ -2,28 +2,29 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
-import { api } from '../services/api'; // Asegúrate de que la ruta a tu api.js sea correcta
+import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            // Enviamos la petición usando el api.js (que mapea con fetch internamente)
             const respuesta = await api.post('/auth/login', {
                 correo: email,
                 password: password
             });
 
-            // Si es correcto, guardamos el token JWT en el localStorage
+            // Usamos la función login del AuthContext para guardar usuario y token correctamente
             if (respuesta.token) {
-                localStorage.setItem('token', respuesta.token);
+                login(respuesta, respuesta.token);
             }
 
             // Alerta de éxito antes de redirigir (Opcional, se quita sola en 1.5s)

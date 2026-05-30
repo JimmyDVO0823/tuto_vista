@@ -126,6 +126,7 @@ public class AuthService {
                 .id(perfil.getId())
                 .correo(perfil.getCorreo())
                 .nombreCompleto(perfil.getNombreCompleto())
+                .urlAvatar(perfil.getUrlAvatar())
                 .rol(perfil.getRol())
                 .build();
     }
