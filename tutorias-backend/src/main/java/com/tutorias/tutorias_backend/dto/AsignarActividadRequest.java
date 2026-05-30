@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO que representa una solicitud para asignar una actividad a un estudiante.
+ * Incluye el identificador de la sesión, detalles del recurso opcional y la descripción de la tarea.
+ */
 @Data
 @Builder
 @NoArgsConstructor

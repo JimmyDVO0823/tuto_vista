@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO que representa la respuesta de una autenticación exitosa.
+ * Contiene el token JWT generado y la información básica del perfil del usuario.
+ */
 @Data
 @Builder
 @NoArgsConstructor
