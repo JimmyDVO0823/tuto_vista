@@ -4,7 +4,7 @@ import com.tutorias.tutorias_backend.enums.TipoRecurso;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
-
+ 
 /**
  * Entidad que representa un recurso educativo (video, documento, enlace, etc.) 
  * compartido por un tutor para una materia específica.
