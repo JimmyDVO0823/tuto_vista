@@ -1,12 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
+import Swal from 'sweetalert2';
 
 const Support = () => {
   const [faqData, setFaqData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("");
   const [openItems, setOpenItems] = useState({});
+
+  const contactEmail = "jimmydfrancovo@ufps.edu.co";
+
+  const handleContactSupport = () => {
+    navigator.clipboard.writeText(contactEmail).then(() => {
+      Swal.fire({
+        title: '¡Correo Copiado!',
+        text: `El correo ${contactEmail} ha sido copiado al portapapeles. ¡Escríbenos pronto!`,
+        icon: 'success',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#002045',
+        background: '#ffffff',
+        customClass: {
+          title: 'font-display text-primary',
+          content: 'font-body text-on-surface-variant'
+        }
+      });
+    }).catch(err => {
+      console.error('Error al copiar:', err);
+      Swal.fire({
+        title: 'Atención',
+        text: `No se pudo copiar automáticamente, pero puedes escribirnos a: ${contactEmail}`,
+        icon: 'info',
+        confirmButtonColor: '#002045'
+      });
+    });
+  };
 
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -141,7 +169,10 @@ const Support = () => {
                 <p className="font-body text-white/80 text-lg mb-8">
                   Nuestro equipo de soporte está disponible 24/7 para asistirle en su viaje de aprendizaje.
                 </p>
-                <button className="bg-tertiary text-primary px-8 py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-tertiary/30 transition-all duration-300">
+                <button 
+                  onClick={handleContactSupport}
+                  className="bg-tertiary text-primary px-8 py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-tertiary/30 transition-all duration-300"
+                >
                   Contactar Soporte
                 </button>
               </div>
