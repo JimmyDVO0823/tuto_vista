@@ -8,26 +8,27 @@ import SockJS from 'sockjs-client';
 class WebSocketService {
     constructor() {
         this.client = null;
-        this.onMessageReceived = null;
         this.subscriptions = new Map();
+        this.isConnected = false;
     }
 
     /**
      * Establishes a connection to the WebSocket server.
-     * @param {string} token - The authentication token.
      * @param {Function} onConnectCallback - Callback executed when connection is successful.
      */
     connect(onConnectCallback) {
-        // Use relative URL or environment variable. Assuming Vite proxy or same host.
-        // For development, we might need the full URL if not proxied.
-        const socketUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws`;
+        if (this.client && (this.client.active || this.client.connected)) {
+            console.log('WebSocket already connected or connecting');
+            if (this.client.connected && onConnectCallback) onConnectCallback();
+            return;
+        }
+
+        const socketUrl = `${import.meta.env.VITE_API_URL || 'https://tutovista-production.up.railway.app'}/ws`;
+        console.log('Connecting to WebSocket at:', socketUrl);
         
         this.client = new Client({
             webSocketFactory: () => new SockJS(socketUrl),
-            // Override the default debug to console if needed
-            debug: (str) => {
-                // console.log(str);
-            },
+            debug: (str) => console.log('[STOMP Debug]:', str),
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
@@ -35,12 +36,20 @@ class WebSocketService {
 
         this.client.onConnect = (frame) => {
             console.log('Connected to WebSocket server');
+            this.isConnected = true;
             if (onConnectCallback) onConnectCallback(frame);
         };
 
+        this.client.onDisconnect = () => {
+            console.log('Disconnected from WebSocket server');
+            this.isConnected = false;
+        };
+
         this.client.onStompError = (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
+            console.error('STOMP error:', frame.headers['message']);
+            console.group('Error Details');
+            console.error(frame.body);
+            console.groupEnd();
         };
 
         this.client.activate();

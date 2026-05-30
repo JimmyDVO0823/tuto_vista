@@ -23,31 +23,22 @@ export default function AcademicChat() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const messagesEndRef = useRef(null);
+  const activeConvIdRef = useRef(activeConversationId);
 
-  // WebSocket Connection
+  // Sync ref with state
   useEffect(() => {
-    WebSocketService.connect(() => {
-      // If we already have an active conversation, subscribe immediately
-      if (activeConversationId) {
-        subscribeToActiveConversation(activeConversationId);
-      }
-    });
-
-    return () => {
-      WebSocketService.disconnect();
-    };
-  }, []);
+    activeConvIdRef.current = activeConversationId;
+  }, [activeConversationId]);
 
   const subscribeToActiveConversation = (id) => {
+    if (!id) return;
+    console.log('Subscribing to conversation:', id);
     WebSocketService.subscribeToConversation(id, (newMsg) => {
       setMessages(prev => {
-        // Prevent duplicate messages if the sender also appends it manually
-        // (Though in our new logic, the sender only appends via WS)
         if (prev.some(m => m.id === newMsg.id)) return prev;
         return [...prev, newMsg];
       });
 
-      // Update last message in the contact list
       setConversations(prev => prev.map(c => {
         if (c.id === id) {
           return { ...c, ultimoMensaje: newMsg };
@@ -56,6 +47,23 @@ export default function AcademicChat() {
       }));
     });
   };
+
+  // WebSocket Connection and Initial Subscription
+  useEffect(() => {
+    WebSocketService.connect(() => {
+      // Access the MUST RECENT ID via Ref to avoid stale closure
+      const currentId = activeConvIdRef.current;
+      if (currentId) {
+        subscribeToActiveConversation(currentId);
+      }
+    });
+
+    return () => {
+      WebSocketService.disconnect();
+    };
+  }, []); // Only once on mount
+
+  // ... (Other effects)
 
   useEffect(() => {
     if (user?.id) {
@@ -72,12 +80,16 @@ export default function AcademicChat() {
     }
   }, [user]);
 
-  // Obtener mensajes de la conversación activa
+  // Obtener mensajes de la conversación activa y suscribirse vía WS
   useEffect(() => {
     if (activeConversationId) {
+      // 1. Cargar historial vía REST
       api.get(`/chat/mensajes/${activeConversationId}`)
         .then(data => setMessages(data || []))
         .catch(err => console.error('Error fetching messages:', err));
+        
+      // 2. Suscribirse a actualizaciones en tiempo real
+      subscribeToActiveConversation(activeConversationId);
     }
   }, [activeConversationId]);
 
