@@ -12,6 +12,16 @@ import TutorBio from '../features/tutor-detail/components/TutorBio';
 import AvailabilityCalendar from '../features/tutor-detail/components/AvailabilityCalendar';
 import ReviewSection from '../features/tutor-detail/components/ReviewSection';
 
+const FULL_DAY_NAMES = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
+
 const TutorAgendaDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -50,39 +60,40 @@ const TutorAgendaDetail = () => {
       setLoading(true);
       setError(null);
 
-      const [tutorData, dispoData, dispoEspecData, sesionesData, solicitudesData] = await Promise.all([
+      const [tutorData, dispoData, dispoEspecData, tutorSesiones, tutorSolicitudes, studentSesiones, studentSolicitudes] = await Promise.all([
         api.get(`/tutores/${id}`),
         api.get(`/disponibilidad/tutor/${id}`),
         api.get(`/disponibilidad/especifica/tutor/${id}`).catch(() => []),
         api.get(`/sesiones/tutor/${id}`).catch(() => []),
-        api.get(`/solicitudes/tutor/${id}`).catch(() => []) 
+        api.get(`/solicitudes/tutor/${id}`).catch(() => []),
+        user ? api.get(`/sesiones/estudiante/${user.id}`).catch(() => []) : Promise.resolve([]),
+        user ? api.get(`/solicitudes/estudiante/${user.id}`).catch(() => []) : Promise.resolve([])
       ]);
 
       setTutor(tutorData);
       setDisponibilidad(dispoData || []);
       setDispoEspecifica(dispoEspecData || []);
 
-      const sesionesMapeadas = (sesionesData || [])
-        .filter(s => s.estado === 'programada' || s.estado === 'en_progreso')
+      const mapCompromisos = (items, type, labelPrefix = "") => (items || [])
+        .filter(s => {
+          const status = s.estado?.toLowerCase();
+          if (type === 'SESION') return status === 'programada' || status === 'en_progreso';
+          return (status === 'aceptada' || status === 'accepted') && !s.pagada;
+        })
         .map(s => ({
-          tipo: 'SESION',
-          fecha: s.programadaPara ? s.programadaPara.split('T')[0] : '',
-          horaInicio: s.programadaPara ? s.programadaPara.split('T')[1].substring(0, 5) : '',
+          tipo: type,
+          fecha: s.programadaPara ? s.programadaPara.split('T')[0] : (s.fechaPreferida || ""),
+          horaInicio: s.programadaPara ? s.programadaPara.split('T')[1].substring(0, 5) : (s.horaPreferida?.substring(0, 5) || ""),
           duracionMin: s.duracionMin || 60,
-          label: 'Sesión Programada'
+          label: `${labelPrefix}${type === 'SESION' ? 'Sesión Programada' : 'Aceptada (Esperando Pago)'}`
         }));
 
-      const solicitudesMapeadas = (solicitudesData || [])
-        .filter(s => (s.estado?.toLowerCase() === 'aceptada' || s.estado?.toLowerCase() === 'accepted') && !s.pagada)
-        .map(s => ({
-          tipo: 'SOLICITUD_ACEPTADA',
-          fecha: s.fechaPreferida,
-          horaInicio: s.horaPreferida?.substring(0, 5),
-          duracionMin: s.duracionMin || 60,
-          label: 'Aceptada (Esperando Pago)'
-        }));
+      const tSes = mapCompromisos(tutorSesiones, 'SESION', "Tutor: ");
+      const tSol = mapCompromisos(tutorSolicitudes, 'SOLICITUD_ACEPTADA', "Tutor: ");
+      const sSes = mapCompromisos(studentSesiones, 'SESION', "Tuya: ");
+      const sSol = mapCompromisos(studentSolicitudes, 'SOLICITUD_ACEPTADA', "Tuya: ");
 
-      setCompromisosOcupados([...sesionesMapeadas, ...solicitudesMapeadas]);
+      setCompromisosOcupados([...tSes, ...tSol, ...sSes, ...sSol]);
 
       if (tutorData?.materias?.length > 0) {
         setSelectedSubjectId(tutorData.materias[0].id.toString());
@@ -225,11 +236,41 @@ const TutorAgendaDetail = () => {
 
   const infoConflictoCompromiso = comprobarColisionCompromisos();
 
+  const comprobarExcesoHorario = () => {
+    if (!selectedSlot || !selectedTime || !selectedDuration) return false;
+    const slotEndMin = timeToMinutes(selectedSlot.horaFin.substring(0, 5));
+    const selectedStartMin = timeToMinutes(selectedTime.substring(0, 5));
+    const sessionEndMin = selectedStartMin + parseInt(selectedDuration);
+    return sessionEndMin > slotEndMin;
+  };
+
+  const infoExcesoHorario = comprobarExcesoHorario();
+
   const handleSlotSelect = (slot) => {
     setSelectedSlot(slot);
     setSelectedDate(slot.isEspecifica ? slot.fechaPorDefecto : getNextDateForDayOfWeek(slot.diaSemana));
     setSelectedTime(slot.horaInicio.substring(0, 5));
     setSuccessMessage(null);
+  };
+
+  const handleDateChange = (newDate) => {
+    if (!selectedSlot) return;
+
+    const [year, month, day] = newDate.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+    
+    if (dateObj.getDay() !== selectedSlot.diaSemana) {
+      Swal.fire({
+        title: 'Día Incorrecto',
+        text: `El bloque seleccionado corresponde a un ${FULL_DAY_NAMES[selectedSlot.diaSemana]}. La fecha se ha ajustado automáticamente.`,
+        icon: 'warning',
+        timer: 3000,
+        showConfirmButton: false
+      });
+      // Volver a la fecha válida más cercana (o mantener la anterior)
+      return; 
+    }
+    setSelectedDate(newDate);
   };
 
   const handleBookingSubmit = async (e) => {
@@ -395,7 +436,7 @@ const TutorAgendaDetail = () => {
               handleSlotSelect={handleSlotSelect}
               handleBookingSubmit={handleBookingSubmit}
               selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
+              setSelectedDate={handleDateChange}
               selectedTime={selectedTime}
               setSelectedTime={setSelectedTime}
               selectedDuration={selectedDuration}
@@ -408,6 +449,7 @@ const TutorAgendaDetail = () => {
               compromisosDelDia={compromisosDelDia}
               infoBloqueo={infoBloqueo}
               infoConflictoCompromiso={infoConflictoCompromiso}
+              infoExcesoHorario={infoExcesoHorario}
             />
 
             {successMessage && (

@@ -31,6 +31,7 @@ const AvailabilityCalendar = ({
   compromisosDelDia,
   infoBloqueo,
   infoConflictoCompromiso,
+  infoExcesoHorario,
 }) => {
   return (
     <div className="bg-surface-container-lowest rounded-3xl p-5 md:p-10 shadow-ambient border border-outline-variant/10">
@@ -281,6 +282,22 @@ const AvailabilityCalendar = ({
             </div>
           )}
 
+          {infoExcesoHorario && (
+            <div className="p-4 bg-orange-50 border border-orange-200 text-orange-800 rounded-xl flex items-start gap-3 my-4 animate-in fade-in duration-300">
+              <span className="material-symbols-outlined text-orange-600">
+                schedule
+              </span>
+              <div className="text-xs font-medium font-display">
+                <p className="font-bold text-orange-900 mb-0.5">
+                  Duración Excedida
+                </p>
+                La sesión termina después del fin de disponibilidad del tutor (
+                <span className="font-bold">{selectedSlot.horaFin.substring(0, 5)}</span>).  
+                Reduce la duración o elige una hora de inicio más temprana.
+              </div>
+            </div>
+          )}
+
           <div className="pt-6 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
               <p className="text-xs text-gray-400 font-bold uppercase tracking-widest font-display">
@@ -298,10 +315,10 @@ const AvailabilityCalendar = ({
             <button
               type="submit"
               disabled={
-                submitting || !!infoBloqueo || !!infoConflictoCompromiso
+                submitting || !!infoBloqueo || !!infoConflictoCompromiso || infoExcesoHorario
               }
               className={`px-10 py-4 rounded-xl font-bold shadow-xl transition-all w-full md:w-auto font-display ${
-                !!infoBloqueo || !!infoConflictoCompromiso
+                !!infoBloqueo || !!infoConflictoCompromiso || infoExcesoHorario
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none opacity-60"
                   : "signature-gradient text-white hover:-translate-y-0.5 shadow-primary/20"
               }`}
