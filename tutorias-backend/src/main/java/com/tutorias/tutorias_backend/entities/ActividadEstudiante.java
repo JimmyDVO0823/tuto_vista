@@ -4,6 +4,10 @@ import com.tutorias.tutorias_backend.enums.EstadoActividad;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Entidad que representa una actividad asignada a un estudiante dentro de una sesión de tutoría.
+ * Almacena el vínculo entre el estudiante, el recurso educativo y el estado de la actividad.
+ */
 @Entity
 @Table(name = "actividad_estudiante")
 @Getter

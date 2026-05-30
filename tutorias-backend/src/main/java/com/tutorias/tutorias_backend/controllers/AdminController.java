@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para funciones administrativas.
+ * Permite la gestión de usuarios y sus estados dentro de la plataforma.
+ */
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -16,6 +20,11 @@ public class AdminController {
 
     private final PerfilRepository perfilRepository;
 
+    /**
+     * Lista todos los usuarios (perfiles) registrados en el sistema con información básica.
+     *
+     * @return ResponseEntity con una lista de mapas con los datos de los usuarios.
+     */
     @GetMapping("/usuarios")
     public ResponseEntity<List<Map<String, Object>>> listarUsuarios() {
         List<Perfil> perfiles = perfilRepository.findAll();
@@ -30,6 +39,13 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Alterna el estado de activación (activo/inactivo) de un usuario específico.
+     *
+     * @param id Identificador del perfil del usuario.
+     * @param activo Nuevo estado de activación deseado.
+     * @return ResponseEntity con el resultado de la operación y el nuevo estado.
+     */
     @PatchMapping("/usuarios/{id}/estado")
     public ResponseEntity<Map<String, Object>> alternarEstadoUsuario(
             @PathVariable Long id,

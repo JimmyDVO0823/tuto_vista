@@ -3,6 +3,10 @@ package com.tutorias.tutorias_backend.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Entidad que representa un parámetro de configuración global del sistema.
+ * Se utiliza para almacenar pares clave-valor de configuraciones persistentes.
+ */
 @Entity
 @Table(name = "configuracion")
 @Getter

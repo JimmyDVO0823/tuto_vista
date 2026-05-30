@@ -3,6 +3,10 @@ package com.tutorias.tutorias_backend.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Entidad que representa un departamento académico dentro de la institución.
+ * Agrupa materias y tutores vinculados a un área específica del conocimiento.
+ */
 @Entity
 @Table(name = "departamento")
 @Getter

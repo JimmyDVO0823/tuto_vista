@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador REST para la gestión de autenticación y sesiones.
+ * Proporciona endpoints para registro, inicio de sesión, verificación de cuenta y renovación de tokens.
+ */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -22,6 +26,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * Endpoint de prueba para verificar la disponibilidad del servicio de autenticación.
+     *
+     * @return ResponseEntity con un mensaje de éxito.
+     */
     @GetMapping("/test")
     @Operation(summary = "Endpoint de prueba para verificar conexión")
     public ResponseEntity<String> test() {
@@ -53,6 +62,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Verifica una cuenta de usuario mediante un token enviado por correo electrónico.
+     *
+     * @param token Token de verificación.
+     * @return ResponseEntity con un mensaje de éxito tras la activación.
+     */
     @GetMapping("/verify")
     @Operation(summary = "Verificar correo electrónico")
     public ResponseEntity<Map<String, String>> verify(@RequestParam String token) {
@@ -62,6 +77,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Renueva el token JWT de la sesión actual.
+     *
+     * @param authHeader Cabecera de autorización que contiene el token actual.
+     * @return ResponseEntity con el nuevo token JWT.
+     */
     @PostMapping("/refresh")
     @Operation(summary = "Renovar el token de sesión")
     public ResponseEntity<AuthResponse> refresh(@RequestHeader("Authorization") String authHeader) {

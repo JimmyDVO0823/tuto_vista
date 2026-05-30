@@ -22,6 +22,8 @@ import java.util.Map;
 
 /**
  * Servicio encargado de la autenticación, registro y gestión de sesiones de usuario.
+ * Proporciona lógica para inicio de sesión, registro de nuevos perfiles,
+ * verificación de cuentas vía correo y renovación de tokens JWT.
  */
 @Service
 @RequiredArgsConstructor
@@ -116,6 +118,12 @@ public class AuthService {
         perfilRepository.save(perfil);
     }
 
+    /**
+     * Renueva el token de autenticación basándose en un token válido previo.
+     *
+     * @param token Token JWT actual (puede estar próximo a expirar).
+     * @return AuthResponse con el nuevo token y datos del perfil.
+     */
     public AuthResponse refreshToken(String token) {
         String email = jwtUtil.extractUsername(token);
         Perfil perfil = perfilRepository.findByCorreo(email)

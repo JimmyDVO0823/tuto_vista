@@ -15,6 +15,11 @@ public class DepartamentoService {
 
     private final DepartamentoRepository departamentoRepository;
 
+    /**
+     * Obtiene la lista completa de departamentos académicos registrados en el sistema.
+     *
+     * @return Lista de objetos DepartamentoDTO.
+     */
     public List<DepartamentoDTO> getAllDepartamentos() {
         return departamentoRepository.findAll().stream()
                 .map(d -> DepartamentoDTO.builder()
@@ -24,6 +29,12 @@ public class DepartamentoService {
                 .toList();
     }
 
+    /**
+     * Crea un nuevo departamento académico.
+     *
+     * @param dto Datos del departamento a crear.
+     * @return DepartamentoDTO con los detalles del departamento guardado.
+     */
     @org.springframework.transaction.annotation.Transactional
     public DepartamentoDTO create(DepartamentoDTO dto) {
         com.tutorias.tutorias_backend.entities.Departamento dept = com.tutorias.tutorias_backend.entities.Departamento.builder()

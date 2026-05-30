@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Entidad que representa una conversación de chat entre dos o más participantes.
+ * Almacena la fecha de creación y la relación con los mensajes y participantes.
  */
 @Entity
 @Table(name = "conversacion")

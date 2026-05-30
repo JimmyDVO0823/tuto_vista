@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
+/**
+ * Servicio para la gestión de la configuración persistente del sistema.
+ * Actualmente maneja configuraciones como la comisión de la plataforma.
+ */
 @Service
 @RequiredArgsConstructor
 public class ConfiguracionService {
@@ -16,6 +20,12 @@ public class ConfiguracionService {
     private static final String CLAVE_COMISION = "comision_plataforma";
     private static final String COMISION_POR_DEFECTO = "0.10";
 
+    /**
+     * Obtiene el valor de la comisión actual del sistema.
+     * Si no se encuentra configurado, retorna un valor por defecto.
+     *
+     * @return El valor de la comisión como BigDecimal.
+     */
     @Transactional(readOnly = true)
     public BigDecimal obtenerComision() {
         return configuracionRepository.findByClave(CLAVE_COMISION)
@@ -29,6 +39,12 @@ public class ConfiguracionService {
                 .orElse(new BigDecimal(COMISION_POR_DEFECTO));
     }
 
+    /**
+     * Guarda un nuevo valor para la comisión de la plataforma.
+     *
+     * @param nuevaComision Nuevo valor de la comisión (entre 0.00 y 1.00).
+     * @throws IllegalArgumentException si la comisión no está en el rango permitido.
+     */
     @Transactional
     public void guardarComision(BigDecimal nuevaComision) {
         if (nuevaComision.compareTo(BigDecimal.ZERO) < 0 || nuevaComision.compareTo(BigDecimal.ONE) > 0) {

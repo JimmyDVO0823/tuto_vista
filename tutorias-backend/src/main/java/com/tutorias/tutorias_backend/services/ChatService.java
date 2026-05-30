@@ -92,16 +92,34 @@ public class ChatService {
         return toMsgDTO(guardado);
     }
 
+    /**
+     * Obtiene el historial de mensajes de una conversación específica.
+     *
+     * @param convId Identificador de la conversación.
+     * @return Lista de MensajeDTO ordenada por fecha de creación.
+     */
     public List<MensajeDTO> getMensajes(Long convId) {
         return mensajeRepository.findByConversacionIdOrderByCreadoEnAsc(convId)
                 .stream().map(this::toMsgDTO).toList();
     }
 
+    /**
+     * Obtiene todas las conversaciones en las que participa un perfil determinado.
+     *
+     * @param perfilId Identificador del perfil.
+     * @return Lista de ConversacionDTO activas.
+     */
     public List<ConversacionDTO> getConversaciones(Long perfilId) {
         return conversacionRepository.findByPerfilId(perfilId)
                 .stream().map(this::toConvDTO).toList();
     }
 
+    /**
+     * Permite a un perfil abandonar una conversación, eliminándolo de la lista de participantes.
+     *
+     * @param convId Identificador de la conversación.
+     * @param perfilId Identificador del perfil que abandona.
+     */
     @Transactional
     public void abandonarConversacion(Long convId, Long perfilId) {
         Conversacion conv = conversacionRepository.findById(convId).orElseThrow();

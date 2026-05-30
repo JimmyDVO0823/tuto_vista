@@ -10,9 +10,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 /**
- * Controller for handling real-time chat messages via WebSockets.
- * Listens for messages on application-defined endpoints and broadcasts
- * them to the relevant topics.
+ * Controlador para la gestión de mensajes de chat en tiempo real mediante WebSockets.
+ * Escucha mensajes en los endpoints definidos y los retransmite a los temas (topics) correspondientes.
  */
 @Controller
 @RequiredArgsConstructor
@@ -22,12 +21,12 @@ public class ChatWSController {
     private final SimpMessagingTemplate messagingTemplate;
 
     /**
-     * Handles incoming messages to a specific conversation.
-     * Persistence is handled via ChatService, and then the message is
-     * broadcasted to all subscribers of that conversation's topic.
+     * Procesa los mensajes entrantes para una conversación específica.
+     * La persistencia se maneja a través de ChatService, y luego el mensaje se retransmite
+     * a todos los suscriptores del tema de esa conversación.
      * 
-     * @param convId The ID of the conversation.
-     * @param mensajeDTO The message payload (should contain remitenteId and contenido).
+     * @param convId Identificador de la conversación.
+     * @param mensajeDTO Objeto con los datos del mensaje (remitenteId y contenido).
      */
     @MessageMapping("/chat/{convId}")
     public void processMessage(@DestinationVariable Long convId, @Payload MensajeDTO mensajeDTO) {

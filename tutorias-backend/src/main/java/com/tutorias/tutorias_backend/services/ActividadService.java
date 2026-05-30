@@ -14,6 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión de actividades de estudiantes.
+ * Contiene la lógica para asignar actividades, completar tareas y realizar el seguimiento
+ * del progreso del estudiante en relación con las sesiones de tutoría.
+ */
 @Service
 @RequiredArgsConstructor
 public class ActividadService {
@@ -24,6 +29,17 @@ public class ActividadService {
     private final NotificacionService notificacionService;
     private final ChatService chatService;
 
+    /**
+     * Asigna una nueva actividad a un estudiante vinculado a una sesión de tutoría.
+     * Crea un nuevo recurso si no se proporciona uno existente y envía notificaciones.
+     *
+     * @param sesionId Identificador de la sesión de tutoría.
+     * @param recursoId Identificador de un recurso existente (opcional).
+     * @param titulo Título de la actividad o recurso.
+     * @param url URL del archivo o enlace de la actividad.
+     * @param descripcion Descripción detallada de la actividad.
+     * @return ActividadEstudianteDTO con los detalles de la actividad creada.
+     */
     @Transactional
     public ActividadEstudianteDTO asignarActividad(Long sesionId, Long recursoId, String titulo, String url,
             String descripcion) {
@@ -82,6 +98,12 @@ public class ActividadService {
         return toDTO(actividad);
     }
 
+    /**
+     * Obtiene la lista de actividades con estado pendiente para un estudiante.
+     *
+     * @param estudianteId Identificador del estudiante.
+     * @return Lista de ActividadEstudianteDTO pendientes.
+     */
     public List<ActividadEstudianteDTO> obtenerPendientesEstudiante(Long estudianteId) {
         return actividadRepository.findByEstudianteIdAndEstado(estudianteId, EstadoActividad.pendiente)
                 .stream()
@@ -89,6 +111,14 @@ public class ActividadService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene una lista paginada de actividades pendientes para un estudiante.
+     *
+     * @param estudianteId Identificador del estudiante.
+     * @param page Número de página.
+     * @param size Cantidad de elementos por página.
+     * @return PagedResponseDTO con las actividades pendientes paginadas.
+     */
     public com.tutorias.tutorias_backend.dto.PagedResponseDTO<ActividadEstudianteDTO> obtenerPendientesEstudiantePaginado(Long estudianteId, int page, int size) {
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending());
         org.springframework.data.domain.Page<ActividadEstudiante> activityPage = actividadRepository.findByEstudianteIdAndEstado(
@@ -103,6 +133,12 @@ public class ActividadService {
                 .build();
     }
 
+    /**
+     * Marca una actividad específica como completada.
+     *
+     * @param actividadId Identificador de la actividad.
+     * @return ActividadEstudianteDTO con la actividad actualizada.
+     */
     @Transactional
     public ActividadEstudianteDTO completarActividad(Long actividadId) {
         ActividadEstudiante actividad = actividadRepository.findById(actividadId)
