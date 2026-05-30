@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import Swal from 'sweetalert2';
 
 const MyTutorsHistory = () => {
   const { user } = useAuth();
@@ -49,17 +50,37 @@ const MyTutorsHistory = () => {
 
   // 🆕 Función para que el estudiante cancele su postulación
   const handleCancelarSolicitud = async (id) => {
-    if (!window.confirm("¿Estás seguro de que deseas cancelar esta solicitud de tutoría?")) return;
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Deseas cancelar esta solicitud de tutoría?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#002045',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cancelar',
+      cancelButtonText: 'Volver'
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       setCancelingId(id);
-      // Enviamos el patch con el estado 'cancelada'
       await api.patch(`/solicitudes/${id}/estado?estado=cancelada`);
-      alert("Solicitud cancelada exitosamente.");
-      fetchData(); // Refrescar listas
+      Swal.fire({
+        title: '¡Cancelada!',
+        text: 'Solicitud cancelada exitosamente.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
+      fetchData();
     } catch (err) {
       console.error('Error canceling solicitud:', err);
-      alert(err.message || 'Error al cancelar la solicitud.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo cancelar la solicitud.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setCancelingId(null);
     }

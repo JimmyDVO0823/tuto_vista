@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 
@@ -89,10 +90,21 @@ const EditChart = () => {
                 avatar: profile.avatar
             });
 
-            alert('¡Perfil actualizado con éxito!');
+            Swal.fire({
+                title: '¡Perfil Actualizado!',
+                text: 'Tus cambios han sido guardados correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
         } catch (error) {
             console.error("Error updating profile:", error);
-            alert('Hubo un error al guardar los cambios.');
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un error al guardar los cambios.',
+                icon: 'error',
+                confirmButtonColor: '#002045'
+            });
         } finally {
             setSaving(false);
         }

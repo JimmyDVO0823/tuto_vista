@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Swal from 'sweetalert2';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
@@ -234,27 +235,60 @@ const TutorAgendaDetail = () => {
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      alert('Debes iniciar sesión como estudiante para solicitar una tutoría.');
-      navigate('/loginform');
+      Swal.fire({
+        title: 'Acceso Estudiante Requerido',
+        text: 'Debes iniciar sesión como estudiante para solicitar una tutoría.',
+        icon: 'info',
+        confirmButtonText: 'Ir al Login',
+        confirmButtonColor: '#002045'
+      }).then(() => {
+        navigate('/loginform');
+      });
       return;
     }
 
-    if (!selectedSlot) { alert('Por favor selecciona un bloque de disponibilidad.'); return; }
-    if (!selectedSubjectId) { alert('Por favor selecciona la materia.'); return; }
-    if (!selectedDate) { alert('Por favor selecciona la fecha de la tutoría.'); return; }
-    if (!selectedTime) { alert('Por favor selecciona la hora de la tutoría.'); return; }
-    if (infoBloqueo) { alert('No puedes solicitar tutorías en un rango de horas bloqueado por el tutor.'); return; }
-    if (infoConflictoCompromiso) { alert(`El horario entra en conflicto con una agenda ya reservada: ${infoConflictoCompromiso.label}`); return; }
+    if (!selectedSlot) { 
+      Swal.fire({ title: 'Bloque no seleccionado', text: 'Por favor selecciona un bloque de disponibilidad.', icon: 'warning' }); 
+      return; 
+    }
+    if (!selectedSubjectId) { 
+      Swal.fire({ title: 'Materia requerida', text: 'Por favor selecciona la materia.', icon: 'warning' }); 
+      return; 
+    }
+    if (!selectedDate) { 
+      Swal.fire({ title: 'Fecha requerida', text: 'Por favor selecciona la fecha de la tutoría.', icon: 'warning' }); 
+      return; 
+    }
+    if (!selectedTime) { 
+      Swal.fire({ title: 'Hora requerida', text: 'Por favor selecciona la hora de la tutoría.', icon: 'warning' }); 
+      return; 
+    }
+    if (infoBloqueo) { 
+      Swal.fire({ title: 'Horario Bloqueado', text: 'No puedes solicitar tutorías en un rango de horas bloqueado por el tutor.', icon: 'error' }); 
+      return; 
+    }
+    if (infoConflictoCompromiso) { 
+      Swal.fire({ title: 'Conflicto de Agenda', text: `El horario entra en conflicto con una agenda ya reservada: ${infoConflictoCompromiso.label}`, icon: 'error' }); 
+      return; 
+    }
 
     const [year, month, day] = selectedDate.split('-').map(Number);
     const dateObj = new Date(year, month - 1, day);
     if (dateObj.getDay() !== selectedSlot.diaSemana) {
-      alert(`La fecha seleccionada no es un ${FULL_DAY_NAMES[selectedSlot.diaSemana]}. Por favor selecciona una fecha correspondiente.`);
+      Swal.fire({
+        title: 'Error de Fecha',
+        text: `La fecha seleccionada no es un ${FULL_DAY_NAMES[selectedSlot.diaSemana]}. Por favor selecciona una fecha correspondiente.`,
+        icon: 'error'
+      });
       return;
     }
 
     if (selectedSlot.isEspecifica && selectedDate !== selectedSlot.fechaPorDefecto) {
-      alert(`Este bloque corresponds a una fecha especial única: ${selectedSlot.fechaPorDefecto}. No se puede cambiar el día.`);
+      Swal.fire({
+        title: 'Fecha Específica Requerida',
+        text: `Este bloque corresponde a una fecha especial única: ${selectedSlot.fechaPorDefecto}. No se puede cambiar el día.`,
+        icon: 'error'
+      });
       return;
     }
 
@@ -264,12 +298,20 @@ const TutorAgendaDetail = () => {
     const sessionEndMin = selectedStartMin + parseInt(selectedDuration);
 
     if (selectedStartMin < slotStartMin || selectedStartMin > slotEndMin) {
-      alert(`La hora de inicio debe estar dentro del bloque disponible del tutor: ${selectedSlot.horaInicio.substring(0, 5)} - ${selectedSlot.horaFin.substring(0, 5)}.`);
+      Swal.fire({
+        title: 'Fuera de Rango',
+        text: `La hora de inicio debe estar dentro del bloque disponible del tutor: ${selectedSlot.horaInicio.substring(0, 5)} - ${selectedSlot.horaFin.substring(0, 5)}.`,
+        icon: 'warning'
+      });
       return;
     }
 
     if (sessionEndMin > slotEndMin) {
-      alert(`La sesión excede el horario de disponibilidad del tutor.`);
+      Swal.fire({
+        title: 'Exceso de Horario',
+        text: `La sesión excede el horario de disponibilidad del tutor.`,
+        icon: 'warning'
+      });
       return;
     }
 
@@ -295,7 +337,12 @@ const TutorAgendaDetail = () => {
       loadTutorDetails();
     } catch (err) {
       console.error('Error enviando solicitud:', err);
-      alert(err.message || 'Error al enviar la solicitud de tutoría.');
+      Swal.fire({
+        title: 'Error de Envío',
+        text: err.message || 'Error al enviar la solicitud de tutoría.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setSubmitting(false);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import Swal from "sweetalert2";
 import MainLayout from "../components/layout/MainLayout/MainLayout";
 import AcademicCalendar from "../features/dashboard/AcademicCalendar/AcademicCalendar";
 import { useAuth } from "../context/AuthContext";
@@ -103,15 +104,38 @@ const DispoManagement = () => {
     const nuevoEstado = !estaDisponible;
     const mensajeAlerta = nuevoEstado 
       ? "¿Deseas volver a estar disponible para recibir nuevas solicitudes?" 
-      : "⚠️ Al desactivar tu disponibilidad, recuerda que debes cumplir con las tutorías ya agendadas o cancelarlas debidamente para evitar reportes. ¿Deseas continuar?";
+      : "Al desactivar tu disponibilidad, recuerda que debes cumplir con las tutorías ya agendadas o cancelarlas debidamente para evitar reportes. ¿Deseas continuar?";
     
-    if (window.confirm(mensajeAlerta)) {
+    const result = await Swal.fire({
+      title: nuevoEstado ? '¿Activar Disponibilidad?' : '¿Desactivar Disponibilidad?',
+      text: mensajeAlerta,
+      icon: nuevoEstado ? 'question' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#002045',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, continuar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.patch(`/tutores/${user.id}/disponibilidad?estado=${nuevoEstado}`);
         setEstaDisponible(nuevoEstado);
+        Swal.fire({
+          title: '¡Actualizado!',
+          text: `Ahora estás ${nuevoEstado ? 'disponible' : 'no disponible'}.`,
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
       } catch (err) {
         console.error("Error al cambiar disponibilidad:", err);
-        alert("No se pudo cambiar el estado de disponibilidad.");
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo cambiar el estado de disponibilidad.',
+          icon: 'error',
+          confirmButtonColor: '#002045'
+        });
       }
     }
   };
@@ -120,13 +144,25 @@ const DispoManagement = () => {
     try {
       await api.patch(`/perfiles/tutor/${user.id}`, { precio_por_hora: newRate });
       setHourlyRate(newRate);
+      Swal.fire({
+        title: 'Tarifa Actualizada',
+        text: 'Tu nueva tarifa por hora ha sido guardada.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } catch (err) {
       if (err.message && (err.message.includes("JSON.parse") || err.syntaxError)) {
         setHourlyRate(newRate);
         return;
       }
       console.error("Error actualizando la tarifa:", err);
-      alert("No se pudo guardar la nueva tarifa.");
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo guardar la nueva tarifa.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -156,7 +192,12 @@ const DispoManagement = () => {
       loadDisponibilidad();
     } catch (err) {
       console.error("Error guardando bloque recurrente:", err);
-      alert("Error guardando bloque de disponibilidad.");
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo guardar el bloque de disponibilidad.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -172,22 +213,59 @@ const DispoManagement = () => {
       });
       setShowSpecificModal(false);
       loadDisponibilidad();
+      Swal.fire({
+        title: '¡Guardado!',
+        text: 'Disponibilidad puntual actualizada.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
     } catch (err) {
       console.error("Error guardando disponibilidad puntual:", err);
-      alert("No se pudo agendar la disponibilidad específica.");
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo agendar la disponibilidad específica.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
   const handleEventClick = async (info) => {
     const isSpecific = info.event.id.toString().startsWith("specific-");
     const dbId = info.event.id.toString().replace("specific-", "").replace("recur-", "");
-    if (window.confirm(`¿Deseas eliminar este bloque de disponibilidad ${isSpecific ? "puntual" : "recurrente"}?`)) {
+    
+    const result = await Swal.fire({
+      title: '¿Eliminar bloque?',
+      text: `¿Deseas eliminar este bloque de disponibilidad ${isSpecific ? "puntual" : "recurrente"}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
       try {
         const endpoint = isSpecific ? `/disponibilidad/especifica/${dbId}` : `/disponibilidad/${dbId}`;
         await api.delete(endpoint);
         loadDisponibilidad();
+        Swal.fire({
+          title: 'Eliminado',
+          text: 'El bloque ha sido eliminado.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
       } catch (err) {
         console.error("Error eliminando bloque:", err);
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo eliminar el bloque.',
+          icon: 'error',
+          confirmButtonColor: '#002045'
+        });
       }
     }
   };

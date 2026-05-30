@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import Swal from 'sweetalert2';
 
 // Importación de subcomponentes modulares
 import SolicitudesTab from '../features/gestion-tutorias/tabs/SolicitudesTab';
@@ -70,10 +71,20 @@ const GestionTutorias = () => {
     try {
       setProcessingId(id);
       await api.patch(`/solicitudes/${id}/estado?estado=aceptada`);
-      alert("¡Solicitud aceptada! En espera de pago por parte del alumno.");
+      Swal.fire({
+        title: '¡Solicitud Aceptada!',
+        text: 'En espera de pago por parte del alumno.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al aceptar la solicitud.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo aceptar la solicitud.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setProcessingId(null);
     }
@@ -88,7 +99,12 @@ const GestionTutorias = () => {
       await api.patch(`/solicitudes/${id}/estado?estado=${nuevoEstado}`);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al procesar la solicitud.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo procesar la solicitud.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setProcessingId(null);
     }
@@ -99,9 +115,19 @@ const GestionTutorias = () => {
       setProcessingId(id);
       await api.patch(`/sesiones/${id}/estado`, { estado: estadoNuevo, motivoCancelacion });
       fetchData();
-      alert("Estado actualizado correctamente.");
+      Swal.fire({
+        title: '¡Actualizado!',
+        text: 'El estado de la tutoría ha sido actualizado.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
     } catch (err) {
-      alert(err.message || 'Error al actualizar el estado.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo actualizar el estado.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setProcessingId(null);
     }
@@ -111,9 +137,19 @@ const GestionTutorias = () => {
     try {
       await api.patch(`/sesiones/${id}/enlace`, { enlaceReunion: nuevoEnlace });
       setSesiones(prev => prev.map(s => s.id === id ? { ...s, enlaceReunion: nuevoEnlace } : s));
-      alert("¡Enlace actualizado!");
+      Swal.fire({
+        title: '¡Enlace Guardado!',
+        text: 'El enlace de la reunión ha sido actualizado correctamente.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
     } catch (err) {
-      alert(err.message || 'Error al actualizar el enlace.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo actualizar el enlace.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 

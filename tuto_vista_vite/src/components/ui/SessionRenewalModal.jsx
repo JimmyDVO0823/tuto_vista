@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import { useAuth } from '../../context/AuthContext';
 
 const SessionRenewalModal = () => {
@@ -43,7 +44,13 @@ const SessionRenewalModal = () => {
     const success = await renewSession();
     if (success) {
       setShowWarning(false);
-      alert('Tu sesión ha sido renovada con éxito.');
+      Swal.fire({
+        title: '¡Sesión Extendida!',
+        text: 'Tu tiempo de estudio ha sido renovado correctamente.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
     }
   };
 

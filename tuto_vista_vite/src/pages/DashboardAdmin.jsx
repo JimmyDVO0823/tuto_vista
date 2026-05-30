@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import MainLayout from '../components/layout/MainLayout/MainLayout';
 import { api } from '../services/api';
+import Swal from 'sweetalert2';
 
 // Modular Components
 import UserTableComponent from '../components/admin/UserTableComponent';
@@ -220,10 +221,21 @@ const DashboardAdmin = () => {
     try {
       const nextStatus = !currentStatus;
       await api.patch(`/admin/usuarios/${userId}/estado?activo=${nextStatus}`);
-      alert(`Usuario ${nextStatus ? 'activado' : 'desactivado'} con éxito.`);
+      Swal.fire({
+        title: nextStatus ? '¡Activado!' : '¡Desactivado!',
+        text: `Usuario ${nextStatus ? 'activado' : 'desactivado'} con éxito.`,
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
       fetchUsers(userPage);
     } catch (err) {
-      alert(err.message || 'Error al cambiar el estado del usuario.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'Error al cambiar el estado del usuario.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -231,10 +243,20 @@ const DashboardAdmin = () => {
   const handleResolverReporte = async (reportId) => {
     try {
       await api.patch(`/reportes/${reportId}/estado?estado=RESUELTO`);
-      alert('Reporte marcado como RESUELTO.');
+      Swal.fire({
+        title: 'Reporte Resuelto',
+        text: 'El reporte ha sido marcado como RESUELTO.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
       fetchReports(reportPage);
     } catch (err) {
-      alert(err.message || 'Error al actualizar el estado del reporte.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'Error al actualizar el estado del reporte.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -246,10 +268,20 @@ const DashboardAdmin = () => {
       const decValue = porcentajeNumerico / 100;
 
       await api.put('/configuracion/comision', { comision: decValue });
-      alert('Comisión de la plataforma actualizada correctamente.');
+      Swal.fire({
+        title: 'Configuración Guardada',
+        text: 'Comisión de la plataforma actualizada correctamente.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al guardar la comisión.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'Error al guardar la comisión.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -257,7 +289,12 @@ const DashboardAdmin = () => {
   const handleGuardarInsignia = async (e) => {
     e.preventDefault();
     if (!nuevaInsignia.nombre || !nuevaInsignia.descripcion) {
-      alert('Por favor completa todos los campos de la insignia.');
+      Swal.fire({
+        title: 'Campos incompletos',
+        text: 'Por favor completa todos los campos de la insignia.',
+        icon: 'warning',
+        confirmButtonColor: '#002045'
+      });
       return;
     }
     try {
@@ -278,7 +315,12 @@ const DashboardAdmin = () => {
           condicionTipo: nuevaInsignia.condicionTipo,
           condicionValor: parseInt(nuevaInsignia.condicionValor)
         });
-        alert('Insignia creada exitosamente.');
+        Swal.fire({
+          title: '¡Éxito!',
+          text: editingBadge ? 'Insignia actualizada exitosamente.' : 'Insignia creada exitosamente.',
+          icon: 'success',
+          confirmButtonColor: '#002045'
+        });
       }
 
       setNuevaInsignia({
@@ -291,7 +333,12 @@ const DashboardAdmin = () => {
       setEditingBadge(null);
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al procesar la insignia.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'Error al procesar la insignia.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -324,11 +371,22 @@ const DashboardAdmin = () => {
     if (!nuevoDept.trim()) return;
     try {
       await api.post('/departamentos', { nombre: nuevoDept });
-      alert('Departamento agregado correctamente.');
+      Swal.fire({
+        title: 'Departamento Agregado',
+        text: 'El departamento ha sido creado correctamente.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
       setNuevoDept('');
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al crear el departamento.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'Error al crear el departamento.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -341,11 +399,22 @@ const DashboardAdmin = () => {
         nombre: nuevaMateria.nombre,
         departamento_id: parseInt(nuevaMateria.departamentoId)
       });
-      alert('Materia agregada correctamente.');
+      Swal.fire({
+        title: 'Materia Agregada',
+        text: 'La materia ha sido creada correctamente.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
       setNuevaMateria(prev => ({ ...prev, nombre: '' }));
       fetchData();
     } catch (err) {
-      alert(err.message || 'Error al crear la materia.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'Error al crear la materia.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -355,21 +424,49 @@ const DashboardAdmin = () => {
     if (!nuevaFaqCat.nombre.trim()) return;
     try {
       await api.post('/faq/tipos', nuevaFaqCat);
-      alert('Categoría de FAQ creada.');
+      Swal.fire({
+        title: 'Categoría Creada',
+        text: 'La categoría de FAQ ha sido creada.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
       setNuevaFaqCat({ nombre: '', icono: 'help' });
       fetchData();
     } catch (err) {
-      alert('Error al crear categoría.');
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo crear la categoría.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
   const handleEliminarFaqCat = async (id) => {
-    if (!window.confirm('¿Eliminar esta categoría y todas sus preguntas?')) return;
+    const result = await Swal.fire({
+      title: '¿Eliminar categoría?',
+      text: "¿Deseas eliminar esta categoría y todas sus preguntas?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await api.delete(`/faq/tipos/${id}`);
       fetchData();
     } catch (err) {
-      alert('Error al eliminar categoría.');
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo eliminar la categoría.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -382,21 +479,49 @@ const DashboardAdmin = () => {
         ...nuevaPregunta,
         tipoId: parseInt(nuevaPregunta.tipoId)
       });
-      alert('Pregunta agregada.');
+      Swal.fire({
+        title: 'Pregunta Agregada',
+        text: 'La pregunta ha sido agregada con éxito.',
+        icon: 'success',
+        timer: 1500,
+        showConfirmButton: false
+      });
       setNuevaPregunta(prev => ({ ...prev, pregunta: '', respuesta: '' }));
       fetchData();
     } catch (err) {
-      alert('Error al crear pregunta.');
+       Swal.fire({
+        title: 'Error',
+        text: 'No se pudo crear la pregunta.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
   const handleEliminarPregunta = async (id) => {
-    if (!window.confirm('¿Eliminar esta pregunta?')) return;
+    const result = await Swal.fire({
+      title: '¿Eliminar pregunta?',
+      text: "¿Deseas eliminar esta pregunta?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       await api.delete(`/faq/preguntas/${id}`);
       fetchData();
     } catch (err) {
-      alert('Error al eliminar pregunta.');
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo eliminar la pregunta.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 

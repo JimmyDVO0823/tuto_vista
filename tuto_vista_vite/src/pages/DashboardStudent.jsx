@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import MainLayout from "../components/layout/MainLayout/MainLayout";
 import NextSessions from "../features/dashboard/NextSessions/NextSessions";
 import PendingAssignments from "../features/dashboard/PendingAssignments/PendingAssignments";
@@ -50,7 +51,12 @@ const DashboardStudent = () => {
       if (status === 'approved' && externalReference) {
         try {
           await api.post('/pagos/confirmar', { solicitudId: externalReference });
-          alert("¡Pago confirmado exitosamente!");
+          Swal.fire({
+            title: '¡Pago Confirmado!',
+            text: 'Tu sesión ha sido agendada exitosamente.',
+            icon: 'success',
+            confirmButtonColor: '#002045'
+          });
           window.history.replaceState({}, document.title, window.location.href.split('?')[0]);
         } catch (error) {
           console.error("Error al confirmar el pago:", error);

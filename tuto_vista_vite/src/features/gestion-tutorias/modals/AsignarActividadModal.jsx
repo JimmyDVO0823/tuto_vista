@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { api } from '../../../services/api';
 
 const AsignarActividadModal = ({ isOpen, onClose, sesion, onAsignada }) => {
@@ -58,7 +59,12 @@ const AsignarActividadModal = ({ isOpen, onClose, sesion, onAsignada }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.titulo || !formData.url) {
-      alert("Por favor, completa el título y la URL.");
+      Swal.fire({
+        title: 'Campos Incompletos',
+        text: 'Por favor, completa el título y la URL.',
+        icon: 'warning',
+        confirmButtonColor: '#002045'
+      });
       return;
     }
 
@@ -69,10 +75,16 @@ const AsignarActividadModal = ({ isOpen, onClose, sesion, onAsignada }) => {
         recursoId: selectedRecursoId ? parseInt(selectedRecursoId) : null,
         titulo: formData.titulo,
         descripcion: formData.descripcion,
-        urlArchivo: formData.url // 🌟 CAMBIO AQUÍ: Enviamos "urlArchivo" para que coincida con tu backend
+      });
+      
+      Swal.fire({
+        title: '¡Actividad Asignada!',
+        text: 'La actividad ha sido enviada correctamente al estudiante.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
       });
 
-      alert("¡Actividad asignada correctamente!");
       onAsignada();
       onClose();
 
@@ -80,7 +92,12 @@ const AsignarActividadModal = ({ isOpen, onClose, sesion, onAsignada }) => {
       setFormData({ titulo: '', url: '', descripcion: '' });
     } catch (error) {
       console.error("Error al asignar actividad:", error);
-      alert("Error al asignar la actividad. Intenta de nuevo.");
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo asignar la actividad. Por favor, intenta de nuevo.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setIsSubmitting(false);
     }

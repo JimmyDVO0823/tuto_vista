@@ -6,6 +6,7 @@ import Searcher from '../components/ui/Searcher/Searcher';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import AddSubjectModal from '../features/tutors/AddSubjectModal/AddSubjectModal';
+import Swal from 'sweetalert2';
 
 /**
  * SubjectsManagement Page.
@@ -51,19 +52,46 @@ const SubjectsManagement = () => {
       ));
     } catch (err) {
       console.error('Error al cambiar estado:', err);
-      alert('No se pudo cambiar el estado de la materia.');
+      Swal.fire({
+        title: 'Error',
+        text: 'No se pudo cambiar el estado de la materia.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
   const handleDeleteMateria = async (materiaId) => {
-    if (!window.confirm('¿Estás seguro de que deseas darte de baja de esta materia?')) return;
+    const result = await Swal.fire({
+      title: '¿Darte de baja?',
+      text: "¿Estás seguro de que deseas darte de baja de esta materia?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#002045',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, darme de baja',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) return;
     
     try {
       await api.delete(`/tutores/${user.id}/materias/${materiaId}`);
       setSubjects(prev => prev.filter(s => s.materiaId !== materiaId));
+      Swal.fire({
+        title: '¡Eliminada!',
+        text: 'Te has dado de baja de la materia correctamente.',
+        icon: 'success',
+        confirmButtonColor: '#002045'
+      });
     } catch (err) {
       console.error('Error al borrar materia:', err);
-      alert(err.message || 'No se pudo eliminar la materia. Verifica si tienes sesiones programadas.');
+      Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo eliminar la materia. Verifica si tienes sesiones programadas.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 
@@ -82,7 +110,12 @@ const SubjectsManagement = () => {
       setSubjects(data || []);
     } catch (err) {
       console.error('Error añadiendo materia:', err);
-      alert(`Error: ${err.message || 'No se pudo añadir la materia'}`);
+      Swal.fire({
+        title: 'Error',
+        text: `No se pudo añadir la materia: ${err.message || ''}`,
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     }
   };
 

@@ -40,14 +40,6 @@ const Login = () => {
             navigate('/dashboard');
 
         } catch (error) {
-            // 1. Esto nos dirá en la consola del navegador exactamente qué texto tiene el error
-            console.error("DEBUG - Mensaje de error completo:", error.message);
-            console.dir(error);
-
-            // 2. Alerta nativa temporal para comprobar si el flujo entra aquí
-            alert("Entró al catch. El mensaje es: " + error.message);
-
-            // 3. Intentar lanzar SweetAlert2
             Swal.fire({
                 title: '¡Acceso Denegado!',
                 text: error.message || 'Credenciales inválidas o error de conexión.',

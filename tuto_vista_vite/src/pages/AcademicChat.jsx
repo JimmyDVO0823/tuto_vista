@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { ProfileBlock } from '../features/chat/ProfileBlock/ProfileBlock';
 import { ContactMenu } from '../features/chat/ContactMenu/ContactMenu';
 import { ChatHeader } from '../features/chat/ChatHeader/ChatHeader';
@@ -115,16 +116,38 @@ export default function AcademicChat() {
   const handleAbandonConversation = async () => {
     if (!activeConversationId || !user?.id) return;
 
-    if (window.confirm("¿Estás seguro de que deseas darte de baja de este chat? Ya no verás esta conversación en tu lista.")) {
+    const result = await Swal.fire({
+      title: '¿Dar de baja chat?',
+      text: "¿Estás seguro de que deseas darte de baja de este chat? Ya no verás esta conversación en tu lista.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, dar de baja',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
       try {
         await api.delete(`/chat/conversacion/${activeConversationId}/${user.id}`);
-        // Limpiar estado local
         setConversations(prev => prev.filter(c => c.id !== activeConversationId));
         setActiveConversationId(null);
         setMessages([]);
+        Swal.fire({
+          title: 'Abandonado',
+          text: 'Te has dado de baja de la conversación.',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        });
       } catch (err) {
         console.error("Error abandonando chat:", err);
-        alert("No se pudo abandonar el chat.");
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo abandonar el chat.',
+          icon: 'error',
+          confirmButtonColor: '#002045'
+        });
       }
     }
   };

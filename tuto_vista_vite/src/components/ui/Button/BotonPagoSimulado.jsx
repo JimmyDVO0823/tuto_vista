@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import { api } from '../../../services/api';
 
 export const BotonPagoSimulado = ({ monto, solicitudId, onPagoExitoso }) => {
@@ -35,7 +36,12 @@ export const BotonPagoSimulado = ({ monto, solicitudId, onPagoExitoso }) => {
       
     } catch (error) {
       console.error("❌ Error general en el proceso de pago:", error);
-      alert("Error al procesar el pago. Por favor intente de nuevo.");
+      Swal.fire({
+        title: 'Error de Procesamiento',
+        text: 'Hubo un problema al simular el pago. Por favor intenta de nuevo.',
+        icon: 'error',
+        confirmButtonColor: '#002045'
+      });
     } finally {
       setLoading(false);
     }

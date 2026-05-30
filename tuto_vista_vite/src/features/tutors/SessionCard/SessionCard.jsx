@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 const SessionCard = ({ session, onUpdateStatus, onUpdateLink, onAsignarActividad, isLoading = false }) => {
   const {
@@ -75,7 +76,12 @@ const SessionCard = ({ session, onUpdateStatus, onUpdateLink, onAsignarActividad
 
   const handleConfirmCancel = async () => {
     if (!motivo.trim()) {
-      alert("Por favor, introduce un motivo.");
+      Swal.fire({
+        title: 'Dato Requerido',
+        text: 'Por favor, introduce un motivo detallado para el registro.',
+        icon: 'warning',
+        confirmButtonColor: '#002045'
+      });
       return;
     }
     await onUpdateStatus(id, tipoCancelacion, motivo);
