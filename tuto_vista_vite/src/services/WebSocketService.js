@@ -13,8 +13,8 @@ class WebSocketService {
     }
 
     /**
-     * Establishes a connection to the WebSocket server.
-     * @param {Function} onConnectCallback - Callback executed when connection is successful.
+     * Establece una conexión con el servidor WebSocket utilizando STOMP.
+     * @param {Function} onConnectCallback - Callback ejecutada tras una conexión exitosa.
      */
     connect(onConnectCallback) {
         if (this.client && (this.client.active || this.client.connected)) {

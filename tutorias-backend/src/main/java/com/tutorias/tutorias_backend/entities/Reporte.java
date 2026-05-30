@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.OffsetDateTime;
 
+/**
+ * Entidad que registra reportes o denuncias entre usuarios.
+ */
 @Entity
 @Table(name = "reporte")
 @Getter

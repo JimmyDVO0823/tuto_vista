@@ -10,6 +10,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Servicio encargado de la comunicación externa vía correo electrónico.
+ * Utiliza la API de Brevo para envíos transaccionales como la verificación de cuentas.
+ */
 @Service
 @RequiredArgsConstructor
 public class EmailService {

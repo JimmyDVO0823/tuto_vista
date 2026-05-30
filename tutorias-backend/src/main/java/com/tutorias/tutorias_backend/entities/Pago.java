@@ -6,6 +6,9 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+/**
+ * Entidad que registra los pagos realizados por sesiones o planes de tutoría.
+ */
 @Entity
 @Table(name = "pago")
 @Getter
@@ -18,6 +21,7 @@ public class Pago {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Sesión asociada al pago. */
     @OneToOne
     @JoinColumn(name = "sesion_id", unique = true)
     private SesionTutoria sesion;
@@ -36,6 +40,7 @@ public class Pago {
     @JoinColumn(name = "tutor_id", nullable = false)
     private Tutor tutor;
 
+    /** Monto total pagado por el estudiante. */
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
 

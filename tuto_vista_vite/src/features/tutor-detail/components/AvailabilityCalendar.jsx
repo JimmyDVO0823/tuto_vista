@@ -11,6 +11,12 @@ const FULL_DAY_NAMES = [
   "Sábado",
 ];
 
+/**
+ * Componente de Calendario de Disponibilidad.
+ * Renderiza la cuadrícula de horarios del tutor, maneja la selección de bloques,
+ * y muestra alertas informativas sobre colisiones de agenda y bloqueos específicos.
+ * Se integra con TutorAgendaDetail para la persistencia del agendamiento.
+ */
 const AvailabilityCalendar = ({
   tutor,
   groupedDispo,

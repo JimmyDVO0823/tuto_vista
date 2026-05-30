@@ -22,6 +22,11 @@ const FULL_DAY_NAMES = [
   "Sábado",
 ];
 
+/**
+ * Vista de Detalle de Agenda del Tutor.
+ * Centraliza la lógica de reservación de tutorías, validación de colisiones (tutor/estudiante),
+ * y gestión de disponibilidad específica y recurrente.
+ */
 const TutorAgendaDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -55,6 +60,11 @@ const TutorAgendaDetail = () => {
     return resultDate.toISOString().split('T')[0];
   };
 
+  /**
+   * Carga toda la información necesaria para el agendamiento:
+   * Perfil del tutor, sus disponibilidades, sesiones programadas del tutor y del estudiante activo.
+   * Mapea estos datos a un estado unificado de 'compromisosOcupados'.
+   */
   const loadTutorDetails = useCallback(async () => {
     try {
       setLoading(true);
@@ -273,6 +283,11 @@ const TutorAgendaDetail = () => {
     setSelectedDate(newDate);
   };
 
+  /**
+   * Procesa el envío de la solicitud de tutoría al backend.
+   * Realiza validaciones finales de integridad (día de la semana, cruce de horas, exceso de bloque).
+   * @param {Event} e - Evento de formulario.
+   */
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     if (!user) {

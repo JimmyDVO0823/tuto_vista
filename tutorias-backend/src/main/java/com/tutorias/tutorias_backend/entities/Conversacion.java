@@ -6,6 +6,9 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entidad que representa una conversación de chat entre dos o más participantes.
+ */
 @Entity
 @Table(name = "conversacion")
 @Getter
@@ -24,6 +27,7 @@ public class Conversacion {
     @OneToMany(mappedBy = "conversacion", cascade = CascadeType.ALL)
     private List<Mensaje> mensajes = new ArrayList<>();
 
+    /** Lista de participantes en la conversación. */
     @ManyToMany
     @JoinTable(
         name = "conversacion_participantes",

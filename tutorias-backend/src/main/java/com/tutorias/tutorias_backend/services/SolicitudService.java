@@ -11,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Servicio encargado de la gestión de solicitudes de tutoría, validación de disponibilidad 
+ * y gestión de horarios.
+ */
 @Service
 @RequiredArgsConstructor
 public class SolicitudService {
@@ -24,6 +28,12 @@ public class SolicitudService {
     private final DispoEspecificaRepository dispoEspecificaRepository;
     private final NotificacionService notificacionService;
 
+    /**
+     * Crea una nueva solicitud de tutoría validando disponibilidad recurrente y específica.
+     * @param estudianteId ID del estudiante que solicita.
+     * @param request Datos de la solicitud (tutor, materia, fecha, hora).
+     * @return SolicitudDTO creada.
+     */
     @Transactional
     public SolicitudDTO crear(Long estudianteId, SolicitudRequest request) {
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
@@ -153,6 +163,12 @@ public class SolicitudService {
         return false;
     }
 
+    /**
+     * Actualiza el estado de una solicitud (ACEPTADA/RECHAZADA) y gestiona la auto-cancelación por cruces.
+     * @param solicitudId ID de la solicitud.
+     * @param nuevoEstado Nuevo estado a asignar.
+     * @return SolicitudDTO actualizada.
+     */
     @Transactional
     public SolicitudDTO actualizarEstado(Long solicitudId, EstadoSolicitud nuevoEstado) {
         Solicitud solicitud = solicitudRepository.findById(solicitudId)

@@ -17,6 +17,12 @@ public class SolicitudController {
     private final SolicitudService solicitudService;
     private final com.tutorias.tutorias_backend.repositories.PerfilRepository perfilRepository;
 
+    /**
+     * Crea una nueva solicitud de tutoría para el estudiante autenticado.
+     * @param request Datos de la solicitud.
+     * @param authentication Información del usuario autenticado.
+     * @return SolicitudDTO creada.
+     */
     @PostMapping
     public ResponseEntity<SolicitudDTO> crear(
             @RequestBody SolicitudRequest request,

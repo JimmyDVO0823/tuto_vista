@@ -3,7 +3,6 @@ package com.tutorias.tutorias_backend.services;
 import com.tutorias.tutorias_backend.dto.SesionTutoriaDTO;
 import com.tutorias.tutorias_backend.entities.*;
 import com.tutorias.tutorias_backend.enums.EstadoSesion;
-import com.tutorias.tutorias_backend.enums.EstadoSolicitud;
 import com.tutorias.tutorias_backend.repositories.SesionTutoriaRepository;
 import com.tutorias.tutorias_backend.repositories.SolicitudRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
+/**
+ * Servicio para la gestión de sesiones de tutoría programadas, cambios de estado y asignación de insignias.
+ */
 @Service
 @RequiredArgsConstructor
 public class SesionTutoriaService {
@@ -25,6 +27,11 @@ public class SesionTutoriaService {
     private final com.tutorias.tutorias_backend.repositories.InsigniaRepository insigniaRepository;
     private final com.tutorias.tutorias_backend.repositories.TutorInsigniaRepository tutorInsigniaRepository;
 
+    /**
+     * Crea una sesión de tutoría oficial tras el pago de una solicitud aceptada.
+     * @param solicitudId ID de la solicitud origen.
+     * @return SesionTutoriaDTO creada.
+     */
     @Transactional
     public SesionTutoriaDTO crearDesdeSolicitud(Long solicitudId) {
         // Idempotencia: Si ya existe una sesión para esta solicitud, retornamos esa en lugar de crear una nueva
@@ -103,6 +110,13 @@ public class SesionTutoriaService {
                 .build();
     }
 
+    /**
+     * Actualiza el estado de una sesión (COMPLETADA, CANCELADA, etc.) y actualiza estadísticas del tutor.
+     * @param id ID de la sesión.
+     * @param estado Nuevo estado.
+     * @param motivo Motivo en caso de cancelación o inasistencia.
+     * @return SesionTutoriaDTO actualizada.
+     */
     @Transactional
     public SesionTutoriaDTO actualizarEstado(Long id, EstadoSesion estado, String motivo) {
         SesionTutoria sesion = sesionTutoriaRepository.findById(id)

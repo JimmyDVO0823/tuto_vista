@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Servicio para gestionar la información básica del perfil de usuario y actualizaciones de tutor.
+ */
 @Service
 @RequiredArgsConstructor
 public class PerfilService {
@@ -14,6 +17,13 @@ public class PerfilService {
     private final TutorRepository tutorRepository;
     private final EstudianteRepository estudianteRepository;
 
+    /**
+     * Actualiza la información básica del perfil (nombre y avatar).
+     * @param id ID del perfil.
+     * @param nombre Nuevo nombre completo.
+     * @param avatar Nueva URL del avatar.
+     * @return PerfilDTO actualizado.
+     */
     @Transactional
     public com.tutorias.tutorias_backend.dto.PerfilDTO actualizarBasico(Long id, String nombre, String avatar) {
         Perfil p = perfilRepository.findById(id).orElseThrow();
@@ -32,6 +42,12 @@ public class PerfilService {
                 .build();
     }
 
+    /**
+     * Actualiza la información extendida de un tutor.
+     * @param id ID del tutor.
+     * @param updateDto Datos a actualizar.
+     * @return Entidad Tutor actualizada.
+     */
     @org.springframework.transaction.annotation.Transactional
     public Tutor actualizarTutor(Long id, com.tutorias.tutorias_backend.dto.TutorUpdateDTO updateDto) {
         Tutor t = tutorRepository.findById(id).orElseThrow(() -> new RuntimeException("Tutor no encontrado"));

@@ -135,6 +135,8 @@ public class TutorService {
 
     /**
      * Obtiene estadísticas calculadas en tiempo real para el dashboard del tutor.
+     * @param tutorId ID del tutor.
+     * @return TutorStatsDTO con horas dictadas, calificación e ingresos mensuales.
      */
     public com.tutorias.tutorias_backend.dto.TutorStatsDTO getTutorStats(Long tutorId) {
         java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
@@ -173,7 +175,9 @@ public class TutorService {
     }
 
     /**
-     * Obtiene un tutor por su ID.
+     * Obtiene un tutor por su ID y lo convierte a DTO.
+     * @param id ID del tutor.
+     * @return TutorDTO con todos los detalles del tutor.
      */
     public TutorDTO getTutorById(Long id) {
         Tutor tutor = tutorRepository.findById(id)
@@ -182,7 +186,8 @@ public class TutorService {
     }
 
     /**
-     * Obtiene todos los tutores disponibles con filtros opcionales y paginación.
+     * Obtiene todos los tutores disponibles filtrados por nombre, precio, materia, etc.
+     * @return TutoresPaginadosDTO con los resultados de la búsqueda.
      */
     public com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO getTutoresDisponibles(
             String nombre,
@@ -260,6 +265,11 @@ public class TutorService {
         tutorRepository.save(t);
     }
 
+    /**
+     * Convierte una entidad Tutor a un objeto de transferencia de datos TutorDTO.
+     * @param t Entidad Tutor.
+     * @return TutorDTO mapeado.
+     */
     public TutorDTO toDTO(Tutor t) {
         List<MateriaDTO> materiasDTO = t.getTutorMaterias() == null ? List.of() :
                 t.getTutorMaterias().stream()

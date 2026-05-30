@@ -16,11 +16,7 @@ public class TutorController {
     private final TutorService tutorService;
 
     /**
-     * GET /tutores
-     * Parámetros opcionales para filtrar:
-     *  - minPrecio, maxPrecio
-     *  - minCalificacion
-     *  - materiaId
+     * Obtiene una lista paginada de tutores disponibles con filtros opcionales.
      */
     @GetMapping
     public ResponseEntity<com.tutorias.tutorias_backend.dto.TutoresPaginadosDTO> getTutores(
@@ -38,8 +34,7 @@ public class TutorController {
     }
 
     /**
-     * GET /tutores/{id}
-     * Obtiene el perfil de un tutor específico por su ID.
+     * Obtiene el perfil detallado de un tutor específico.
      */
     @GetMapping("/{id}")
     public ResponseEntity<TutorDTO> getTutorById(@PathVariable Long id) {

@@ -21,35 +21,45 @@ import java.util.Set;
 @AllArgsConstructor
 public class Tutor {
 
+    /** Identificador único del tutor, coincide con el ID de Perfil. */
     @Id
     private Long id;
 
+    /** Perfil de usuario asociado (Relación 1:1). */
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")
     private Perfil perfil;
 
+    /** Biografía detallada del tutor. */
     @Column(columnDefinition = "TEXT")
     private String biografia;
 
+    /** Frase corta de presentación personal. */
     @Column(name = "frase_personal", columnDefinition = "TEXT")
     private String frasePersonal;
 
+    /** Años de experiencia académica o profesional. */
     @Column(name = "anios_experiencia", nullable = false)
     private Integer aniosExperiencia = 0;
 
+    /** Tarifa por hora de tutoría. */
     @Column(name = "precio_por_hora", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioPorHora = BigDecimal.ZERO;
 
+    /** Duración estándar sugerida de las sesiones en minutos. */
     @Column(name = "duracion_sesion_min", nullable = false)
     private Integer duracionSesionMin = 90;
 
+    /** Estado de disponibilidad general para nuevas tutorías. */
     @Column(name = "esta_disponible", nullable = false)
     private Boolean estaDisponible = true;
 
+    /** Promedio de calificación dado por los estudiantes (1.0 - 5.0). */
     @Column(name = "calificacion_promedio", nullable = false, precision = 3, scale = 2)
     private BigDecimal calificacionPromedio = BigDecimal.ZERO;
 
+    /** Número total de sesiones realizadas por el tutor. */
     @Column(name = "total_sesiones", nullable = false)
     private Integer totalSesiones = 0;
 

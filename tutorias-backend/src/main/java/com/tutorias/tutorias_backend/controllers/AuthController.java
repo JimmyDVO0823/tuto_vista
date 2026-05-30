@@ -28,12 +28,22 @@ public class AuthController {
         return ResponseEntity.ok("Conexión exitosa con el backend");
     }
 
+    /**
+     * Endpoint para autenticación de usuarios.
+     * @param request Datos de acceso.
+     * @return Token JWT y perfil del usuario.
+     */
     @PostMapping("/login")
     @Operation(summary = "Iniciar sesión y obtener JWT")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    /**
+     * Endpoint para registro de nuevos perfiles.
+     * @param request Datos del registro.
+     * @return Mensaje de éxito informando sobre el correo de verificación.
+     */
     @PostMapping("/register")
     @Operation(summary = "Registrar un nuevo perfil (estudiante, tutor o admin)")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterRequest request) {

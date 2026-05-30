@@ -12,6 +12,11 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import WebSocketService from '../services/WebSocketService';
 
+/**
+ * Componente de Chat Académico.
+ * Gestiona la mensajería en tiempo real utilizando WebSockets y fallback a REST.
+ * Permite a estudiantes y tutores comunicarse, ver historial y abandonar conversaciones.
+ */
 export default function AcademicChat() {
   const { user } = useAuth();
 
@@ -31,6 +36,11 @@ export default function AcademicChat() {
     activeConvIdRef.current = activeConversationId;
   }, [activeConversationId]);
 
+  /**
+   * Suscribe el cliente al tópico de una conversación específica en el servidor WebSocket.
+   * Actualiza el estado de mensajes y el preview de la conversación al recibir nuevos datos.
+   * @param {number} id - ID de la conversación.
+   */
   const subscribeToActiveConversation = (id) => {
     if (!id) return;
     console.log('Subscribing to conversation:', id);
@@ -103,6 +113,11 @@ export default function AcademicChat() {
   }, [messages]);
 
   // 4. MANEJADOR: Enviar nuevo mensaje vía WebSocket
+  /**
+   * Envía un nuevo mensaje al servidor a través del WebSocket.
+   * El mensaje será persistido en base de datos y retransmitido a los participantes.
+   * @param {string} text - Contenido del mensaje.
+   */
   const handleSendMessage = (text) => {
     if (!activeConversationId || !user?.id) return;
 

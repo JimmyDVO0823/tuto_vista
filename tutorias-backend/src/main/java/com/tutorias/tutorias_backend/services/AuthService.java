@@ -20,6 +20,9 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Servicio encargado de la autenticación, registro y gestión de sesiones de usuario.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -31,6 +34,11 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
 
+    /**
+     * Autentica a un usuario mediante correo y contraseña.
+     * @param request Datos de acceso (correo, password).
+     * @return AuthResponse con el token JWT y datos básicos del perfil.
+     */
     public AuthResponse login(LoginRequest request) {
         Perfil perfil = perfilRepository.findByCorreo(request.getCorreo())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -48,6 +56,11 @@ public class AuthService {
         return generateAuthResponse(perfil);
     }
 
+    /**
+     * Registra un nuevo usuario en la plataforma.
+     * @param request Datos del nuevo usuario (nombre, correo, password, rol).
+     * @return null (se requiere verificación por correo previo a la primera sesión).
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         // 1. Verificar si el correo ya existe
@@ -85,6 +98,10 @@ public class AuthService {
         return null; 
     }
 
+    /**
+     * Verifica la cuenta de un usuario mediante un token enviado por correo.
+     * @param token Token de verificación.
+     */
     @Transactional
     public void verifyAccount(String token) {
         String email = jwtUtil.extractUsername(token);

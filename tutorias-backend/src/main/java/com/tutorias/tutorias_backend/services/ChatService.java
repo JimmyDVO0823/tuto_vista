@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+/**
+ * Servicio para la gestión de mensajería instantánea entre tutores y estudiantes.
+ * Maneja la creación de conversaciones y el envío de mensajes con notificaciones integradas.
+ */
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -19,6 +23,12 @@ public class ChatService {
     private final PerfilRepository perfilRepository;
     private final NotificacionService notificacionService;
 
+    /**
+     * Busca una conversación existente entre dos perfiles o crea una nueva si no existe.
+     * @param p1 ID del primer perfil.
+     * @param p2 ID del segundo perfil.
+     * @return ConversacionDTO con los datos de la conversación.
+     */
     @Transactional
     public ConversacionDTO crearOObtenerConversacion(Long p1, Long p2) {
         // Buscar si ya existe una conversación entre ambos
@@ -37,6 +47,13 @@ public class ChatService {
         return toConvDTO(conversacionRepository.save(conv));
     }
 
+    /**
+     * Registra un nuevo mensaje en una conversación y envía una notificación al destinatario.
+     * @param convId ID de la conversación.
+     * @param remitenteId ID del perfil que envía el mensaje.
+     * @param contenido Texto del mensaje.
+     * @return MensajeDTO del mensaje guardado.
+     */
     @Transactional
     public MensajeDTO enviarMensaje(Long convId, Long remitenteId, String contenido) {
         Conversacion conv = conversacionRepository.findById(convId).orElseThrow();

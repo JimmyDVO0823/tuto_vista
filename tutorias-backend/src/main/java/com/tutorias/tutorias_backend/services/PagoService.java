@@ -17,6 +17,9 @@ import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Servicio para la gestión de pagos de sesiones, comisiones y vinculación con Mercado Pago.
+ */
 @Service
 @RequiredArgsConstructor
 public class PagoService {
@@ -28,6 +31,11 @@ public class PagoService {
     private final NotificacionService notificacionService;
     private final ConfiguracionService configuracionService;
 
+    /**
+     * Registra un pago completado y gatilla la creación de la sesión de tutoría correspondiente.
+     * @param solicitudId ID de la solicitud pagada.
+     * @return PagoDTO registrado.
+     */
     @Transactional
     public PagoDTO registrarPagoYCrearSesion(Long solicitudId) {
         Solicitud solicitud = solicitudRepository.findById(solicitudId)
@@ -113,6 +121,11 @@ public class PagoService {
         return toDTO(guardadoPago);
     }
 
+    /**
+     * Genera un punto de inicio (URL) de Mercado Pago para realizar el pago de una solicitud.
+     * @param solicitudId ID de la solicitud a pagar.
+     * @return URL de redirección a Mercado Pago Checkout.
+     */
     @Transactional
     public String crearPreferencia(Long solicitudId) {
         Solicitud solicitud = solicitudRepository.findById(solicitudId)

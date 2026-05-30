@@ -6,6 +6,10 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+/**
+ * Entidad que representa una sesión de tutoría programada, en progreso o finalizada.
+ * Es el resultado de una solicitud aceptada y pagada.
+ */
 @Entity
 @Table(name = "sesion_tutoria")
 @Getter
@@ -18,10 +22,12 @@ public class SesionTutoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Solicitud original que dio origen a esta sesión. */
     @OneToOne
     @JoinColumn(name = "solicitud_id", unique = true)
     private Solicitud solicitud;
 
+    /** Tutor que imparte la sesión. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_id", nullable = false)
     private Tutor tutor;

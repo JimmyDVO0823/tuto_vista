@@ -19,8 +19,10 @@ public class PagoController {
     private final PagoService pagoService;
 
     /**
-     * Endpoint de Simulación de Pago (Reemplaza a Mercado Pago para pruebas)
+     * Endpoint de Simulación de Pago (Reemplaza a Mercado Pago para pruebas locales).
      * Marca una solicitud como pagada y crea la sesión automáticamente.
+     * @param payload Mapa con 'solicitudId'.
+     * @return PagoDTO o error.
      */
     @PostMapping("/simular")
     public ResponseEntity<?> simularPago(@RequestBody Map<String, Object> payload) {

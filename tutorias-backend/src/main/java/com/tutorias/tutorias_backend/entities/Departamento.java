@@ -16,6 +16,7 @@ public class Departamento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Nombre único del departamento académico. */
     @Column(nullable = false, unique = true)
     private String nombre;
 }

@@ -37,12 +37,14 @@ public class Solicitud {
     @Column(name = "hora_preferida", nullable = false)
     private LocalTime horaPreferida;
 
+    /** Duración estimada de la sesión en minutos. */
     @Column(name = "duracion_min", nullable = false)
     private Integer duracionMin = 90;
 
     @Column(columnDefinition = "TEXT")
     private String mensaje;
 
+    /** Estado actual de la solicitud (PENDIENTE, ACEPTADA, RECHAZADA, CANCELADA). */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoSolicitud estado = EstadoSolicitud.pendiente;

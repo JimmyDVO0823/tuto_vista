@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/**
+ * Servicio para la gestión de departamentos académicos.
+ */
 @Service
 @RequiredArgsConstructor
 public class DepartamentoService {

@@ -27,6 +27,11 @@ public class StudentService {
     private final SesionTutoriaRepository sesionTutoriaRepository;
     private final ActividadEstudianteRepository actividadEstudianteRepository;
 
+    /**
+     * Obtiene estadísticas globales para el dashboard del estudiante.
+     * @param studentId ID del estudiante.
+     * @return StudentStatsDTO con conteo de sesiones, cursos y progreso.
+     */
     public StudentStatsDTO getDashboardStats(Long studentId) {
         OffsetDateTime now = OffsetDateTime.now();
         List<SesionTutoria> allSessions = sesionTutoriaRepository.findByEstudianteId(studentId);
@@ -56,6 +61,11 @@ public class StudentService {
                 .build();
     }
 
+    /**
+     * Calcula el progreso del semestre basado en sesiones de tutoría.
+     * @param studentId ID del estudiante.
+     * @return SemesterProgressResponseDTO con el detalle de actividades.
+     */
     public SemesterProgressResponseDTO getSessionsProgress(Long studentId) {
         OffsetDateTime[] range = getSemesterRange();
         List<SesionTutoria> sessions = sesionTutoriaRepository.findSessionsByStudentInDateRange(studentId, range[0], range[1]);
@@ -131,6 +141,12 @@ public class StudentService {
         return getSessionsProgress(studentId);
     }
 
+    /**
+     * Obtiene la lista de materias en las que el estudiante tiene tutorías activas.
+     * Calcula el progreso individual por materia basado en las actividades.
+     * @param studentId ID del estudiante.
+     * @return Lista de StudentMateriaDTO.
+     */
     public List<StudentMateriaDTO> getStudentMaterias(Long studentId) {
         // 1. Obtener todas las sesiones de tutoría asociadas al estudiante que no estén canceladas
         List<SesionTutoria> sessions = sesionTutoriaRepository.findByEstudianteId(studentId);

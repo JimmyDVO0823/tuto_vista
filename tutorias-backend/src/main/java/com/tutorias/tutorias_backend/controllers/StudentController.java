@@ -19,6 +19,11 @@ public class StudentController {
 
     private final StudentService studentService;
 
+    /**
+     * Obtiene estadísticas de desempeño y progreso para el dashboard del estudiante.
+     * @param id ID del estudiante.
+     * @return StudentStatsDTO.
+     */
     @GetMapping("/{id}/dashboard-stats")
     public ResponseEntity<com.tutorias.tutorias_backend.dto.StudentStatsDTO> getDashboardStats(@PathVariable Long id) {
         return ResponseEntity.ok(studentService.getDashboardStats(id));

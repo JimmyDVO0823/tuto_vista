@@ -15,6 +15,11 @@ public class SesionTutoriaController {
 
     private final SesionTutoriaService sesionTutoriaService;
 
+    /**
+     * Programa una nueva sesión de tutoría a partir de una solicitud aprobada.
+     * @param solicitudId ID de la solicitud.
+     * @return SesionTutoriaDTO creada.
+     */
     @PostMapping("/desde-solicitud/{solicitudId}")
     public ResponseEntity<SesionTutoriaDTO> crearDesdeSolicitud(@PathVariable Long solicitudId) {
         return ResponseEntity.ok(sesionTutoriaService.crearDesdeSolicitud(solicitudId));
@@ -46,6 +51,12 @@ public class SesionTutoriaController {
         return ResponseEntity.ok(sesionTutoriaService.getProximasByEstudiante(id, page, size));
     }
 
+    /**
+     * Actualiza el estado (COMPLETADA, CANCELADA, etc.) de una sesión existente.
+     * @param id ID de la sesión.
+     * @param body Mapa con 'estado' y opcionalmente 'motivoCancelacion'.
+     * @return SesionTutoriaDTO actualizada.
+     */
     @PatchMapping("/{id}/estado")
     public ResponseEntity<SesionTutoriaDTO> actualizarEstado(
             @PathVariable Long id,

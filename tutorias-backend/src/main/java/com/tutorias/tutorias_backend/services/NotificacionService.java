@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/**
+ * Servicio para la gestión y envío de notificaciones internas del sistema.
+ */
 @Service
 @RequiredArgsConstructor
 public class NotificacionService {
@@ -16,6 +19,13 @@ public class NotificacionService {
     private final NotificacionRepository notificacionRepository;
     private final PerfilRepository perfilRepository;
 
+    /**
+     * Persiste una nueva notificación para un usuario específico.
+     * @param perfilId ID del destinatario.
+     * @param tipo Categoría de la notificación.
+     * @param titulo Título breve.
+     * @param cuerpo Contenido detallado del mensaje.
+     */
     public void enviar(Long perfilId, TipoNotificacion tipo, String titulo, String cuerpo) {
         Perfil perfil = perfilRepository.findById(perfilId).orElseThrow();
         
@@ -58,6 +68,10 @@ public class NotificacionService {
         notificacionRepository.save(n);
     }
 
+    /**
+     * Marca todas las notificaciones pendientes de un usuario como leídas.
+     * @param perfilId ID del usuario.
+     */
     @org.springframework.transaction.annotation.Transactional
     public void marcarTodasComoLeidas(Long perfilId) {
         List<Notificacion> unread = notificacionRepository.findByPerfilIdAndLeidaFalse(perfilId);
