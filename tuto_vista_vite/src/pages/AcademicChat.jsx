@@ -157,10 +157,10 @@ export default function AcademicChat() {
 
   return (
     <MainLayout>
-      <main className="flex-1 flex h-full overflow-hidden">
-
-        {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
-        <section className="hidden md:flex md:w-80 lg:w-96 h-full bg-surface flex-col z-10 flex-shrink-0">
+      <div className="h-[calc(100vh-80px)] md:h-screen w-full overflow-hidden flex flex-col">
+        <main className="flex-1 flex overflow-hidden">
+          {/* SECCIÓN B: BARRA LATERAL DE MENSAJES / CONTACTOS */}
+          <section className="hidden md:flex md:w-80 lg:w-96 h-full bg-surface-container-low border-r border-outline-variant/10 flex-col z-10 flex-shrink-0">
           <header className="p-8 pb-4">
             <h2 className="font-headline font-extrabold text-2xl tracking-tight mb-6">Messages</h2>
             <div className="relative">
@@ -233,6 +233,7 @@ export default function AcademicChat() {
 
         </section>
       </main>
+      </div>
     </MainLayout>
   );
 }
